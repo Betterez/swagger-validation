@@ -28,7 +28,7 @@
     "test-debug": "mocha --debug-brk"
   },
   "dependencies": {
-    "lodash": "2.4.x",
+    "lodash": "^3.10.1",
     "moment": "^2.8.1"
   },
   "devDependencies": {
