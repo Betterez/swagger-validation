@@ -317,4 +317,42 @@ describe('array', function() {
     ], model);
     helper.validateError(ret, 3, ["test1 is not a type of integer", "test2 is not a type of string", "test3 is not a type of boolean"]);
   });
+
+  it('should validate minItems', function () {
+
+    var model = {
+      Test: {
+        id: 'Test',
+        name: 'Test',
+        properties: {
+          test1: { type: 'integer' },
+          test2: { type: 'string' },
+          test3: { type: 'boolean' }
+        }
+      }
+    };
+
+    var ret = validate(helper.makeArrayParam(false, 'Test', undefined, undefined, undefined, "Legs", 1, 1), [
+
+    ], model);
+    helper.validateError(ret, 1, ["Legs should have at least 1 item(s)"]);
+  });
+
+  it('should validate maxItems', function () {
+
+    var model = {
+      Test: {
+        id: 'Test',
+        name: 'Test',
+        properties: {
+          test2: { type: 'string' },
+        }
+      }
+    };
+
+    var ret = validate(helper.makeArrayParam(false, 'Test', undefined, undefined, undefined, "Legs", 1, 2), [
+      {test2: "hello"}, {test2: "world"}, {test2: "today"}
+    ], model);
+    helper.validateError(ret, 1, ["Legs should have at most 2 item(s)"]);
+  });
 });

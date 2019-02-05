@@ -37,7 +37,7 @@ exports.makeNumberParam = function(type, required, format, minimum, maximum, nam
 };
 
 // helper method to make the array / set param object
-exports.makeArrayParam = function(required, itemType, itemFormat, itemPattern, uniqueItems, name) {
+exports.makeArrayParam = function(required, itemType, itemFormat, itemPattern, uniqueItems, name, minItems, maxItems) {
   return {
     type: 'Array',
     required: required,
@@ -47,7 +47,9 @@ exports.makeArrayParam = function(required, itemType, itemFormat, itemPattern, u
       pattern: itemPattern ? itemPattern : undefined
     },
     uniqueItems: uniqueItems ? uniqueItems : undefined,
-    name: name ? name : 'testParam'
+    name: name ? name : 'testParam',
+    minItems: minItems ? minItems : undefined,
+    maxItems: maxItems ? maxItems : undefined,
   };
 };
 
