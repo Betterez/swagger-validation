@@ -23,7 +23,9 @@
     "node": ">= 0.8.x"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "preversion": "npm test",
+    "postversion": "git push origin master && git push --tags"
   },
   "dependencies": {
     "lodash": "4.17.15",
@@ -31,8 +33,6 @@
   },
   "devDependencies": {
     "chai": "4.2.0",
-    "mocha": "7.1.2",
-    "preversion": "npm t",
-    "postversion": "git push origin master && git push --tags"
+    "mocha": "7.1.2"
   }
 }
