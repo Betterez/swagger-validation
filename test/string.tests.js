@@ -66,7 +66,7 @@ describe('string', function() {
 
   it('should not validate with string with object passed in for pattern', function() {
     var ret = validate(helper.makeStringParam('string', false, null, {}), 'Does not matter');
-    helper.validateError(ret, 1, ['testParam is specified with an invalid pattern [object Object]']);
+    helper.validateError(ret, 1, ['testParam is specified with an invalid pattern {}']);
   });
 
   it('should not validate with string with random string passed in for pattern', function() {

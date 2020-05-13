@@ -23,24 +23,16 @@
     "node": ">= 0.8.x"
   },
   "scripts": {
-    "jshint": "jshint ./lib ./test index.js gulpfile.js",
-    "test": "npm run jshint && mocha",
-    "test-debug": "mocha --debug-brk"
+    "test": "mocha"
   },
   "dependencies": {
-    "lodash": "^3.10.1",
-    "moment": "^2.8.1"
+    "lodash": "4.17.15",
+    "moment": "2.25.3"
   },
   "devDependencies": {
-    "chai": "1.9.x",
-    "gulp": "3.8.7",
-    "gulp-concat": "2.3.x",
-    "gulp-jsdoc-to-markdown": "0.1.x",
-    "gulp-shell": "0.2.x",
-    "gulp-util": "3.0.x",
-    "ink-docstrap": "0.4.x",
-    "jsdoc": "3.3.x",
-    "jshint": "^2.5.3",
-    "mocha": "1.21.x"
+    "chai": "4.2.0",
+    "mocha": "7.1.2",
+    "preversion": "npm t",
+    "postversion": "git push origin master && git push --tags"
   }
 }
