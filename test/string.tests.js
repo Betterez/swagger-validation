@@ -22,6 +22,18 @@ describe('string', function() {
     helper.validateSuccess(ret, 1, [value]);
   });
 
+  it('should validate maxLength', function() {
+    var value = "ASDF";
+    var ret = validate(helper.makeStringParam('string', false, undefined, undefined, undefined, undefined, 3), value);
+    helper.validateError(ret, 1, ["testParam requires a max length of 3"]);
+  });
+  
+  it('should validate minLength', function() {
+    var value = "A";
+    var ret = validate(helper.makeStringParam('string', false, undefined, undefined, undefined, undefined, undefined, 2), value);
+    helper.validateError(ret, 1, ["testParam requires a min length of 2"]);
+  });
+
   it('should validate when pattern does match', function() {
     var value = 'Heya';
     var ret = validate(helper.makeStringParam('string', false, null, '^Heya$'), value);

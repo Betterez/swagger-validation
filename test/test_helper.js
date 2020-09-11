@@ -13,14 +13,16 @@ exports.makeParam = function(type, required, format, name) {
 };
 
 // helper method to make the string param object
-exports.makeStringParam = function(type, required, format, pattern, enums, name) {
+exports.makeStringParam = function(type, required, format, pattern, enums, name, maxLength, minLength) {
   return {
     type: type,
     required: required,
     format: format ? format : undefined,
     'enum': enums ? enums : undefined,
     name: name ? name : 'testParam',
-    pattern: pattern || pattern === false ? pattern : undefined
+    pattern: pattern || pattern === false ? pattern : undefined,
+    maxLength,
+    minLength
   };
 };
 
