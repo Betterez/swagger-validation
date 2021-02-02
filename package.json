@@ -28,11 +28,11 @@
     "postversion": "git push origin master && git push --tags"
   },
   "dependencies": {
-    "lodash": "4.17.15",
-    "moment": "2.25.3"
+    "lodash": "4.17.20",
+    "moment": "2.29.1"
   },
   "devDependencies": {
     "chai": "4.2.0",
-    "mocha": "7.1.2"
+    "mocha": "8.2.1"
   }
 }
