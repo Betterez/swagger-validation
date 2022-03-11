@@ -66,6 +66,13 @@ describe.only('oneOF', function() {
       expect(ret).to.be.an('array');
       expect(ret).to.have.length(1);
     });
+
+    it('should return success because value is integer', function() {
+      var value = 0;
+      var ret = validate(param, value, model);
+      expect(ret).to.be.an('array');
+      expect(ret).to.have.length(1);
+    });
     
     it('should return success because value is string', function() {
       var value = "hi";
