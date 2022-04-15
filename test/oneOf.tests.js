@@ -1,7 +1,7 @@
 
 var validate = require('../lib/validation/parameter');
 
-describe.only('oneOF', function() {
+describe('oneOF', function() {
   const {expect} = require("chai");
   describe('basic tests', function() {
     var model = {
