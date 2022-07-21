@@ -32,8 +32,8 @@ exports.makeNumberParam = function(type, required, format, minimum, maximum, nam
     type: type,
     required: required,
     format: format ? format : undefined,
-    minimum: minimum ? minimum : undefined,
-    maximum: maximum ? maximum : undefined,
+    minimum: minimum !== undefined ? minimum : undefined,
+    maximum: maximum !== undefined ? maximum : undefined,
     name: name ? name : 'testParam'
   };
 };
