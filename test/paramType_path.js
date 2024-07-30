@@ -22,6 +22,12 @@ describe('paramType - path', function() {
             type: 'number',
             format: 'float',
             paramType: 'path'
+          },
+          {
+            name: 'someString',
+            type: 'string',
+            in: 'path',
+            pattern: 'some.*'
           }
         ]
       };
