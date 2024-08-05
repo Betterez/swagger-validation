@@ -237,7 +237,7 @@ describe('paramType - rootObject', function() {
 
     it('should handle nested models when converting strings', function() {
       var spec = {
-        parameters: {
+        properties: {
           someModel: {
             name: 'someModel',
             type: 'SomeModel',
@@ -285,13 +285,12 @@ describe('paramType - rootObject', function() {
 
     it('should return validation errors', function() {
       var spec = {
-        parameters: [
-          {
+        properties: {
+          someModel: {
             name: 'someModel',
             type: 'SomeModel',
-            in: 'body'
           }
-        ]
+        }
       };
       var models = {
         SomeModel: {
@@ -308,11 +307,9 @@ describe('paramType - rootObject', function() {
         }
       };
       var object = {
-        body: {
-          someModel: {
-            someDate: 'not a real date',
-            someString: 'blah blah'
-          }
+        someModel: {
+          someDate: 'not a real date',
+          someString: 'blah blah'
         }
       };
       var ret = validate(spec, object, models);
@@ -363,13 +360,12 @@ describe('paramType - rootObject', function() {
         validation: {
           enabled: false
         },
-        parameters: [
-          {
+        properties: {
+          baz: {
             name: 'baz',
             type: 'baz',
-            in: 'body'
           }
-        ]
+        }
       };
 
       var object = {
