@@ -1239,4 +1239,48 @@ describe('object', function() {
       helper.validateError(ret, 11, ['boolean is required', 'byte is required', 'date is required', 'datetime is required', 'double is required', 'float is required', 'int32 is required', 'int64 is required', 'integer is required', 'number is required', 'string is required']);
     });
   });
+
+  describe('additional properties', function() {
+    let models;
+
+    beforeEach(() => {
+      models = {
+        Test: {
+          id: 'Test',
+          name: 'Test',
+          properties: {
+            id: {type: 'string'}
+          },
+          additionalProperties: false
+        }
+      };
+    });
+
+    it('should validate', () => {
+      const value = {id: '123'};
+      const result = validate(helper.makeParam('Test', true), value, models);
+      helper.validateSuccess(result, 1, [{id: '123'}]);
+    });
+
+    it('should return an error when "additionalProperties" is false and an additional property is provided', () => {
+      const value = {
+        id: '123',
+        extraProperty: 'some value',
+        anotherProperty: 'some value'
+      };
+      const result = validate(helper.makeParam('Test', true), value, models);
+      helper.validateError(result, 1, ["Properties are not allowed: extraProperty, anotherProperty"]);
+    });
+
+    it('should return success when "additionalProperties" is false and there are no properties in the model or the value', () => {
+      models.Test = {
+        id: 'Test',
+        name: 'Test',
+        additionalProperties: false
+      };
+      const value = {};
+      const result = validate(helper.makeParam('Test', true), value, models);
+      helper.validateSuccess(result, 1, [{}]);
+    });
+  });
 });
