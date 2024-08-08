@@ -1239,4 +1239,35 @@ describe('object', function() {
       helper.validateError(ret, 11, ['boolean is required', 'byte is required', 'date is required', 'datetime is required', 'double is required', 'float is required', 'int32 is required', 'int64 is required', 'integer is required', 'number is required', 'string is required']);
     });
   });
+
+  describe('additional properties', function() {
+    // each section defines it's own validation parameters
+    const model = {
+      Test: {
+        id: 'Test',
+        name: 'Test',
+        properties: {
+          id: {type: 'string'}
+        },
+        additionalProperties: false
+      }
+    };
+
+    it('should validate', () => {
+      const value = {id: '123'};
+      const result = validate(helper.makeParam('Test', false), value, model);
+      helper.validateSuccess(result, 1, [{id: '123'}]);
+    });
+
+    it('should return an error when "additionalProperties" is false and an additional property is provided', function() {
+      const value = {id: '123', someOtherProperty: 'some value'};
+      var ret = validate(helper.makeParam('Test', true), value, model);
+      helper.validateError(ret, 1, ["Unrecognized property: someOtherProperty"]);
+    });
+    //
+    // it('should not validate', function() {
+    //   var ret = validate(helper.makeParam('Test', true), {id: 'thisisastring'}, model);
+    //   helper.validateError(ret, 1, ["id is not a type of boolean"]);
+    // });
+  });
 });
