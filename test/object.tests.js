@@ -1269,7 +1269,7 @@ describe('object', function() {
         anotherProperty: 'some value'
       };
       const result = validate(helper.makeParam('Test', true), value, models);
-      helper.validateError(result, 1, ["Properties are not allowed: extraProperty, anotherProperty"]);
+      helper.validateError(result, 1, ["testParam contains invalid properties: extraProperty, anotherProperty"]);
     });
 
     it('should return success when "additionalProperties" is false and there are no properties in the model or the value', () => {
