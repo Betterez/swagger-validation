@@ -21,6 +21,7 @@
   "license": "MIT",
   "scripts": {
     "test": "mocha",
+    "tdd": "mocha -w",
     "preversion": "npm test",
     "postversion": "git push origin master && git push --tags"
   },
