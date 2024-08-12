@@ -371,4 +371,26 @@ describe('array', function() {
     ], model);
     helper.validateError(ret, 1, ["Legs should have at most 2 item(s)"]);
   });
+
+  it('should not allow null items when "nullable" is false', () => {
+    const model = {
+      TestArray: {
+        name: 'testParam',
+        type: 'Array',
+        items: {
+          $ref: 'TestArrayItem',
+          nullable: false
+        }
+      },
+      TestArrayItem: {
+        name: 'TestArrayItem',
+        properties: {
+          someString: { type: 'string' },
+        }
+      }
+    };
+
+    const result = validate(model.TestArray, [{someString: 'A'}, null], model);
+    helper.validateError(result, 1, ["TestArrayItem cannot be null"]);
+  })
 });
