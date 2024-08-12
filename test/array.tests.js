@@ -73,6 +73,22 @@ describe('array', function() {
     helper.validateSuccess(ret, 1, [transformedValue]);
   });
 
+  it('should not validate a string if it does not belong to a given enum', function() {
+    var value = ['allowed', 'not_allowed'];
+    var param = helper.makeArrayParam(false, 'string');
+    param.items.enum = ['These', 'are', 'allowed', 'strings'];
+    var ret = validate(param, value);
+    helper.validateError(ret, 1, ['not_allowed is not a valid entry']);
+  });
+
+  it('should validate strings if it belong to a given enum', function() {
+    var value = ['allowed', 'string'];
+    var param = helper.makeArrayParam(false, 'string');
+    param.items.enum = ['These', 'are', 'allowed', 'strings'];
+    var ret = validate(param, value);
+    helper.validateSuccess(ret, 1);
+  });
+
   it('should validate with simple objects', function() {
     var value = [
       {id: 1.23},
