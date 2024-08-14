@@ -190,4 +190,16 @@ describe('number', function() {
     var ret = validate(helper.makeNumberParam('number', false), value);
     helper.validateError(ret, 1, ["testParam is not a type of number"]);
   });
+
+  it('should not validate with null if nullable is false', function () {
+    const param = {
+      type: 'number',
+      required: false,
+      name: 'testParam',
+      nullable: false
+    };
+
+    const result = validate(param, null);
+    helper.validateError(result, 1, ['testParam cannot be null']);
+  });
 });

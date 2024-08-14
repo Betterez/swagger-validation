@@ -73,20 +73,54 @@ describe('array', function() {
     helper.validateSuccess(ret, 1, [transformedValue]);
   });
 
-  it('should not validate a string if it does not belong to a given enum', function() {
-    var value = ['allowed', 'not_allowed'];
-    var param = helper.makeArrayParam(false, 'string');
+
+  it('should validate a string if it belongs to a given enum', function() {
+    const value = ['allowed', 'string'];
+    const param = helper.makeArrayParam(false, 'string');
     param.items.enum = ['These', 'are', 'allowed', 'strings'];
-    var ret = validate(param, value);
-    helper.validateError(ret, 1, ['not_allowed is not a valid entry']);
+    const result = validate(param, value);
+    helper.validateSuccess(result, 1);
   });
 
-  it('should validate strings if it belong to a given enum', function() {
-    var value = ['allowed', 'string'];
-    var param = helper.makeArrayParam(false, 'string');
-    param.items.enum = ['These', 'are', 'allowed', 'strings'];
-    var ret = validate(param, value);
-    helper.validateSuccess(ret, 1);
+  it('should validate a string if it matches a pattern', function() {
+    const value = ['allowed', 'string'];
+    const param = helper.makeArrayParam(false, 'string');
+    param.items.pattern = '.*';
+    const result = validate(param, value);
+    helper.validateSuccess(result, 1);
+  });
+
+  it('should validate a string if its length is not greater than maxLength', function() {
+    const value = ['allowed', 'string'];
+    const param = helper.makeArrayParam(false, 'string');
+    param.items.maxLength = 20;
+    const result = validate(param, value);
+    helper.validateSuccess(result, 1);
+  });
+
+  it('should validate a string if its length is not less than minLength', function() {
+    const value = ['allowed', 'string'];
+    const param = helper.makeArrayParam(false, 'string');
+    param.items.minLength = 5;
+    const result = validate(param, value);
+    helper.validateSuccess(result, 1);
+  });
+
+  it('should validate a number if it greater than minimum', function() {
+    const value = [6, 10];
+    const param = helper.makeArrayParam(false, 'number');
+    param.items.minimum = 5;
+    const result = validate(param, value);
+    console.log(result)
+    helper.validateSuccess(result, 1);
+  });
+
+  it('should validate a number if its less than maximum', function() {
+    const value = [6, 10];
+    const param = helper.makeArrayParam(false, 'number');
+    param.items.maximum = 15;
+    const result = validate(param, value);
+    helper.validateSuccess(result, 1);
   });
 
   it('should validate with simple objects', function() {
@@ -393,4 +427,44 @@ describe('array', function() {
     const result = validate(model.TestArray, [{someString: 'A'}, null], model);
     helper.validateError(result, 1, ["TestArrayItem cannot be null"]);
   })
+
+  it('should not validate a string if it does not belong to a given enum', function() {
+    const value = ['allowed', 'not_allowed'];
+    const param = helper.makeArrayParam(false, 'string');
+    param.items.enum = ['These', 'are', 'allowed', 'strings'];
+    const result = validate(param, value);
+    helper.validateError(result, 1, ['not_allowed is not a valid entry']);
+  });
+
+  it('should not validate a string if its length is greater than maxLength', function() {
+    const value = ['allowed', 'not_allowed'];
+    const param = helper.makeArrayParam(false, 'string');
+    param.items.maxLength = 9;
+    const result = validate(param, value);
+    helper.validateError(result, 1, ['not_allowed requires a max length of 9']);
+  });
+
+  it('should not validate a string if its length is less than minLength', function() {
+    const value = ['allowed', 'n-a'];
+    const param = helper.makeArrayParam(false, 'string');
+    param.items.minLength = 5;
+    const result = validate(param, value);
+    helper.validateError(result, 1, ['n-a requires a min length of 5']);
+  });
+
+  it('should not validate a number if it is less than minimum', function() {
+    const value = [6, 10];
+    const param = helper.makeArrayParam(false, 'number');
+    param.items.minimum = 9;
+    const result = validate(param, value);
+    helper.validateError(result, 1, ['6 is below the minimum value']);
+  });
+
+  it('should not validate a number if its greater than maximum', function() {
+    const value = [6, 10];
+    const param = helper.makeArrayParam(false, 'number');
+    param.items.maximum = 8;
+    const result = validate(param, value);
+    helper.validateError(result, 1, ['10 is above the maximum value']);
+  });
 });

@@ -88,4 +88,16 @@ describe('boolean', function() {
     var ret = validate(helper.makeParam('boolean', false), value);
     helper.validateError(ret, 1, ["testParam is not a type of boolean"]);
   });
+
+  it('should not validate with null if nullable is false', function () {
+    const param = {
+      type: 'boolean',
+      required: false,
+      name: 'testParam',
+      nullable: false
+    };
+
+    const result = validate(param, null);
+    helper.validateError(result, 1, ['testParam cannot be null']);
+  });
 });

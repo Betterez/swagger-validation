@@ -27,7 +27,7 @@ describe('string', function() {
     var ret = validate(helper.makeStringParam('string', false, undefined, undefined, undefined, undefined, 3), value);
     helper.validateError(ret, 1, ["testParam requires a max length of 3"]);
   });
-  
+
   it('should validate minLength', function() {
     var value = "A";
     var ret = validate(helper.makeStringParam('string', false, undefined, undefined, undefined, undefined, undefined, 2), value);
@@ -148,5 +148,44 @@ describe('string', function() {
     var value = 'Heya';
     var ret = validate(helper.makeStringParam('string', false, null, '/^Goodbye$/i'), value);
     helper.validateError(ret, 1, ["testParam is not valid based on the pattern /^Goodbye$/i"]);
+  });
+
+
+  describe('string - when required is false and an empty string is provided', function () {
+    it('should not validate an empty string if a pattern is given', function () {
+      var value = '';
+      var param = {
+        type: 'string',
+        required: false,
+        name: 'testParam',
+        pattern: 'test'
+      };
+      var ret = validate(param, value);
+      helper.validateError(ret, 1, ['testParam is not valid based on the pattern test'])
+    });
+
+    it('should not validate an empty string if minLength is given', function () {
+      var value = '';
+      var param = {
+        type: 'string',
+        required: false,
+        name: 'testParam',
+        minLength: 1
+      };
+      var ret = validate(param, value);
+      helper.validateError(ret, 1, ['testParam requires a min length of 1']);
+    });
+
+    it('should not validate a null if nullable is false', function () {
+      const param = {
+        type: 'string',
+        required: false,
+        name: 'testParam',
+        nullable: false
+      };
+
+      const result = validate(param, null);
+      helper.validateError(result, 1, ['testParam cannot be null']);
+    });
   });
 });
