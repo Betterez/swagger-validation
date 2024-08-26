@@ -2,6 +2,7 @@
 
 var helper = require('./test_helper');
 var validate = require('../lib/validation/parameter');
+const {expect} = require('chai');
 
 describe('string', function() {
   it('should validate', function() {
@@ -152,19 +153,30 @@ describe('string', function() {
 
 
   describe('string - when required is false and an empty string is provided', function () {
-    it('should not validate an empty string if a pattern is given', function () {
-      var value = '';
-      var param = {
+    it('should allow an empty string when no "minLength" is specified', function () {
+      const value = '';
+      const param = {
+        type: 'string',
+        required: false,
+        name: 'testParam'
+      };
+      const result = validate(param, value);
+      expect(result).to.eql([{value: ''}]);
+    });
+
+    it('should allow an empty string when a "minLength" of 0 is specified', function () {
+      const value = '';
+      const param = {
         type: 'string',
         required: false,
         name: 'testParam',
-        pattern: 'test'
+        minLength: 0
       };
-      var ret = validate(param, value);
-      helper.validateError(ret, 1, ['testParam is not valid based on the pattern test'])
+      const result = validate(param, value);
+      expect(result).to.eql([{value: ''}]);
     });
 
-    it('should not validate an empty string if minLength is given', function () {
+    it('should not validate an empty string if a minLength greater than 0 is given', function () {
       var value = '';
       var param = {
         type: 'string',
