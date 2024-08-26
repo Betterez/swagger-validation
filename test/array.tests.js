@@ -410,7 +410,7 @@ describe('array', function() {
     const model = {
       TestArray: {
         name: 'testParam',
-        type: 'Array',
+        type: 'array',
         items: {
           $ref: 'TestArrayItem',
           nullable: false

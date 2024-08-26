@@ -13,7 +13,7 @@ describe('paramType - body', function() {
         parameters: [
           {
             name: 'someModel',
-            type: 'SomeModel',
+            $ref: 'SomeModel',
             paramType: 'body'
           }
         ]
@@ -54,7 +54,7 @@ describe('paramType - body', function() {
         parameters: [
           {
             name: 'someModel',
-            type: 'SomeModel',
+            $ref: 'SomeModel',
             paramType: 'body'
           }
         ]
@@ -68,7 +68,7 @@ describe('paramType - body', function() {
               format: 'date'
             },
             nestedModel: {
-              type: 'NestedModel'
+              $ref: 'NestedModel'
             }
           }
         },
@@ -105,7 +105,7 @@ describe('paramType - body', function() {
         parameters: [
           {
             name: 'someModel',
-            type: 'SomeModel',
+            $ref: 'SomeModel',
             paramType: 'body'
           }
         ]
@@ -213,7 +213,7 @@ describe('paramType - body', function() {
         parameters: [
           {
             name: 'someModel',
-            type: 'SomeModel',
+            $ref: 'SomeModel',
             in: 'body'
           }
         ]
@@ -254,7 +254,7 @@ describe('paramType - body', function() {
         parameters: [
           {
             name: 'someModel',
-            type: 'SomeModel',
+            $ref: 'SomeModel',
             paramType: 'body'
           }
         ]
@@ -268,7 +268,7 @@ describe('paramType - body', function() {
               format: 'date'
             },
             nestedModel: {
-              type: 'NestedModel'
+              $ref: 'NestedModel'
             }
           }
         },
@@ -305,7 +305,7 @@ describe('paramType - body', function() {
         parameters: [
           {
             name: 'someModel',
-            type: 'SomeModel',
+            $ref: 'SomeModel',
             in: 'body'
           }
         ]

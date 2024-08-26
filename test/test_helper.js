@@ -41,7 +41,7 @@ exports.makeNumberParam = function(type, required, format, minimum, maximum, nam
 // helper method to make the array / set param object
 exports.makeArrayParam = function(required, itemType, itemFormat, itemPattern, uniqueItems, name, minItems, maxItems) {
   return {
-    type: 'Array',
+    type: 'array',
     required: required,
     items: {
       type: itemType,

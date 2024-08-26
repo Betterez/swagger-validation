@@ -13,7 +13,7 @@ describe('paramType - header', function() {
         parameters: [
           {
             name: 'someModel',
-            type: 'SomeModel',
+            $ref: 'SomeModel',
             paramType: 'header'
           }
         ]
@@ -54,7 +54,7 @@ describe('paramType - header', function() {
         parameters: [
           {
             name: 'someModel',
-            type: 'SomeModel',
+            $ref: 'SomeModel',
             paramType: 'header'
           }
         ]
@@ -68,7 +68,7 @@ describe('paramType - header', function() {
               format: 'date'
             },
             nestedModel: {
-              type: 'NestedModel'
+              $ref: 'NestedModel'
             }
           }
         },
@@ -106,7 +106,7 @@ describe('paramType - header', function() {
         parameters: [
           {
             name: 'someModel',
-            type: 'SomeModel',
+            $ref: 'SomeModel',
             paramType: 'header'
           }
         ]
@@ -144,7 +144,7 @@ describe('paramType - header', function() {
         parameters: [
           {
             name: 'someModel',
-            type: 'SomeModel',
+            $ref: 'SomeModel',
             in: 'header'
           }
         ]
@@ -185,7 +185,7 @@ describe('paramType - header', function() {
         parameters: [
           {
             name: 'someModel',
-            type: 'SomeModel',
+            $ref: 'SomeModel',
             in: 'header'
           }
         ]
@@ -199,7 +199,7 @@ describe('paramType - header', function() {
               format: 'date'
             },
             nestedModel: {
-              type: 'NestedModel'
+              $ref: 'NestedModel'
             }
           }
         },
@@ -237,7 +237,7 @@ describe('paramType - header', function() {
         parameters: [
           {
             name: 'someModel',
-            type: 'SomeModel',
+            $ref: 'SomeModel',
             in: 'header'
           }
         ]
