@@ -2,74 +2,74 @@
 
 var moment = require('moment');
 var helper = require('./test_helper');
-var validate = require('../lib/validation/parameter');
+var {validateParameter} = require('../lib/validation/parameter');
 
 describe('array', function() {
   it('should validate with number with no format', function() {
     var value = ['1', '2'];
     var transformedValue = [1, 2];
-    var ret = validate(helper.makeArrayParam(false, 'number'), value);
+    var ret = validateParameter(helper.makeArrayParam(false, 'number'), value);
     helper.validateSuccess(ret, 1, [transformedValue]);
   });
 
   it('should validate with number with float format', function() {
     var value = [1, '2.0'];
     var transformedValue = [1, 2.0];
-    var ret = validate(helper.makeArrayParam(false, 'number', 'float'), value);
+    var ret = validateParameter(helper.makeArrayParam(false, 'number', 'float'), value);
     helper.validateSuccess(ret, 1, [transformedValue]);
   });
 
   it('should validate with number with double format', function() {
     var value = [1.265, '2.2352', 2e0, 0x88];
     var transformedValue = [1.265, 2.2352, 2.0, 0x88];
-    var ret = validate(helper.makeArrayParam(false, 'number', 'double'), value);
+    var ret = validateParameter(helper.makeArrayParam(false, 'number', 'double'), value);
     helper.validateSuccess(ret, 1, [transformedValue]);
   });
 
   it('should validate with integer with no format', function() {
     var value = ['1', '2'];
     var transformedValue = [1, 2];
-    var ret = validate(helper.makeArrayParam(false, 'integer'), value);
+    var ret = validateParameter(helper.makeArrayParam(false, 'integer'), value);
     helper.validateSuccess(ret, 1, [transformedValue]);
   });
 
   it('should validate with integer with int32 format', function() {
     var value = [1, '2.0'];
     var transformedValue = [1, 2.0];
-    var ret = validate(helper.makeArrayParam(false, 'integer', 'int32'), value);
+    var ret = validateParameter(helper.makeArrayParam(false, 'integer', 'int32'), value);
     helper.validateSuccess(ret, 1, [transformedValue]);
   });
 
   it('should validate with integer with int64 format', function() {
     var value = [Number.MAX_VALUE, Number.MIN_VALUE + 1, 2.0, 2e0, 0x88];
     var transformedValue = [Number.MAX_VALUE, Number.MIN_VALUE + 1, 2.0, 2, 136];
-    var ret = validate(helper.makeArrayParam(false, 'integer', 'int64'), value);
+    var ret = validateParameter(helper.makeArrayParam(false, 'integer', 'int64'), value);
     helper.validateSuccess(ret, 1, [transformedValue]);
   });
 
   it('should validate with string with no format', function() {
     var value = ['These', 'are', 'a', 'lot', 'of', 'strings'];
-    var ret = validate(helper.makeArrayParam(false, 'string'), value);
+    var ret = validateParameter(helper.makeArrayParam(false, 'string'), value);
     helper.validateSuccess(ret, 1, [value]);
   });
 
   it('should validate with string with byte format', function() {
     var value = [65, 35, 23];
-    var ret = validate(helper.makeArrayParam(false, 'string', 'byte'), value);
+    var ret = validateParameter(helper.makeArrayParam(false, 'string', 'byte'), value);
     helper.validateSuccess(ret, 1, [value]);
   });
 
   it('should validate with string with date format', function() {
     var value = ['8-9-2014', '1-1-1970'];
     var transformedValue = [moment('2014-08-09').toDate(), moment('1970-01-01').toDate()];
-    var ret = validate(helper.makeArrayParam(false, 'string', 'date', 'M-D-YYYY'), value);
+    var ret = validateParameter(helper.makeArrayParam(false, 'string', 'date', 'M-D-YYYY'), value);
     helper.validateSuccess(ret, 1, [transformedValue]);
   });
 
   it('should validate with string with date-time format', function() {
     var value = ['8-9-2014 12:00AM', '1-1-1970 1:32PM'];
     var transformedValue = [moment('2014-08-09T00:00:00').toDate(), moment('1970-01-01T13:32:00').toDate()];
-    var ret = validate(helper.makeArrayParam(false, 'string', 'date-time', 'M-D-YYYY h:mmA'), value);
+    var ret = validateParameter(helper.makeArrayParam(false, 'string', 'date-time', 'M-D-YYYY h:mmA'), value);
     helper.validateSuccess(ret, 1, [transformedValue]);
   });
 
@@ -78,7 +78,7 @@ describe('array', function() {
     const value = ['allowed', 'string'];
     const param = helper.makeArrayParam(false, 'string');
     param.items.enum = ['These', 'are', 'allowed', 'strings'];
-    const result = validate(param, value);
+    const result = validateParameter(param, value);
     helper.validateSuccess(result, 1);
   });
 
@@ -86,7 +86,7 @@ describe('array', function() {
     const value = ['allowed', 'string'];
     const param = helper.makeArrayParam(false, 'string');
     param.items.pattern = '.*';
-    const result = validate(param, value);
+    const result = validateParameter(param, value);
     helper.validateSuccess(result, 1);
   });
 
@@ -94,7 +94,7 @@ describe('array', function() {
     const value = ['allowed', 'string'];
     const param = helper.makeArrayParam(false, 'string');
     param.items.maxLength = 20;
-    const result = validate(param, value);
+    const result = validateParameter(param, value);
     helper.validateSuccess(result, 1);
   });
 
@@ -102,7 +102,7 @@ describe('array', function() {
     const value = ['allowed', 'string'];
     const param = helper.makeArrayParam(false, 'string');
     param.items.minLength = 5;
-    const result = validate(param, value);
+    const result = validateParameter(param, value);
     helper.validateSuccess(result, 1);
   });
 
@@ -110,7 +110,7 @@ describe('array', function() {
     const value = [6, 10];
     const param = helper.makeArrayParam(false, 'number');
     param.items.minimum = 5;
-    const result = validate(param, value);
+    const result = validateParameter(param, value);
     console.log(result)
     helper.validateSuccess(result, 1);
   });
@@ -119,7 +119,7 @@ describe('array', function() {
     const value = [6, 10];
     const param = helper.makeArrayParam(false, 'number');
     param.items.maximum = 15;
-    const result = validate(param, value);
+    const result = validateParameter(param, value);
     helper.validateSuccess(result, 1);
   });
 
@@ -138,7 +138,7 @@ describe('array', function() {
         }
       }
     };
-    var ret = validate(helper.makeArrayParam(false, 'Test'), value, model);
+    var ret = validateParameter(helper.makeArrayParam(false, 'Test'), value, model);
     helper.validateSuccess(ret, 1, [value]);
   });
 
@@ -158,7 +158,7 @@ describe('array', function() {
         }
       }
     };
-    var ret = validate(helper.makeArrayParam(false, 'Test'), value, model);
+    var ret = validateParameter(helper.makeArrayParam(false, 'Test'), value, model);
     helper.validateSuccess(ret, 1, [value]);
   });
 
@@ -236,97 +236,97 @@ describe('array', function() {
         boolean: true
       }
     ];
-    var ret = validate(helper.makeArrayParam(false, 'baz'), value, model);
+    var ret = validateParameter(helper.makeArrayParam(false, 'baz'), value, model);
     helper.validateSuccess(ret, 1, [transformedValue]);
   });
 
   it('should not validate with required field null', function() {
-    var ret = validate(helper.makeArrayParam(true, 'string'), null);
+    var ret = validateParameter(helper.makeArrayParam(true, 'string'), null);
     helper.validateError(ret, 1, ["testParam is required"]);
   });
 
   it('should not validate with required field undefined', function() {
-    var ret = validate(helper.makeArrayParam(true, 'number'), undefined);
+    var ret = validateParameter(helper.makeArrayParam(true, 'number'), undefined);
     helper.validateError(ret, 1, ["testParam is required"]);
   });
 
   it('should not validate with required field empty string', function() {
-    var ret = validate(helper.makeArrayParam(true, 'integer'), '');
+    var ret = validateParameter(helper.makeArrayParam(true, 'integer'), '');
     helper.validateError(ret, 1, ["testParam is required"]);
   });
 
   it('should not validate with empty object', function() {
-    var ret = validate(helper.makeArrayParam(false, 'boolean'), {});
+    var ret = validateParameter(helper.makeArrayParam(false, 'boolean'), {});
     helper.validateError(ret, 1, ["testParam is not a type of array"]);
   });
 
   it('should not validate with one error with number with no format', function() {
-    var ret = validate(helper.makeArrayParam(false, 'number'), ['1', 'this is a string']);
+    var ret = validateParameter(helper.makeArrayParam(false, 'number'), ['1', 'this is a string']);
     helper.validateError(ret, 1, ["this is a string is not a type of number"]);
   });
 
   it('should not validate with one error with number with float format', function() {
-    var ret = validate(helper.makeArrayParam(false, 'number', 'float'), [1, 'this is a string']);
+    var ret = validateParameter(helper.makeArrayParam(false, 'number', 'float'), [1, 'this is a string']);
     helper.validateError(ret, 1, ["this is a string is not a type of float"]);
   });
 
   it('should not validate with one error with number with double format', function() {
-    var ret = validate(helper.makeArrayParam(false, 'number', 'double'), [1.265, '2.2352', 2e0, 0x88, 'this is a string']);
+    var ret = validateParameter(helper.makeArrayParam(false, 'number', 'double'), [1.265, '2.2352', 2e0, 0x88, 'this is a string']);
     helper.validateError(ret, 1, ["this is a string is not a type of double"]);
   });
 
   it('should not validate with one error with integer with no format', function() {
-    var ret = validate(helper.makeArrayParam(false, 'integer'), ['1', '2', 'this is a string']);
+    var ret = validateParameter(helper.makeArrayParam(false, 'integer'), ['1', '2', 'this is a string']);
     helper.validateError(ret, 1, ["this is a string is not a type of integer"]);
   });
 
   it('should not validate with one error with integer with int32 format', function() {
-    var ret = validate(helper.makeArrayParam(false, 'integer', 'int32'), [1, '2.0', 'this is a string']);
+    var ret = validateParameter(helper.makeArrayParam(false, 'integer', 'int32'), [1, '2.0', 'this is a string']);
     helper.validateError(ret, 1, ["this is a string is not a type of int32"]);
   });
 
   it('should not validate with one error with integer with int64 format', function() {
-    var ret = validate(helper.makeArrayParam(false, 'integer', 'int64'), [1234, 2e0, 0x88, 'this is a string']);
+    var ret = validateParameter(helper.makeArrayParam(false, 'integer', 'int64'), [1234, 2e0, 0x88, 'this is a string']);
     helper.validateError(ret, 1, ["this is a string is not a type of int64"]);
   });
 
   it('should not validate with one error with string with no format', function() {
-    var ret = validate(helper.makeArrayParam(false, 'string'), ['These', 'are', 'a', 'lot', 'of', 'strings', 1]);
+    var ret = validateParameter(helper.makeArrayParam(false, 'string'), ['These', 'are', 'a', 'lot', 'of', 'strings', 1]);
     helper.validateError(ret, 1, ["1 is not a type of string"]);
   });
 
   it('should not validate with two errors with number with no format', function() {
-    var ret = validate(helper.makeArrayParam(false, 'number'), ['1', 'this is a string', 'this is also a string']);
+    var ret = validateParameter(helper.makeArrayParam(false, 'number'), ['1', 'this is a string', 'this is also a string']);
     helper.validateError(ret, 2, ["this is a string is not a type of number", "this is also a string is not a type of number"]);
   });
 
   it('should not validate with two errors with number with float format', function() {
-    var ret = validate(helper.makeArrayParam(false, 'number', 'float'), [1, 'this is a string', 'this is also a string']);
+    var ret = validateParameter(helper.makeArrayParam(false, 'number', 'float'), [1, 'this is a string', 'this is also a string']);
     helper.validateError(ret, 2, ["this is a string is not a type of float", "this is also a string is not a type of float"]);
   });
 
   it('should not validate with two errors with number with double format', function() {
-    var ret = validate(helper.makeArrayParam(false, 'number', 'double'), [1.265, '2.2352', 2e0, 0x88, 'this is a string', 'this is also a string']);
+    var ret = validateParameter(helper.makeArrayParam(false, 'number', 'double'), [1.265, '2.2352', 2e0, 0x88, 'this is a string', 'this is also a string']);
     helper.validateError(ret, 2, ["this is a string is not a type of double", "this is also a string is not a type of double"]);
   });
 
   it('should not validate with two errors with integer with no format', function() {
-    var ret = validate(helper.makeArrayParam(false, 'integer'), ['1', '2', 'this is a string', 'this is also a string']);
+    var ret = validateParameter(helper.makeArrayParam(false, 'integer'), ['1', '2', 'this is a string', 'this is also a string']);
     helper.validateError(ret, 2, ["this is a string is not a type of integer", "this is also a string is not a type of integer"]);
   });
 
   it('should not validate with two errors with integer with int32 format', function() {
-    var ret = validate(helper.makeArrayParam(false, 'integer', 'int32'), [1, '2.0', 'this is a string', 'this is also a string']);
+    var ret = validateParameter(helper.makeArrayParam(false, 'integer', 'int32'), [1, '2.0', 'this is a string', 'this is also a string']);
     helper.validateError(ret, 2, ["this is a string is not a type of int32", "this is also a string is not a type of int32"]);
   });
 
   it('should not validate with two errors with integer with int64 format', function() {
-    var ret = validate(helper.makeArrayParam(false, 'integer', 'int64'), [Number.MAX_VALUE - 123123123123, 2e0, 0x88, 'this is a string', 'this is also a string']);
+    var ret = validateParameter(helper.makeArrayParam(false, 'integer', 'int64'), [Number.MAX_VALUE - 123123123123, 2e0, 0x88, 'this is a string', 'this is also a string']);
     helper.validateError(ret, 2, ["this is a string is not a type of int64", "this is also a string is not a type of int64"]);
   });
 
   it('should not validate with two errors with string with no format', function() {
-    var ret = validate(helper.makeArrayParam(false, 'string'), ['These', 'are', 'a', 'lot', 'of', 1, true, 'strings']);
+    var ret = validateParameter(helper.makeArrayParam(false, 'string'), ['These', 'are', 'a', 'lot', 'of', 1, true, 'strings']);
     helper.validateError(ret, 2, ["1 is not a type of string", "true is not a type of string"]);
   });
 
@@ -341,7 +341,7 @@ describe('array', function() {
       }
     };
 
-    var ret = validate(helper.makeArrayParam(false, 'Test'), [
+    var ret = validateParameter(helper.makeArrayParam(false, 'Test'), [
       {id: 1},
       {id: 'Yo'}
     ], model);
@@ -362,7 +362,7 @@ describe('array', function() {
       }
     };
 
-    var ret = validate(helper.makeArrayParam(false, 'Test'), [
+    var ret = validateParameter(helper.makeArrayParam(false, 'Test'), [
       {test1: 'No', test2: true, test3: 1}
     ], model);
     helper.validateError(ret, 3, ["test1 is not a type of integer", "test2 is not a type of string", "test3 is not a type of boolean"]);
@@ -382,7 +382,7 @@ describe('array', function() {
       }
     };
 
-    var ret = validate(helper.makeArrayParam(false, 'Test', undefined, undefined, undefined, "Legs", 1, 1), [
+    var ret = validateParameter(helper.makeArrayParam(false, 'Test', undefined, undefined, undefined, "Legs", 1, 1), [
 
     ], model);
     helper.validateError(ret, 1, ["Legs should have at least 1 item(s)"]);
@@ -400,7 +400,7 @@ describe('array', function() {
       }
     };
 
-    var ret = validate(helper.makeArrayParam(false, 'Test', undefined, undefined, undefined, "Legs", 1, 2), [
+    var ret = validateParameter(helper.makeArrayParam(false, 'Test', undefined, undefined, undefined, "Legs", 1, 2), [
       {test2: "hello"}, {test2: "world"}, {test2: "today"}
     ], model);
     helper.validateError(ret, 1, ["Legs should have at most 2 item(s)"]);
@@ -424,7 +424,7 @@ describe('array', function() {
       }
     };
 
-    const result = validate(model.TestArray, [{someString: 'A'}, null], model);
+    const result = validateParameter(model.TestArray, [{someString: 'A'}, null], model);
     helper.validateError(result, 1, ["TestArrayItem cannot be null"]);
   })
 
@@ -432,7 +432,7 @@ describe('array', function() {
     const value = ['allowed', 'not_allowed'];
     const param = helper.makeArrayParam(false, 'string');
     param.items.enum = ['These', 'are', 'allowed', 'strings'];
-    const result = validate(param, value);
+    const result = validateParameter(param, value);
     helper.validateError(result, 1, ['not_allowed is not a valid entry']);
   });
 
@@ -440,7 +440,7 @@ describe('array', function() {
     const value = ['allowed', 'not_allowed'];
     const param = helper.makeArrayParam(false, 'string');
     param.items.maxLength = 9;
-    const result = validate(param, value);
+    const result = validateParameter(param, value);
     helper.validateError(result, 1, ['not_allowed requires a max length of 9']);
   });
 
@@ -448,7 +448,7 @@ describe('array', function() {
     const value = ['allowed', 'n-a'];
     const param = helper.makeArrayParam(false, 'string');
     param.items.minLength = 5;
-    const result = validate(param, value);
+    const result = validateParameter(param, value);
     helper.validateError(result, 1, ['n-a requires a min length of 5']);
   });
 
@@ -456,7 +456,7 @@ describe('array', function() {
     const value = [6, 10];
     const param = helper.makeArrayParam(false, 'number');
     param.items.minimum = 9;
-    const result = validate(param, value);
+    const result = validateParameter(param, value);
     helper.validateError(result, 1, ['6 is below the minimum value']);
   });
 
@@ -464,7 +464,7 @@ describe('array', function() {
     const value = [6, 10];
     const param = helper.makeArrayParam(false, 'number');
     param.items.maximum = 8;
-    const result = validate(param, value);
+    const result = validateParameter(param, value);
     helper.validateError(result, 1, ['10 is above the maximum value']);
   });
 });

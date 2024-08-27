@@ -1,5 +1,5 @@
 
-var validate = require('../lib/validation/parameter');
+var {validateParameter} = require('../lib/validation/parameter');
 
 describe('oneOF', function() {
   const {expect} = require("chai");
@@ -33,7 +33,7 @@ describe('oneOF', function() {
 
     it('should return all errors because is required and not given', function() {
       var value = null;
-      var ret = validate(param, value, model);
+      var ret = validateParameter(param, value, model);
       expect(ret).to.be.an('array');
       expect(ret).to.have.length(3);
     });
@@ -41,49 +41,49 @@ describe('oneOF', function() {
     it('should return all errors because is wrong type', function() {
       param.required = false;
       var value = [{}];
-      var ret = validate(param, value, model);
+      var ret = validateParameter(param, value, model);
       expect(ret).to.be.an('array');
       expect(ret).to.have.length(3);
     });
 
     it('should return all errors because is required and wrong type', function() {
       var value = [{}];
-      var ret = validate(param, value, model);
+      var ret = validateParameter(param, value, model);
       expect(ret).to.be.an('array');
       expect(ret).to.have.length(3);
     });
 
     it('should return all errors because is required and empty string', function() {
       var value = "";
-      var ret = validate(param, value, model);
+      var ret = validateParameter(param, value, model);
       expect(ret).to.be.an('array');
       expect(ret).to.have.length(3);
     });
 
     it('should return success because value is integer', function() {
       var value = 0;
-      var ret = validate(param, value, model);
+      var ret = validateParameter(param, value, model);
       expect(ret).to.be.an('array');
       expect(ret).to.have.length(1);
     });
 
     it('should return success because value is integer', function() {
       var value = 0;
-      var ret = validate(param, value, model);
+      var ret = validateParameter(param, value, model);
       expect(ret).to.be.an('array');
       expect(ret).to.have.length(1);
     });
-    
+
     it('should return success because value is string', function() {
       var value = "hi";
-      var ret = validate(param, value, model);
+      var ret = validateParameter(param, value, model);
       expect(ret).to.be.an('array');
       expect(ret).to.have.length(1);
     });
 
     it('should return success because value is boolean', function() {
       var value = false;
-      var ret = validate(param, value, model);
+      var ret = validateParameter(param, value, model);
       expect(ret).to.be.an('array');
       expect(ret).to.have.length(1);
     });
