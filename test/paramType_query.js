@@ -3,7 +3,7 @@
 var moment = require('moment');
 var chai = require('chai');
 var expect = chai.expect;
-var validate = require('../lib/validation/validate');
+var {validateRequest} = require('../lib/validation/validate');
 var helper = require('./test_helper');
 
 describe('paramType - query', function() {
@@ -36,7 +36,7 @@ describe('paramType - query', function() {
           someNumber: someNumber
         }
       };
-      var ret = validate(spec, req);
+      var ret = validateRequest(spec, req);
       helper.validateSuccess(ret, 0);
       expect(req.query.someDate).to.eql(someDateTransformed);
       expect(req.query.someNumber).to.equal(someNumberTransformed);
@@ -65,7 +65,7 @@ describe('paramType - query', function() {
       var req = {
         query: {}
       };
-      var ret = validate(spec, req);
+      var ret = validateRequest(spec, req);
       helper.validateSuccess(ret, 0);
       expect(req.query.someDate).to.eql("2014-11-23");
       expect(req.query.someNumber).to.equal("233.2354");
@@ -100,7 +100,7 @@ describe('paramType - query', function() {
           someNumber: someNumber
         }
       };
-      var ret = validate(spec, req);
+      var ret = validateRequest(spec, req);
       helper.validateSuccess(ret, 0);
       expect(req.query.someDate).to.eql(someDate);
       expect(req.query.someNumber).to.equal(someNumber);
@@ -122,7 +122,7 @@ describe('paramType - query', function() {
           someString: 'nothi'
         }
       };
-      var ret = validate(spec, req);
+      var ret = validateRequest(spec, req);
       helper.validateError(ret, 1, ["someString is not valid based on the pattern /^hi/i"]);
     });
   });
@@ -156,7 +156,7 @@ describe('paramType - query', function() {
           someNumber: someNumber
         }
       };
-      var ret = validate(spec, req);
+      var ret = validateRequest(spec, req);
       helper.validateSuccess(ret, 0);
       expect(req.query.someDate).to.eql(someDateTransformed);
       expect(req.query.someNumber).to.equal(someNumberTransformed);
@@ -185,7 +185,7 @@ describe('paramType - query', function() {
       var req = {
         query: {}
       };
-      var ret = validate(spec, req);
+      var ret = validateRequest(spec, req);
       helper.validateSuccess(ret, 0);
       expect(req.query.someDate).to.eql("2014-11-23");
       expect(req.query.someNumber).to.equal("233.2354");
@@ -220,7 +220,7 @@ describe('paramType - query', function() {
           someNumber: someNumber
         }
       };
-      var ret = validate(spec, req);
+      var ret = validateRequest(spec, req);
       helper.validateSuccess(ret, 0);
       expect(req.query.someDate).to.eql(someDate);
       expect(req.query.someNumber).to.equal(someNumber);
@@ -242,7 +242,7 @@ describe('paramType - query', function() {
           someString: 'nothi'
         }
       };
-      var ret = validate(spec, req);
+      var ret = validateRequest(spec, req);
       helper.validateError(ret, 1, ["someString is not valid based on the pattern /^hi/i"]);
     });
   });

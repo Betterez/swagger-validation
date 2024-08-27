@@ -3,7 +3,7 @@
 var moment = require('moment');
 var chai = require('chai');
 var expect = chai.expect;
-var validate = require('../lib/validation/validate');
+var {validateRequest} = require('../lib/validation/validate');
 var helper = require('./test_helper');
 
 describe('paramType - body', function() {
@@ -43,7 +43,7 @@ describe('paramType - body', function() {
           }
         }
       };
-      var ret = validate(spec, req, models);
+      var ret = validateRequest(spec, req, models);
       helper.validateSuccess(ret, 0);
       expect(req.body.someModel.someDate).to.eql(someDateTransformed);
       expect(req.body.someModel.someString).to.equal(someString);
@@ -94,7 +94,7 @@ describe('paramType - body', function() {
           }
         }
       };
-      var ret = validate(spec, req, models);
+      var ret = validateRequest(spec, req, models);
       helper.validateSuccess(ret, 0);
       expect(req.body.someModel.someDate).to.eql(someDateTransformed);
       expect(req.body.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
@@ -132,7 +132,7 @@ describe('paramType - body', function() {
           }
         }
       };
-      var ret = validate(spec, req, models);
+      var ret = validateRequest(spec, req, models);
       helper.validateError(ret, 1, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
     });
 
@@ -202,7 +202,7 @@ describe('paramType - body', function() {
         datetime: Number(2.2356),
         boolean: 'Not a boolean'
       };
-      var ret = validate(spec, req, models);
+      var ret = validateRequest(spec, req, models);
       helper.validateSuccess(ret, 0);
     });
   });
@@ -243,7 +243,7 @@ describe('paramType - body', function() {
           }
         }
       };
-      var ret = validate(spec, req, models);
+      var ret = validateRequest(spec, req, models);
       helper.validateSuccess(ret, 0);
       expect(req.body.someModel.someDate).to.eql(someDateTransformed);
       expect(req.body.someModel.someString).to.equal(someString);
@@ -294,7 +294,7 @@ describe('paramType - body', function() {
           }
         }
       };
-      var ret = validate(spec, req, models);
+      var ret = validateRequest(spec, req, models);
       helper.validateSuccess(ret, 0);
       expect(req.body.someModel.someDate).to.eql(someDateTransformed);
       expect(req.body.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
@@ -332,7 +332,7 @@ describe('paramType - body', function() {
           }
         }
       };
-      var ret = validate(spec, req, models);
+      var ret = validateRequest(spec, req, models);
       helper.validateError(ret, 1, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
     });
 
@@ -402,7 +402,7 @@ describe('paramType - body', function() {
         datetime: Number(2.2356),
         boolean: 'Not a boolean'
       };
-      var ret = validate(spec, req, models);
+      var ret = validateRequest(spec, req, models);
       helper.validateSuccess(ret, 0);
     });
   });
@@ -426,7 +426,7 @@ describe('paramType - body', function() {
           "someDate": someDate
         }
       };
-      var ret = validate(spec, req);
+      var ret = validateRequest(spec, req);
       helper.validateSuccess(ret, 0);
       expect(req.body.someDate).to.eql(someDateTransformed);
     });
@@ -449,7 +449,7 @@ describe('paramType - body', function() {
       var req = {
         body: {someDate: someDate}
       };
-      var ret = validate(spec, req);
+      var ret = validateRequest(spec, req);
       helper.validateSuccess(ret, 0);
       expect(req.body.someDate).to.eql(someDate);
     });
@@ -474,7 +474,7 @@ describe('paramType - body', function() {
           "someDate": someDate
         }
       };
-      var ret = validate(spec, req);
+      var ret = validateRequest(spec, req);
       helper.validateSuccess(ret, 0);
       expect(req.body.someDate).to.eql(someDateTransformed);
     });
@@ -497,7 +497,7 @@ describe('paramType - body', function() {
       var req = {
         body: {someDate: someDate}
       };
-      var ret = validate(spec, req);
+      var ret = validateRequest(spec, req);
       helper.validateSuccess(ret, 0);
       expect(req.body.someDate).to.eql(someDate);
     });

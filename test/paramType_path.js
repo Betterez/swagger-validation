@@ -3,7 +3,7 @@
 var moment = require('moment');
 var chai = require('chai');
 var expect = chai.expect;
-var validate = require('../lib/validation/validate');
+var {validateRequest} = require('../lib/validation/validate');
 var helper = require('./test_helper');
 
 describe('paramType - path', function() {
@@ -41,7 +41,7 @@ describe('paramType - path', function() {
           someNumber: someNumber
         }
       };
-      var ret = validate(spec, req);
+      var ret = validateRequest(spec, req);
       helper.validateSuccess(ret, 0);
       expect(req.params.someDate).to.eql(someDateTransformed);
       expect(req.params.someNumber).to.equal(someNumberTransformed);
@@ -75,7 +75,7 @@ describe('paramType - path', function() {
           someNumber: someNumber
         }
       };
-      var ret = validate(spec, req);
+      var ret = validateRequest(spec, req);
       helper.validateSuccess(ret, 0);
       expect(req.params.someDate).to.eql(someDate);
       expect(req.params.someNumber).to.equal(someNumber);

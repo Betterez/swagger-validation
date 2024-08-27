@@ -1,7 +1,7 @@
 const moment = require("moment");
 const chai = require("chai");
 const expect = chai.expect;
-const validate = require("../lib/validation/validate");
+const {validateRequest} = require("../lib/validation/validate");
 const helper = require("./test_helper");
 const someDate = "2014-08-12";
 const someDateTransformed = moment(someDate).toDate();
@@ -51,7 +51,7 @@ describe("paramType - rootObject", function () {
         }
       };
 
-      const ret = validate(spec, object, models);
+      const ret = validateRequest(spec, object, models);
       helper.validateError(ret, 1, ["someDate is required"]);
     });
 
@@ -71,7 +71,7 @@ describe("paramType - rootObject", function () {
         }
       };
 
-      const ret = validate(spec, object, models);
+      const ret = validateRequest(spec, object, models);
       helper.validateSuccess(ret, 0);
 
       expect(object.someModel.someDate).to.eql(someDateTransformed);
@@ -96,7 +96,7 @@ describe("paramType - rootObject", function () {
         }
       };
 
-      const ret = validate(spec, object, models);
+      const ret = validateRequest(spec, object, models);
       helper.validateSuccess(ret, 0);
 
       expect(object.someModel.someDate).to.eql(someDateTransformed);
@@ -168,7 +168,7 @@ describe("paramType - rootObject", function () {
         boolean: "Not a boolean"
       };
 
-      const ret = validate(spec, object, models);
+      const ret = validateRequest(spec, object, models);
       helper.validateSuccess(ret, 0);
     });
 
@@ -188,7 +188,7 @@ describe("paramType - rootObject", function () {
         }
       };
 
-      const ret = validate(spec, object, models);
+      const ret = validateRequest(spec, object, models);
       helper.validateError(ret, 1, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
     });
   });
@@ -207,7 +207,7 @@ describe("without models", function () {
     const object = {
       someDate
     };
-    const ret = validate(spec, object);
+    const ret = validateRequest(spec, object);
     helper.validateSuccess(ret, 0);
     expect(object.someDate).to.eql(someDateTransformed);
   });
@@ -229,7 +229,7 @@ describe("without models", function () {
       someDate
     };
 
-    const ret = validate(spec, object);
+    const ret = validateRequest(spec, object);
     helper.validateSuccess(ret, 0);
 
     expect(object.someDate).to.eql(someDate);

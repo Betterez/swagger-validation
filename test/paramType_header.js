@@ -3,7 +3,7 @@
 var moment = require('moment');
 var chai = require('chai');
 var expect = chai.expect;
-var validate = require('../lib/validation/validate');
+var {validateRequest} = require('../lib/validation/validate');
 var helper = require('./test_helper');
 
 describe('paramType - header', function() {
@@ -43,7 +43,7 @@ describe('paramType - header', function() {
           }
         }
       };
-      var ret = validate(spec, req, models);
+      var ret = validateRequest(spec, req, models);
       helper.validateSuccess(ret, 0);
       expect(req.header.someModel.someDate).to.eql(someDateTransformed);
       expect(req.header.someModel.someString).to.equal(someString);
@@ -95,7 +95,7 @@ describe('paramType - header', function() {
         }
       };
 
-      var ret = validate(spec, req, models);
+      var ret = validateRequest(spec, req, models);
       helper.validateSuccess(ret, 0);
       expect(req.header.someModel.someDate).to.eql(someDateTransformed);
       expect(req.header.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
@@ -133,7 +133,7 @@ describe('paramType - header', function() {
           }
         }
       };
-      var ret = validate(spec, req, models);
+      var ret = validateRequest(spec, req, models);
       helper.validateError(ret, 1, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
     });
   });
@@ -174,7 +174,7 @@ describe('paramType - header', function() {
           }
         }
       };
-      var ret = validate(spec, req, models);
+      var ret = validateRequest(spec, req, models);
       helper.validateSuccess(ret, 0);
       expect(req.header.someModel.someDate).to.eql(someDateTransformed);
       expect(req.header.someModel.someString).to.equal(someString);
@@ -226,7 +226,7 @@ describe('paramType - header', function() {
         }
       };
 
-      var ret = validate(spec, req, models);
+      var ret = validateRequest(spec, req, models);
       helper.validateSuccess(ret, 0);
       expect(req.header.someModel.someDate).to.eql(someDateTransformed);
       expect(req.header.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
@@ -264,7 +264,7 @@ describe('paramType - header', function() {
           }
         }
       };
-      var ret = validate(spec, req, models);
+      var ret = validateRequest(spec, req, models);
       helper.validateError(ret, 1, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
     });
   });
@@ -288,7 +288,7 @@ describe('paramType - header', function() {
           someDate: someDate
         }
       };
-      var ret = validate(spec, req);
+      var ret = validateRequest(spec, req);
       helper.validateSuccess(ret, 0);
       expect(req.header.someDate).to.eql(someDateTransformed);
     });
@@ -313,7 +313,7 @@ describe('paramType - header', function() {
           someDate: someDate
         }
       };
-      var ret = validate(spec, req);
+      var ret = validateRequest(spec, req);
       helper.validateSuccess(ret, 0);
       expect(req.header.someDate).to.eql(someDate);
     });
@@ -338,7 +338,7 @@ describe('paramType - header', function() {
           someDate: someDate
         }
       };
-      var ret = validate(spec, req);
+      var ret = validateRequest(spec, req);
       helper.validateSuccess(ret, 0);
       expect(req.header.someDate).to.eql(someDateTransformed);
     });
@@ -363,7 +363,7 @@ describe('paramType - header', function() {
           someDate: someDate
         }
       };
-      var ret = validate(spec, req);
+      var ret = validateRequest(spec, req);
       helper.validateSuccess(ret, 0);
       expect(req.header.someDate).to.eql(someDate);
     });

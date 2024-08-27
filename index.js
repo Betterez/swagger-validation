@@ -1,1 +1,5 @@
-module.exports = require('./lib/validation/validate');
+const {validateRequest} = require('./lib/validation/validate');
+
+module.exports = {
+  validateRequest,
+};
