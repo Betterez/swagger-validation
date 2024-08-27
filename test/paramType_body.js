@@ -135,79 +135,9 @@ describe('paramType - body', function() {
       var ret = validateRequest(spec, req, models);
       helper.validateError(ret, 1, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
     });
-
-    it('should not run validation tests', function() {
-      var models = {
-        foo: {
-          id: 'foo',
-          name: 'foo',
-          subTypes: ["bar"],
-          discriminator: "name",
-          required: ['number', 'float', 'double', 'integer', 'int32'],
-          properties: {
-            number: {type: 'number'},
-            float: {type: 'number', format: 'float'},
-            double: {type: 'number', format: 'double'},
-            integer: {type: 'integer'},
-            int32: {type: 'integer', format: 'int32'}
-          }
-        },
-        bar: {
-          id: 'bar',
-          name: 'bar',
-          subTypes: ["baz"],
-          discriminator: "name",
-          required: ['int64', 'string', 'byte', 'date', 'datetime'],
-          properties: {
-            int64: {type: 'integer', format: 'int64'},
-            string: {type: 'string'},
-            byte: {type: 'string', format: 'byte'},
-            date: {type: 'string', format: 'date'},
-            datetime: {type: 'string', format: 'date-time'}
-          }
-        },
-        baz: {
-          id: 'baz',
-          name: 'baz',
-          required: ['boolean'],
-          properties: {
-            boolean: {type: 'boolean'}
-          }
-        }
-      };
-
-      var spec = {
-        validation: {
-          enabled: false
-        },
-        parameters: [
-          {
-            name: 'baz',
-            type: 'baz',
-            paramType: 'body'
-          }
-        ]
-      };
-
-      var req = {
-        number: 'Random String',
-        float: true,
-        double: [323.33],
-        integer: {},
-        int32: Number.MIN_VALUE,
-        int64: Number.MAX_VALUE + Number.MAX_VALUE,
-        string: 1,
-        byte: false,
-        date: Number(1),
-        datetime: Number(2.2356),
-        boolean: 'Not a boolean'
-      };
-      var ret = validateRequest(spec, req, models);
-      helper.validateSuccess(ret, 0);
-    });
   });
 
-    describe('with models - without paramType', function() {
+  describe('with models - without paramType', function() {
     it('should convert strings', function() {
       var spec = {
         parameters: [
@@ -335,76 +265,6 @@ describe('paramType - body', function() {
       var ret = validateRequest(spec, req, models);
       helper.validateError(ret, 1, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
     });
-
-    it('should not run validation tests', function() {
-      var models = {
-        foo: {
-          id: 'foo',
-          name: 'foo',
-          subTypes: ["bar"],
-          discriminator: "name",
-          required: ['number', 'float', 'double', 'integer', 'int32'],
-          properties: {
-            number: {type: 'number'},
-            float: {type: 'number', format: 'float'},
-            double: {type: 'number', format: 'double'},
-            integer: {type: 'integer'},
-            int32: {type: 'integer', format: 'int32'}
-          }
-        },
-        bar: {
-          id: 'bar',
-          name: 'bar',
-          subTypes: ["baz"],
-          discriminator: "name",
-          required: ['int64', 'string', 'byte', 'date', 'datetime'],
-          properties: {
-            int64: {type: 'integer', format: 'int64'},
-            string: {type: 'string'},
-            byte: {type: 'string', format: 'byte'},
-            date: {type: 'string', format: 'date'},
-            datetime: {type: 'string', format: 'date-time'}
-          }
-        },
-        baz: {
-          id: 'baz',
-          name: 'baz',
-          required: ['boolean'],
-          properties: {
-            boolean: {type: 'boolean'}
-          }
-        }
-      };
-
-      var spec = {
-        validation: {
-          enabled: false
-        },
-        parameters: [
-          {
-            name: 'baz',
-            type: 'baz',
-            in: 'body'
-          }
-        ]
-      };
-
-      var req = {
-        number: 'Random String',
-        float: true,
-        double: [323.33],
-        integer: {},
-        int32: Number.MIN_VALUE,
-        int64: Number.MAX_VALUE + Number.MAX_VALUE,
-        string: 1,
-        byte: false,
-        date: Number(1),
-        datetime: Number(2.2356),
-        boolean: 'Not a boolean'
-      };
-      var ret = validateRequest(spec, req, models);
-      helper.validateSuccess(ret, 0);
-    });
   });
 
   describe('without models - without paramType', function() {
@@ -455,7 +315,7 @@ describe('paramType - body', function() {
     });
   });
 
-    describe('without models', function() {
+  describe('without models', function() {
     it('should validate spec and convert strings', function() {
       var spec = {
         parameters: [

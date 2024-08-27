@@ -270,7 +270,6 @@ Swagger-validation also adds another object to the swagger.spec definition calle
 
 ```javascript
 validation = {
-  enabled : [true / false],
   replaceValues : [true / false]
 };
 ```
@@ -284,7 +283,7 @@ exports.findByName = {
     path : "/pet/{petName}",
     method: "GET",
     type : "Pet",
-    validation = {
+    validation: {
       replaceValues : false
     },
     produces : ["application/json"],
@@ -298,9 +297,8 @@ exports.findByName = {
 };
 ```
 
-The `enabled` property turns on / off swagger-validation holistically for the particular spec. <br/>
 The `replaceValues` property turns on / off the functionality to manipulate values on the req (detailed in the previous section). <br/>
-Both of these values default to true (so validation is enabled as well as it will replace the values on the req).
+This value defaults to true, meaning that it will replace the values on the req.
 
 ## Types of validation
 
