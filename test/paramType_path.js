@@ -3,7 +3,7 @@
 var moment = require('moment');
 var chai = require('chai');
 var expect = chai.expect;
-var {validateRequest} = require('../lib/validation/validate');
+var {validateRequest} = require('../lib/validation/validateRequest');
 var helper = require('./test_helper');
 
 describe('paramType - path', function() {
