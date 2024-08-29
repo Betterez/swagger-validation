@@ -2,6 +2,7 @@ const moment = require('moment');
 const {expect} = require('chai');
 const {validateRequest} = require('../lib/validation/validateRequest');
 const helper = require('./test_helper');
+const {assertValidationPassed, assertValidationFailed} = helper;
 
 describe('paramType - path', function() {
   describe('without models', function() {
@@ -39,7 +40,7 @@ describe('paramType - path', function() {
         }
       };
       var ret = validateRequest(spec, req);
-      helper.assertValidationPassed(ret);
+      assertValidationPassed(ret);
       expect(req.params.someDate).to.eql(someDateTransformed);
       expect(req.params.someNumber).to.equal(someNumberTransformed);
     });
@@ -73,7 +74,7 @@ describe('paramType - path', function() {
         }
       };
       var ret = validateRequest(spec, req);
-      helper.assertValidationPassed(ret);
+      assertValidationPassed(ret);
       expect(req.params.someDate).to.eql(someDate);
       expect(req.params.someNumber).to.equal(someNumber);
     });

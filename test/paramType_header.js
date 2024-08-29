@@ -2,6 +2,7 @@ const moment = require('moment');
 const {expect} = require('chai');
 const {validateRequest} = require('../lib/validation/validateRequest');
 const helper = require('./test_helper');
+const {assertValidationPassed, assertValidationFailed} = helper;
 
 describe('paramType - header', function() {
   describe('with models', function() {
@@ -41,7 +42,7 @@ describe('paramType - header', function() {
         }
       };
       var ret = validateRequest(spec, req, models);
-      helper.assertValidationPassed(ret);
+      assertValidationPassed(ret);
       expect(req.header.someModel.someDate).to.eql(someDateTransformed);
       expect(req.header.someModel.someString).to.equal(someString);
     });
@@ -93,7 +94,7 @@ describe('paramType - header', function() {
       };
 
       var ret = validateRequest(spec, req, models);
-      helper.assertValidationPassed(ret);
+      assertValidationPassed(ret);
       expect(req.header.someModel.someDate).to.eql(someDateTransformed);
       expect(req.header.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
     });
@@ -131,7 +132,7 @@ describe('paramType - header', function() {
         }
       };
       var ret = validateRequest(spec, req, models);
-      helper.assertValidationFailed(ret, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
+      assertValidationFailed(ret, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
     });
   });
 
@@ -172,7 +173,7 @@ describe('paramType - header', function() {
         }
       };
       var ret = validateRequest(spec, req, models);
-      helper.assertValidationPassed(ret);
+      assertValidationPassed(ret);
       expect(req.header.someModel.someDate).to.eql(someDateTransformed);
       expect(req.header.someModel.someString).to.equal(someString);
     });
@@ -224,7 +225,7 @@ describe('paramType - header', function() {
       };
 
       var ret = validateRequest(spec, req, models);
-      helper.assertValidationPassed(ret);
+      assertValidationPassed(ret);
       expect(req.header.someModel.someDate).to.eql(someDateTransformed);
       expect(req.header.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
     });
@@ -262,7 +263,7 @@ describe('paramType - header', function() {
         }
       };
       var ret = validateRequest(spec, req, models);
-      helper.assertValidationFailed(ret, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
+      assertValidationFailed(ret, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
     });
   });
 
@@ -286,7 +287,7 @@ describe('paramType - header', function() {
         }
       };
       var ret = validateRequest(spec, req);
-      helper.assertValidationPassed(ret);
+      assertValidationPassed(ret);
       expect(req.header.someDate).to.eql(someDateTransformed);
     });
 
@@ -311,7 +312,7 @@ describe('paramType - header', function() {
         }
       };
       var ret = validateRequest(spec, req);
-      helper.assertValidationPassed(ret);
+      assertValidationPassed(ret);
       expect(req.header.someDate).to.eql(someDate);
     });
   });
@@ -336,7 +337,7 @@ describe('paramType - header', function() {
         }
       };
       var ret = validateRequest(spec, req);
-      helper.assertValidationPassed(ret);
+      assertValidationPassed(ret);
       expect(req.header.someDate).to.eql(someDateTransformed);
     });
 
@@ -361,7 +362,7 @@ describe('paramType - header', function() {
         }
       };
       var ret = validateRequest(spec, req);
-      helper.assertValidationPassed(ret);
+      assertValidationPassed(ret);
       expect(req.header.someDate).to.eql(someDate);
     });
   });

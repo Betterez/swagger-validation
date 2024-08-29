@@ -2,6 +2,7 @@ const moment = require('moment');
 const {expect} = require('chai');
 const {validateAgainstSchema} = require('../lib/validation/validateAgainstSchema');
 const helper = require('./test_helper');
+const {assertValidationPassed, assertValidationFailed} = helper;
 
 const someDate = "2014-08-12";
 const someDateTransformed = moment(someDate).toDate();
@@ -52,7 +53,7 @@ describe("validateAgainstSchema()", function () {
       };
 
       const ret = validateAgainstSchema(spec, object, models);
-      helper.assertValidationFailed(ret, ["someDate is required"]);
+      assertValidationFailed(ret, ["someDate is required"]);
     });
 
     it("should convert strings", function () {
@@ -72,7 +73,7 @@ describe("validateAgainstSchema()", function () {
       };
 
       const ret = validateAgainstSchema(spec, object, models);
-      helper.assertValidationPassed(ret);
+      assertValidationPassed(ret);
 
       expect(object.someModel.someDate).to.eql(someDateTransformed);
       expect(object.someModel.someString).to.equal(someString);
@@ -97,7 +98,7 @@ describe("validateAgainstSchema()", function () {
       };
 
       const ret = validateAgainstSchema(spec, object, models);
-      helper.assertValidationPassed(ret);
+      assertValidationPassed(ret);
 
       expect(object.someModel.someDate).to.eql(someDateTransformed);
       expect(object.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
@@ -120,7 +121,7 @@ describe("validateAgainstSchema()", function () {
       };
 
       const ret = validateAgainstSchema(spec, object, models);
-      helper.assertValidationFailed(ret, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
+      assertValidationFailed(ret, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
     });
   });
 });
@@ -139,7 +140,7 @@ describe("without models", function () {
       someDate
     };
     const ret = validateAgainstSchema(spec, object);
-    helper.assertValidationPassed(ret);
+    assertValidationPassed(ret);
     expect(object.someDate).to.eql(someDateTransformed);
   });
 
@@ -161,7 +162,7 @@ describe("without models", function () {
     };
 
     const ret = validateAgainstSchema(spec, object);
-    helper.assertValidationPassed(ret);
+    assertValidationPassed(ret);
 
     expect(object.someDate).to.eql(someDate);
   });

@@ -1,5 +1,6 @@
 const moment = require('moment');
 const helper = require('./test_helper');
+const {assertValidationPassed, assertValidationFailed} = helper;
 const {validateParameter} = require('../lib/validation/parameter');
 const {ValidationContext} = require('../lib/validation/validationContext');
 const {expect} = require('chai');
@@ -33,50 +34,50 @@ describe('object', function() {
       };
 
       const result = validateParameter(models.BasicObject, {id: 1}, models, validationContext);
-      helper.assertValidationPassed(result, [{id: 1}]);
+      assertValidationPassed(result, [{id: 1}]);
     });
 
     it('should validate with parameter null', function() {
       var value = null;
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should validate with parameter undefined', function() {
       var value = void(0);
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should validate with parameter empty', function() {
       var value = {};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should not validate with required parameter null', function() {
       var ret = validateParameter(helper.makeParam('Test', true), null, model, validationContext);
-      helper.assertValidationFailed(ret, ["testParam is required"]);
+      assertValidationFailed(ret, ["testParam is required"]);
     });
 
     it('should not validate with required parameter undefined', function() {
       var ret = validateParameter(helper.makeParam('Test', true), undefined, model, validationContext);
-      helper.assertValidationFailed(ret, ["testParam is required"]);
+      assertValidationFailed(ret, ["testParam is required"]);
     });
 
     it('should not validate with array', function() {
       var ret = validateParameter(helper.makeParam('Test', true), [], model, validationContext);
-      helper.assertValidationFailed(ret, ["testParam is not a type of object"]);
+      assertValidationFailed(ret, ["testParam is not a type of object"]);
     });
 
     it('should not validate with Number', function() {
       var ret = validateParameter(helper.makeParam('Test', true), 12, model, validationContext);
-      helper.assertValidationFailed(ret, ["testParam is not a type of object"]);
+      assertValidationFailed(ret, ["testParam is not a type of object"]);
     });
 
     it('should not validate with string', function() {
       var ret = validateParameter(helper.makeParam('Test', true), 'thisisastring', model, validationContext);
-      helper.assertValidationFailed(ret, ["testParam is not a type of object"]);
+      assertValidationFailed(ret, ["testParam is not a type of object"]);
     });
   });
 
@@ -95,12 +96,12 @@ describe('object', function() {
     it('should validate', function() {
       var value = {id: 1};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should not validate', function() {
       var ret = validateParameter(helper.makeParam('Test', false), {id: 'thisisastring'}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is not a type of number"]);
+      assertValidationFailed(ret, ["id is not a type of number"]);
     });
   });
 
@@ -119,12 +120,12 @@ describe('object', function() {
     it('should validate', function() {
       var value = {id: 1.233242};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should not validate', function() {
       var ret = validateParameter(helper.makeParam('Test', false), {id: 'thisisastring'}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is not a type of float"]);
+      assertValidationFailed(ret, ["id is not a type of float"]);
     });
   });
 
@@ -143,12 +144,12 @@ describe('object', function() {
     it('should validate', function() {
       var value = {id: 1.233242};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should not validate', function() {
       var ret = validateParameter(helper.makeParam('Test', false), {id: 'thisisastring'}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is not a type of double"]);
+      assertValidationFailed(ret, ["id is not a type of double"]);
     });
   });
 
@@ -167,12 +168,12 @@ describe('object', function() {
     it('should validate', function() {
       var value = {id: 1};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should not validate', function() {
       var ret = validateParameter(helper.makeParam('Test', false), {id: 'thisisastring'}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is not a type of integer"]);
+      assertValidationFailed(ret, ["id is not a type of integer"]);
     });
   });
 
@@ -191,12 +192,12 @@ describe('object', function() {
     it('should validate', function() {
       var value = {id: 1};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should not validate', function() {
       var ret = validateParameter(helper.makeParam('Test', false), {id: 'thisisastring'}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is not a type of int32"]);
+      assertValidationFailed(ret, ["id is not a type of int32"]);
     });
   });
 
@@ -215,12 +216,12 @@ describe('object', function() {
     it('should validate', function() {
       var value = {id: 1};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should not validate', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {id: '  '}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is not a type of int64"]);
+      assertValidationFailed(ret, ["id is not a type of int64"]);
     });
   });
 
@@ -239,12 +240,12 @@ describe('object', function() {
     it('should validate', function() {
       var value = {id: 'this is a string'};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should not validate', function() {
       var ret = validateParameter(helper.makeParam('Test', false), {id: {}}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is not a type of string"]);
+      assertValidationFailed(ret, ["id is not a type of string"]);
     });
   });
 
@@ -263,7 +264,7 @@ describe('object', function() {
     it('should validate', function() {
       var value = {id: [65, 43]};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
   });
 
@@ -286,7 +287,7 @@ describe('object', function() {
       var value = {id: '2014-08-08'};
       var transformedValue = {id: moment('2014-08-08').toDate()};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [transformedValue]);
+      assertValidationPassed(ret, [transformedValue]);
     });
   });
 
@@ -306,7 +307,7 @@ describe('object', function() {
       var value = {id: '2014-08-09T12:43:00'};
       var transformedValue = {id: moment('2014-08-09T12:43:00').toDate()};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [transformedValue]);
+      assertValidationPassed(ret, [transformedValue]);
     });
   });
 
@@ -326,12 +327,12 @@ describe('object', function() {
       var value = {id: 'true'};
       var transformedValue = {id: true};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [transformedValue]);
+      assertValidationPassed(ret, [transformedValue]);
     });
 
     it('should not validate', function() {
       var ret = validateParameter(helper.makeParam('Test', false), {id: 'thisisastring'}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is not a type of boolean"]);
+      assertValidationFailed(ret, ["id is not a type of boolean"]);
     });
   });
 
@@ -351,17 +352,17 @@ describe('object', function() {
     it('should validate', function() {
       var value = {id: 1};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should not validate with missing parameter', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(ret, ["id is required"]);
     });
 
     it('should not validate', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {id: 'thisisastring'}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is not a type of number"]);
+      assertValidationFailed(ret, ["id is not a type of number"]);
     });
   });
 
@@ -381,17 +382,17 @@ describe('object', function() {
     it('should validate', function() {
       var value = {id: 1.233242};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should not validate with missing parameter', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(ret, ["id is required"]);
     });
 
     it('should not validate', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {id: 'thisisastring'}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is not a type of float"]);
+      assertValidationFailed(ret, ["id is not a type of float"]);
     });
   });
 
@@ -411,17 +412,17 @@ describe('object', function() {
     it('should validate', function() {
       var value = {id: 1.233242};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should not validate with missing parameter', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(ret, ["id is required"]);
     });
 
     it('should not validate', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {id: 'thisisastring'}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is not a type of double"]);
+      assertValidationFailed(ret, ["id is not a type of double"]);
     });
   });
 
@@ -441,17 +442,17 @@ describe('object', function() {
     it('should validate', function() {
       var value = {id: 1};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should not validate with missing parameter', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(ret, ["id is required"]);
     });
 
     it('should not validate', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {id: 'thisisastring'}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is not a type of integer"]);
+      assertValidationFailed(ret, ["id is not a type of integer"]);
     });
   });
 
@@ -471,17 +472,17 @@ describe('object', function() {
     it('should validate', function() {
       var value = {id: 1};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should not validate with missing parameter', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(ret, ["id is required"]);
     });
 
     it('should not validate', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {id: 'thisisastring'}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is not a type of int32"]);
+      assertValidationFailed(ret, ["id is not a type of int32"]);
     });
   });
 
@@ -501,17 +502,17 @@ describe('object', function() {
     it('should validate', function() {
       var value = {id: 1};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should not validate with missing parameter', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(ret, ["id is required"]);
     });
 
     it('should not validate', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {id: ' '}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is not a type of int64"]);
+      assertValidationFailed(ret, ["id is not a type of int64"]);
     });
   });
 
@@ -531,17 +532,17 @@ describe('object', function() {
     it('should validate', function() {
       var value = {id: 'this is a string'};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should not validate with missing parameter', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(ret, ["id is required"]);
     });
 
     it('should not validate', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {id: {}}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is not a type of string"]);
+      assertValidationFailed(ret, ["id is not a type of string"]);
     });
   });
 
@@ -561,12 +562,12 @@ describe('object', function() {
     it('should validate', function() {
       var value = {id: [65, 43]};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should not validate with missing parameter', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(ret, ["id is required"]);
     });
   });
 
@@ -590,12 +591,12 @@ describe('object', function() {
       var value = {id: '2014-08-08'};
       var transformedValue = {id: moment('2014-08-08').toDate()};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [transformedValue]);
+      assertValidationPassed(ret, [transformedValue]);
     });
 
     it('should not validate with missing parameter', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(ret, ["id is required"]);
     });
   });
 
@@ -619,12 +620,12 @@ describe('object', function() {
       var value = {id: '2014-08-09T12:43:00'};
       var transformedValue = {id: moment('2014-08-09T12:43:00').toDate()};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [transformedValue]);
+      assertValidationPassed(ret, [transformedValue]);
     });
 
     it('should not validate with missing parameter', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(ret, ["id is required"]);
     });
   });
 
@@ -645,17 +646,17 @@ describe('object', function() {
       var value = {id: 'true'};
       var transformedValue = {id: true};
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [transformedValue]);
+      assertValidationPassed(ret, [transformedValue]);
     });
 
     it('should not validate with missing parameter', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(ret, ["id is required"]);
     });
 
     it('should not validate', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {id: 'thisisastring'}, model, validationContext);
-      helper.assertValidationFailed(ret, ["id is not a type of boolean"]);
+      assertValidationFailed(ret, ["id is not a type of boolean"]);
     });
   });
 
@@ -709,7 +710,7 @@ describe('object', function() {
         boolean: true
       };
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [transformedValue]);
+      assertValidationPassed(ret, [transformedValue]);
     });
 
     it('should not validate all invalid', function() {
@@ -726,7 +727,7 @@ describe('object', function() {
         datetime: Number(2.23526),
         boolean: 'Not a boolean'
       }, model, validationContext);
-      helper.assertValidationFailed(ret, [
+      assertValidationFailed(ret, [
         'boolean is not a type of boolean',
         'date is not valid based on the pattern for moment.ISO 8601',
         'datetime is not valid based on the pattern for moment.ISO 8601',
@@ -754,7 +755,7 @@ describe('object', function() {
         datetime: '2014-01-01T17:00',
         boolean: true
       }, model, validationContext);
-      helper.assertValidationFailed(ret, [
+      assertValidationFailed(ret, [
         'double is not a type of double',
         'float is not a type of float',
         'integer is not a type of integer',
@@ -776,7 +777,7 @@ describe('object', function() {
         datetime: Number(2.3265),
         boolean: 'Not a boolean'
       }, model, validationContext);
-      helper.assertValidationFailed(ret, [
+      assertValidationFailed(ret, [
         'boolean is not a type of boolean',
         'date is not valid based on the pattern for moment.ISO 8601',
         'datetime is not valid based on the pattern for moment.ISO 8601',
@@ -838,12 +839,12 @@ describe('object', function() {
         param11: true
       };
       var ret = validateParameter(helper.makeParam('Test', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [transformedValue]);
+      assertValidationPassed(ret, [transformedValue]);
     });
 
     it('should not validate all missing', function() {
       var ret = validateParameter(helper.makeParam('Test', true), {}, model, validationContext);
-      helper.assertValidationFailed(ret, ['param1 is required', 'param10 is required', 'param11 is required', 'param2 is required', 'param3 is required', 'param4 is required', 'param5 is required', 'param6 is required', 'param7 is required', 'param8 is required', 'param9 is required']);
+      assertValidationFailed(ret, ['param1 is required', 'param10 is required', 'param11 is required', 'param2 is required', 'param3 is required', 'param4 is required', 'param5 is required', 'param6 is required', 'param7 is required', 'param8 is required', 'param9 is required']);
     });
   });
 
@@ -872,12 +873,12 @@ describe('object', function() {
         integer: 1
       };
       var ret = validateParameter(helper.makeParam('foo', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should validate all missing', function() {
       var ret = validateParameter(helper.makeParam('foo', true), {}, model, validationContext);
-      helper.assertValidationPassed(ret, [
+      assertValidationPassed(ret, [
         {}
       ]);
     });
@@ -888,7 +889,7 @@ describe('object', function() {
         integer: 1
       };
       var ret = validateParameter(helper.makeParam('foo', true), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should not validate all invalid', function() {
@@ -897,7 +898,7 @@ describe('object', function() {
         integer: false
       };
       var ret = validateParameter(helper.makeParam('foo', true), value, model, validationContext);
-      helper.assertValidationFailed(ret, ['integer is not a type of integer', 'obj is not a type of object']);
+      assertValidationFailed(ret, ['integer is not a type of integer', 'obj is not a type of object']);
     });
 
     it('should not validate array invalid', function() {
@@ -906,7 +907,7 @@ describe('object', function() {
         integer: 1
       };
       var ret = validateParameter(helper.makeParam('foo', true), value, model, validationContext);
-      helper.assertValidationFailed(ret, ['1 is not a type of boolean']);
+      assertValidationFailed(ret, ['1 is not a type of boolean']);
     });
   });
 
@@ -937,7 +938,7 @@ describe('object', function() {
         integer: 1
       };
       var ret = validateParameter(helper.makeParam('foo', false), value, model, validationContext);
-      helper.assertValidationPassed(ret, [value]);
+      assertValidationPassed(ret, [value]);
     });
 
     it('should not validate array missing', function() {
@@ -946,7 +947,7 @@ describe('object', function() {
         integer: 1
       };
       var ret = validateParameter(helper.makeParam('foo', true), value, model, validationContext);
-      helper.assertValidationFailed(ret, ['array is required']);
+      assertValidationFailed(ret, ['array is required']);
     });
 
     it('should not validate all invalid', function() {
@@ -955,7 +956,7 @@ describe('object', function() {
         integer: false
       };
       var ret = validateParameter(helper.makeParam('foo', true), value, model, validationContext);
-      helper.assertValidationFailed(ret, ['integer is not a type of integer', 'obj is not a type of object']);
+      assertValidationFailed(ret, ['integer is not a type of integer', 'obj is not a type of object']);
     });
 
     it('should not validate array invalid', function() {
@@ -964,12 +965,12 @@ describe('object', function() {
         integer: 1
       };
       var ret = validateParameter(helper.makeParam('foo', true), value, model, validationContext);
-      helper.assertValidationFailed(ret, ['1 is not a type of boolean']);
+      assertValidationFailed(ret, ['1 is not a type of boolean']);
     });
 
     it('should not validate all missing', function() {
       var ret = validateParameter(helper.makeParam('foo', true), {}, model, validationContext);
-      helper.assertValidationFailed(ret, ['integer is required', 'obj is required']);
+      assertValidationFailed(ret, ['integer is required', 'obj is required']);
     });
   });
 
@@ -992,7 +993,7 @@ describe('object', function() {
     it('should validate', () => {
       const value = {id: '123'};
       const result = validateParameter(helper.makeParam('Test', true), value, models, validationContext);
-      helper.assertValidationPassed(result, [{id: '123'}]);
+      assertValidationPassed(result, [{id: '123'}]);
     });
 
     it('should return an error when "additionalProperties" is false and an additional property is provided', () => {
@@ -1002,7 +1003,7 @@ describe('object', function() {
         anotherProperty: 'some value'
       };
       const result = validateParameter(helper.makeParam('Test', true), value, models, validationContext);
-      helper.assertValidationFailed(result, ["testParam contains invalid properties: extraProperty, anotherProperty"]);
+      assertValidationFailed(result, ["testParam contains invalid properties: extraProperty, anotherProperty"]);
     });
 
     it('should return success when "additionalProperties" is false and there are no properties in the model or the value', () => {
@@ -1013,7 +1014,7 @@ describe('object', function() {
       };
       const value = {};
       const result = validateParameter(helper.makeParam('Test', true), value, models, validationContext);
-      helper.assertValidationPassed(result, [{}]);
+      assertValidationPassed(result, [{}]);
     });
   });
 
@@ -1031,7 +1032,7 @@ describe('object', function() {
       };
 
       let result = validateParameter(models.ObjectWithString, {someProperty: 1}, models, validationContext);
-      helper.assertValidationFailed(result, ['someProperty is not a type of string']);
+      assertValidationFailed(result, ['someProperty is not a type of string']);
       expect(result[0].context.toLiteral()).to.eql({dataPath: ['someProperty']});
       expect(result[0].context.formatDataPath()).to.eql("someProperty");
 
@@ -1055,7 +1056,7 @@ describe('object', function() {
       };
 
       result = validateParameter(models.ObjectContainingAnotherObject, {someNestedObject: {someProperty: 1}}, models, validationContext);
-      helper.assertValidationFailed(result, ['someProperty is not a type of string']);
+      assertValidationFailed(result, ['someProperty is not a type of string']);
       expect(result[0].context.toLiteral()).to.eql({dataPath: ['someNestedObject', 'someProperty']});
       expect(result[0].context.formatDataPath()).to.eql("someNestedObject.someProperty");
     });

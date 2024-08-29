@@ -2,6 +2,7 @@ const moment = require('moment');
 const {expect} = require('chai');
 const {validateRequest} = require('../lib/validation/validateRequest');
 const helper = require('./test_helper');
+const {assertValidationPassed, assertValidationFailed} = helper;
 
 describe('paramType - query', function() {
   describe('without models', function() {
@@ -34,7 +35,7 @@ describe('paramType - query', function() {
         }
       };
       var ret = validateRequest(spec, req);
-      helper.assertValidationPassed(ret);
+      assertValidationPassed(ret);
       expect(req.query.someDate).to.eql(someDateTransformed);
       expect(req.query.someNumber).to.equal(someNumberTransformed);
     });
@@ -63,7 +64,7 @@ describe('paramType - query', function() {
         query: {}
       };
       var ret = validateRequest(spec, req);
-      helper.assertValidationPassed(ret);
+      assertValidationPassed(ret);
       expect(req.query.someDate).to.eql("2014-11-23");
       expect(req.query.someNumber).to.equal("233.2354");
     });
@@ -98,7 +99,7 @@ describe('paramType - query', function() {
         }
       };
       var ret = validateRequest(spec, req);
-      helper.assertValidationPassed(ret);
+      assertValidationPassed(ret);
       expect(req.query.someDate).to.eql(someDate);
       expect(req.query.someNumber).to.equal(someNumber);
     });
@@ -120,7 +121,7 @@ describe('paramType - query', function() {
         }
       };
       var ret = validateRequest(spec, req);
-      helper.assertValidationFailed(ret, ["someString is not valid based on the pattern /^hi/i"]);
+      assertValidationFailed(ret, ["someString is not valid based on the pattern /^hi/i"]);
     });
   });
 
@@ -154,7 +155,7 @@ describe('paramType - query', function() {
         }
       };
       var ret = validateRequest(spec, req);
-      helper.assertValidationPassed(ret);
+      assertValidationPassed(ret);
       expect(req.query.someDate).to.eql(someDateTransformed);
       expect(req.query.someNumber).to.equal(someNumberTransformed);
     });
@@ -183,7 +184,7 @@ describe('paramType - query', function() {
         query: {}
       };
       var ret = validateRequest(spec, req);
-      helper.assertValidationPassed(ret);
+      assertValidationPassed(ret);
       expect(req.query.someDate).to.eql("2014-11-23");
       expect(req.query.someNumber).to.equal("233.2354");
     });
@@ -218,7 +219,7 @@ describe('paramType - query', function() {
         }
       };
       var ret = validateRequest(spec, req);
-      helper.assertValidationPassed(ret);
+      assertValidationPassed(ret);
       expect(req.query.someDate).to.eql(someDate);
       expect(req.query.someNumber).to.equal(someNumber);
     });
@@ -240,7 +241,7 @@ describe('paramType - query', function() {
         }
       };
       var ret = validateRequest(spec, req);
-      helper.assertValidationFailed(ret, ["someString is not valid based on the pattern /^hi/i"]);
+      assertValidationFailed(ret, ["someString is not valid based on the pattern /^hi/i"]);
     });
   });
 });
