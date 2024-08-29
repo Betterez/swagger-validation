@@ -3,7 +3,7 @@ const {assertValidationPassed, assertValidationFailed} = helper;
 const {validateParameter} = require('../lib/validation/parameter');
 const {ValidationContext} = require('../lib/validation/validationContext');
 
-describe('boolean', function() {
+describe('boolean', function () {
   let models;
   let validationContext;
 
@@ -12,100 +12,170 @@ describe('boolean', function() {
     validationContext = new ValidationContext();
   });
 
-  it('should validate with true', function() {
+  it('should validate with true', function () {
     var value = true;
-    var ret = validateParameter(helper.makeParam('boolean', false), value, models, validationContext);
+    var ret = validateParameter({
+      schema: helper.makeParam('boolean', false),
+      value,
+      models,
+      validationContext
+    });
     assertValidationPassed(ret, [value]);
   });
 
-  it('should validate with false', function() {
+  it('should validate with false', function () {
     var value = false;
-    var ret = validateParameter(helper.makeParam('boolean', false), value, models, validationContext);
+    var ret = validateParameter({
+      schema: helper.makeParam('boolean', false),
+      value,
+      models,
+      validationContext
+    });
     assertValidationPassed(ret, [value]);
   });
 
-  it('should validate with true string', function() {
+  it('should validate with true string', function () {
     var value = 'true';
     var transformedValue = true;
-    var ret = validateParameter(helper.makeParam('boolean', false), value, models, validationContext);
+    var ret = validateParameter({
+      schema: helper.makeParam('boolean', false),
+      value,
+      models,
+      validationContext
+    });
     assertValidationPassed(ret, [transformedValue]);
   });
 
-  it('should validate with false string', function() {
+  it('should validate with false string', function () {
     var value = 'false';
     var transformedValue = false;
-    var ret = validateParameter(helper.makeParam('boolean', false), value, models, validationContext);
+    var ret = validateParameter({
+      schema: helper.makeParam('boolean', false),
+      value,
+      models,
+      validationContext
+    });
     assertValidationPassed(ret, [transformedValue]);
   });
 
-  it('should not validate with required field null', function() {
+  it('should not validate with required field null', function () {
     var value = null;
-    var ret = validateParameter(helper.makeParam('boolean', true), value, models, validationContext);
+    var ret = validateParameter({
+      schema: helper.makeParam('boolean', true),
+      value,
+      models,
+      validationContext
+    });
     assertValidationFailed(ret, ["testParam is required"]);
   });
 
-  it('should not validate with required field undefined', function() {
-    var ret = validateParameter(helper.makeParam('boolean', true), undefined, models, validationContext);
+  it('should not validate with required field undefined', function () {
+    var ret = validateParameter({
+      schema: helper.makeParam('boolean', true),
+      value: undefined,
+      models,
+      validationContext
+    });
     assertValidationFailed(ret, ["testParam is required"]);
   });
 
-  it('should not validate with required field empty string', function() {
+  it('should not validate with required field empty string', function () {
     var value = '';
-    var ret = validateParameter(helper.makeParam('boolean', true), value, models, validationContext);
+    var ret = validateParameter({
+      schema: helper.makeParam('boolean', true),
+      value,
+      models,
+      validationContext
+    });
     assertValidationFailed(ret, ["testParam is required"]);
   });
 
-  it('should not validate with empty object', function() {
+  it('should not validate with empty object', function () {
     var value = {};
-    var ret = validateParameter(helper.makeParam('boolean', false), value, models, validationContext);
+    var ret = validateParameter({
+      schema: helper.makeParam('boolean', false),
+      value,
+      models,
+      validationContext
+    });
     assertValidationFailed(ret, ["testParam is not a type of boolean"]);
   });
 
-  it('should not validate with number', function() {
+  it('should not validate with number', function () {
     var value = 1;
-    var ret = validateParameter(helper.makeParam('boolean', false), value, models, validationContext);
+    var ret = validateParameter({
+      schema: helper.makeParam('boolean', false),
+      value,
+      models,
+      validationContext
+    });
     assertValidationFailed(ret, ["testParam is not a type of boolean"]);
   });
 
-  it('should not validate with True string', function() {
+  it('should not validate with True string', function () {
     var value = 'True';
-    var ret = validateParameter(helper.makeParam('boolean', false), value, models, validationContext);
+    var ret = validateParameter({
+      schema: helper.makeParam('boolean', false),
+      value,
+      models,
+      validationContext
+    });
     assertValidationFailed(ret, ["testParam is not a type of boolean"]);
   });
 
-  it('should not validate with False string', function() {
+  it('should not validate with False string', function () {
     var value = 'False';
-    var ret = validateParameter(helper.makeParam('boolean', false), value, models, validationContext);
+    var ret = validateParameter({
+      schema: helper.makeParam('boolean', false),
+      value,
+      models,
+      validationContext
+    });
     assertValidationFailed(ret, ["testParam is not a type of boolean"]);
   });
 
-  it('should not validate with random string', function() {
+  it('should not validate with random string', function () {
     var value = 'Hello World';
-    var ret = validateParameter(helper.makeParam('boolean', false), value, models, validationContext);
+    var ret = validateParameter({
+      schema: helper.makeParam('boolean', false),
+      value,
+      models,
+      validationContext
+    });
     assertValidationFailed(ret, ["testParam is not a type of boolean"]);
   });
 
-  it('should not validate with empty array', function() {
+  it('should not validate with empty array', function () {
     var value = [];
-    var ret = validateParameter(helper.makeParam('boolean', false), value, models, validationContext);
+    var ret = validateParameter({
+      schema: helper.makeParam('boolean', false),
+      value,
+      models,
+      validationContext
+    });
     assertValidationFailed(ret, ["testParam is not a type of boolean"]);
   });
 
-  it('should not validate with empty array containing booleans', function() {
+  it('should not validate with empty array containing booleans', function () {
     var value = [true, false];
-    var ret = validateParameter(helper.makeParam('boolean', false), value, models, validationContext);
+    var ret = validateParameter({
+      schema: helper.makeParam('boolean', false),
+      value,
+      models,
+      validationContext
+    });
     assertValidationFailed(ret, ["testParam is not a type of boolean"]);
   });
 
   it('should not validate with null if nullable is false', function () {
-    const param = {
+    const schema = {
       type: 'boolean',
       required: false,
       name: 'testParam',
       nullable: false
     };
 
-    const result = validateParameter(param, null, models, validationContext);
+    const result = validateParameter({schema, value: null, models, validationContext});
     assertValidationFailed(result, ['testParam cannot be null']);
   });
 });

@@ -4,9 +4,9 @@ const {validateRequest} = require('../lib/validation/validateRequest');
 const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
 
-describe('paramType - header', function() {
-  describe('with models', function() {
-    it('should convert strings', function() {
+describe('paramType - header', function () {
+  describe('with models', function () {
+    it('should convert strings', function () {
       var spec = {
         parameters: [
           {
@@ -47,7 +47,7 @@ describe('paramType - header', function() {
       expect(req.header.someModel.someString).to.equal(someString);
     });
 
-    it('should handle nested models when converting strings', function() {
+    it('should handle nested models when converting strings', function () {
       var spec = {
         parameters: [
           {
@@ -99,7 +99,7 @@ describe('paramType - header', function() {
       expect(req.header.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
     });
 
-    it('should return validation errors', function() {
+    it('should return validation errors', function () {
       var spec = {
         parameters: [
           {
@@ -136,8 +136,8 @@ describe('paramType - header', function() {
     });
   });
 
-    describe('with models - without paramType', function() {
-    it('should convert strings', function() {
+  describe('with models - without paramType', function () {
+    it('should convert strings', function () {
       var spec = {
         parameters: [
           {
@@ -178,7 +178,7 @@ describe('paramType - header', function() {
       expect(req.header.someModel.someString).to.equal(someString);
     });
 
-    it('should handle nested models when converting strings', function() {
+    it('should handle nested models when converting strings', function () {
       var spec = {
         parameters: [
           {
@@ -230,7 +230,7 @@ describe('paramType - header', function() {
       expect(req.header.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
     });
 
-    it('should return validation errors', function() {
+    it('should return validation errors', function () {
       var spec = {
         parameters: [
           {
@@ -267,8 +267,8 @@ describe('paramType - header', function() {
     });
   });
 
-  describe('without models', function() {
-    it('should validate spec and convert strings', function() {
+  describe('without models', function () {
+    it('should validate spec and convert strings', function () {
       var spec = {
         parameters: [
           {
@@ -291,7 +291,7 @@ describe('paramType - header', function() {
       expect(req.header.someDate).to.eql(someDateTransformed);
     });
 
-    it('should validate spec and not convert strings', function() {
+    it('should validate spec and not convert strings', function () {
       var spec = {
         validation: {
           replaceValues: false
@@ -317,8 +317,8 @@ describe('paramType - header', function() {
     });
   });
 
-  describe('without models - without paramType', function() {
-    it('should validate spec and convert strings', function() {
+  describe('without models - without paramType', function () {
+    it('should validate spec and convert strings', function () {
       var spec = {
         parameters: [
           {
@@ -341,7 +341,7 @@ describe('paramType - header', function() {
       expect(req.header.someDate).to.eql(someDateTransformed);
     });
 
-    it('should validate spec and not convert strings', function() {
+    it('should validate spec and not convert strings', function () {
       var spec = {
         validation: {
           replaceValues: false

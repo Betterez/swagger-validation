@@ -4,9 +4,9 @@ const {validateRequest} = require('../lib/validation/validateRequest');
 const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
 
-describe('paramType - path', function() {
-  describe('without models', function() {
-    it('should convert strings', function() {
+describe('paramType - path', function () {
+  describe('without models', function () {
+    it('should convert strings', function () {
       var spec = {
         parameters: [
           {
@@ -45,7 +45,7 @@ describe('paramType - path', function() {
       expect(req.params.someNumber).to.equal(someNumberTransformed);
     });
 
-    it('should not convert strings', function() {
+    it('should not convert strings', function () {
       var spec = {
         validation: {
           replaceValues: false

@@ -4,9 +4,9 @@ const {validateRequest} = require('../lib/validation/validateRequest');
 const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
 
-describe('paramType - body', function() {
-  describe('with models', function() {
-    it('should convert strings', function() {
+describe('paramType - body', function () {
+  describe('with models', function () {
+    it('should convert strings', function () {
       var spec = {
         parameters: [
           {
@@ -47,7 +47,7 @@ describe('paramType - body', function() {
       expect(req.body.someModel.someString).to.equal(someString);
     });
 
-    it('should handle nested models when converting strings', function() {
+    it('should handle nested models when converting strings', function () {
       var spec = {
         parameters: [
           {
@@ -98,7 +98,7 @@ describe('paramType - body', function() {
       expect(req.body.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
     });
 
-    it('should return validation errors', function() {
+    it('should return validation errors', function () {
       var spec = {
         parameters: [
           {
@@ -135,8 +135,8 @@ describe('paramType - body', function() {
     });
   });
 
-  describe('with models - without paramType', function() {
-    it('should convert strings', function() {
+  describe('with models - without paramType', function () {
+    it('should convert strings', function () {
       var spec = {
         parameters: [
           {
@@ -177,7 +177,7 @@ describe('paramType - body', function() {
       expect(req.body.someModel.someString).to.equal(someString);
     });
 
-    it('should handle nested models when converting strings', function() {
+    it('should handle nested models when converting strings', function () {
       var spec = {
         parameters: [
           {
@@ -228,7 +228,7 @@ describe('paramType - body', function() {
       expect(req.body.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
     });
 
-    it('should return validation errors', function() {
+    it('should return validation errors', function () {
       var spec = {
         parameters: [
           {
@@ -265,8 +265,8 @@ describe('paramType - body', function() {
     });
   });
 
-  describe('without models - without paramType', function() {
-    it('should validate spec and convert strings', function() {
+  describe('without models - without paramType', function () {
+    it('should validate spec and convert strings', function () {
       var spec = {
         parameters: [
           {
@@ -289,7 +289,7 @@ describe('paramType - body', function() {
       expect(req.body.someDate).to.eql(someDateTransformed);
     });
 
-    it('should validate spec and not convert strings', function() {
+    it('should validate spec and not convert strings', function () {
       var spec = {
         validation: {
           replaceValues: false
@@ -313,8 +313,8 @@ describe('paramType - body', function() {
     });
   });
 
-  describe('without models', function() {
-    it('should validate spec and convert strings', function() {
+  describe('without models', function () {
+    it('should validate spec and convert strings', function () {
       var spec = {
         parameters: [
           {
@@ -337,7 +337,7 @@ describe('paramType - body', function() {
       expect(req.body.someDate).to.eql(someDateTransformed);
     });
 
-    it('should validate spec and not convert strings', function() {
+    it('should validate spec and not convert strings', function () {
       var spec = {
         validation: {
           replaceValues: false

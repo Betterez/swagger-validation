@@ -4,9 +4,9 @@ const {validateRequest} = require('../lib/validation/validateRequest');
 const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
 
-describe('paramType - query', function() {
-  describe('without models', function() {
-    it('should convert strings', function() {
+describe('paramType - query', function () {
+  describe('without models', function () {
+    it('should convert strings', function () {
       var spec = {
         parameters: [
           {
@@ -40,7 +40,7 @@ describe('paramType - query', function() {
       expect(req.query.someNumber).to.equal(someNumberTransformed);
     });
 
-    it('should convert strings to defaultValue', function() {
+    it('should convert strings to defaultValue', function () {
       var spec = {
         parameters: [
           {
@@ -69,7 +69,7 @@ describe('paramType - query', function() {
       expect(req.query.someNumber).to.equal("233.2354");
     });
 
-    it('should not convert strings with date format to Date object', function() {
+    it('should not convert strings with date format to Date object', function () {
       var spec = {
         validation: {
           replaceValues: false
@@ -104,7 +104,7 @@ describe('paramType - query', function() {
       expect(req.query.someNumber).to.equal(someNumber);
     });
 
-    it('should return validation errors if string pattern does not match', function() {
+    it('should return validation errors if string pattern does not match', function () {
       var spec = {
         parameters: [
           {
@@ -125,8 +125,8 @@ describe('paramType - query', function() {
     });
   });
 
-  describe('without models - without paramType', function() {
-    it('should convert strings', function() {
+  describe('without models - without paramType', function () {
+    it('should convert strings', function () {
       var spec = {
         parameters: [
           {
@@ -160,7 +160,7 @@ describe('paramType - query', function() {
       expect(req.query.someNumber).to.equal(someNumberTransformed);
     });
 
-    it('should convert strings to defaultValue', function() {
+    it('should convert strings to defaultValue', function () {
       var spec = {
         parameters: [
           {
@@ -189,7 +189,7 @@ describe('paramType - query', function() {
       expect(req.query.someNumber).to.equal("233.2354");
     });
 
-    it('should not convert strings with date format to Date object', function() {
+    it('should not convert strings with date format to Date object', function () {
       var spec = {
         validation: {
           replaceValues: false
@@ -224,7 +224,7 @@ describe('paramType - query', function() {
       expect(req.query.someNumber).to.equal(someNumber);
     });
 
-    it('should return validation errors if string pattern does not match', function() {
+    it('should return validation errors if string pattern does not match', function () {
       var spec = {
         parameters: [
           {

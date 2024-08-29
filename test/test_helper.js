@@ -4,7 +4,7 @@ const {ValidationContext} = require('../lib/validation/validationContext');
 exports = module.exports = {};
 
 // helper method to make the basic param object
-exports.makeParam = function(type, required, format, name) {
+exports.makeParam = function (type, required, format, name) {
   return {
     type: type,
     required: required,
@@ -14,7 +14,7 @@ exports.makeParam = function(type, required, format, name) {
 };
 
 // helper method to make the string param object
-exports.makeStringParam = function(type, required, format, pattern, enums, name, maxLength, minLength) {
+exports.makeStringParam = function (type, required, format, pattern, enums, name, maxLength, minLength) {
   return {
     type: type,
     required: required,
@@ -28,7 +28,7 @@ exports.makeStringParam = function(type, required, format, pattern, enums, name,
 };
 
 // helper method to make the number param object
-exports.makeNumberParam = function(type, required, format, minimum, maximum, name) {
+exports.makeNumberParam = function (type, required, format, minimum, maximum, name) {
   return {
     type: type,
     required: required,
@@ -40,7 +40,7 @@ exports.makeNumberParam = function(type, required, format, minimum, maximum, nam
 };
 
 // helper method to make the array / set param object
-exports.makeArrayParam = function(required, itemType, itemFormat, itemPattern, uniqueItems, name, minItems, maxItems) {
+exports.makeArrayParam = function (required, itemType, itemFormat, itemPattern, uniqueItems, name, minItems, maxItems) {
   return {
     type: 'array',
     required: required,
@@ -57,7 +57,7 @@ exports.makeArrayParam = function(required, itemType, itemFormat, itemPattern, u
 };
 
 // helper method to run all the unit test checks when it should succeed
-exports.assertValidationPassed = function(validationResults, values) {
+exports.assertValidationPassed = function (validationResults, values) {
   expect(validationResults).to.exist;
   expect(validationResults).to.be.an("array");
   expect(validationResults.every((result) => !result.hasOwnProperty('error'))).to.be.true;
@@ -78,7 +78,7 @@ exports.assertValidationPassed = function(validationResults, values) {
 };
 
 // helper method to run all the unit test checks when it should fail
-exports.assertValidationFailed = function(validationResults, expectedErrorMessages) {
+exports.assertValidationFailed = function (validationResults, expectedErrorMessages) {
   expect(validationResults).to.exist;
   expect(validationResults).to.be.an("array");
   expect(validationResults).to.have.length(expectedErrorMessages.length);
