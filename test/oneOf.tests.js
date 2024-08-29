@@ -1,8 +1,7 @@
+const {expect} = require('chai');
+const {validateParameter} = require('../lib/validation/parameter');
 
-var {validateParameter} = require('../lib/validation/parameter');
-
-describe('oneOF', function() {
-  const {expect} = require("chai");
+describe('oneOf', function() {
   describe('basic tests', function() {
     var model = {
       Test: {

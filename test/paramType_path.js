@@ -1,10 +1,7 @@
-'use strict';
-
-var moment = require('moment');
-var chai = require('chai');
-var expect = chai.expect;
-var {validateRequest} = require('../lib/validation/validateRequest');
-var helper = require('./test_helper');
+const moment = require('moment');
+const {expect} = require('chai');
+const {validateRequest} = require('../lib/validation/validateRequest');
+const helper = require('./test_helper');
 
 describe('paramType - path', function() {
   describe('without models', function() {
@@ -42,7 +39,7 @@ describe('paramType - path', function() {
         }
       };
       var ret = validateRequest(spec, req);
-      helper.validateSuccess(ret, 0);
+      helper.assertValidationPassed(ret);
       expect(req.params.someDate).to.eql(someDateTransformed);
       expect(req.params.someNumber).to.equal(someNumberTransformed);
     });
@@ -76,7 +73,7 @@ describe('paramType - path', function() {
         }
       };
       var ret = validateRequest(spec, req);
-      helper.validateSuccess(ret, 0);
+      helper.assertValidationPassed(ret);
       expect(req.params.someDate).to.eql(someDate);
       expect(req.params.someNumber).to.equal(someNumber);
     });

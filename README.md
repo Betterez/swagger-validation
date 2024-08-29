@@ -100,9 +100,9 @@ exports.findById = {
   },
   'action': function (req,res) {
     
-    var validate = require('swagger-validation');
-    var models = require("./models.js");
-    var _ = require('lodash');
+    const validate = require('swagger-validation');
+    const models = require('./models.js');
+    const _ = require('lodash');
     // models are only needed if this is intended to validate an object
     var ret = validate(exports.findById.spec, req, models); 
     if(ret.length) {
@@ -156,9 +156,9 @@ exports.findById = {
 
 // put this somewhere else, either in the same file or put it in a 
 // separate module using the standard module.exports Node convention
-var validate = require('swagger-validation');
-var _ = require('lodash');
-var models = require("./models.js");
+const validate = require('swagger-validation');
+const _ = require('lodash');
+const models = require('./models.js');
 
 function validateReq(req, res, spec, func) {
   var ret = validate(spec, req, models);
@@ -192,7 +192,7 @@ This **will** be deprecated / removed once the pull request specified above gets
 
     // change it to 
     else {
-      var validate = require('swagger-validation');
+      const validate = require('swagger-validation');
       var ret = validate(spec, req, self.allModels);
       if(ret.length) {
         var errors = _.pluck(_.pluck(ret, 'error'), 'message');
@@ -313,7 +313,7 @@ This value defaults to true, meaning that it will replace the values on the req.
 | `number` | | This allows all forms of a number (so 2, 2.0, 2.2, 2e0, 0x2) and allows numbers between `Number.MIN_VALUE` and `Number.MAX_VALUE` (both inclusive). As a hex value COULD be the hex representation of an actual number (and JavaScript parses it for us anyway), allow JavaScript to treat hex numbers in the way it wants to. Additionally, if a minimum or maximum is defined this ensures the value is greater than the minimum (if minimum defined) or less than the maximum (if maximum defined). <br/><br/> This does have issues with edge case validation (such as Number.MAX_VALUE + 1) as, per [IEEE-754 2008 §4.3.1 spec](http://ieeexplore.ieee.org/xpl/freeabs_all.jsp?arnumber=4610935), JavaScript does rounding during addition, so essentially, Number.MAX_VALUE + 1 will equal Number.MAX_VALUE not Number.Infinity. There isn't anything we can do about this as it is correct, per spec, but it isn't intuitive. <br/><br/> If "nothing" was passed into the validate function and it's required with no default value, then this will throw a parameter is required error.
 | `number` | `float` | This allows all forms of a number (so 2, 2.0, 2.2, 2e0, 0x2) and allows numbers between `Number.MIN_VALUE` and `Number.MAX_VALUE` (both inclusive). As a hex value COULD be the hex representation of an actual number (and JavaScript parses it for us anyway), allow JavaScript to treat hex numbers in the way it wants to. Additionally, if a minimum or maximum is defined this ensures the value is greater than the minimum (if minimum defined) or less than the maximum (if maximum defined). <br/><br/> This does have issues with edge case validation (such as Number.MAX_VALUE + 1) as, per [IEEE-754 2008 §4.3.1 spec](http://ieeexplore.ieee.org/xpl/freeabs_all.jsp?arnumber=4610935), JavaScript does rounding during addition, so essentially, Number.MAX_VALUE + 1 will equal Number.MAX_VALUE not Number.Infinity. There isn't anything we can do about this as it is correct, per spec, but it isn't intuitive. <br/><br/> If "nothing" was passed into the validate function and it's required with no default value, then this will throw a parameter is required error.
 | `number` | `double` | This allows all forms of a number (so 2, 2.0, 2.2, 2e0, 0x2) and allows numbers between `Number.MIN_VALUE` and `Number.MAX_VALUE` (both inclusive). As a hex value COULD be the hex representation of an actual number (and JavaScript parses it for us anyway), allow JavaScript to treat hex numbers in the way it wants to. Additionally, if a minimum or maximum is defined this ensures the value is greater than the minimum (if minimum defined) or less than the maximum (if maximum defined). <br/><br/> This does have issues with edge case validation (such as Number.MAX_VALUE + 1) as, per [IEEE-754 2008 §4.3.1 spec](http://ieeexplore.ieee.org/xpl/freeabs_all.jsp?arnumber=4610935), JavaScript does rounding during addition, so essentially, Number.MAX_VALUE + 1 will equal Number.MAX_VALUE not Number.Infinity. There isn't anything we can do about this as it is correct, per spec, but it isn't intuitive. <br/><br/> If "nothing" was passed into the validate function and it's required with no default value, then this will throw a parameter is required error.
-| `object` | | This checks that the value is a valid Object by iterating through each property on the associated model and calling out to the respective validation method to validate that property. After validating the properties on this object's model, it will recursively look to see if any other models have this model in their subType array. If so, it will validate those properties as well. It will continue to do this until no more types are found in the subType array. <br/><br/> If "nothing" was passed into the validate function and it's required with no default value, then this will throw a parameter is required error.<br/><br/> The `additionalProperties` option is available to indicate if the object under validation is allowed to have only the properties that have been difined in the schema. This boolean option is `true` by default.
+| `object` | | This checks that the value is a valid Object by iterating through each property on the associated model and calling out to the respective validation method to validate that property.<br/><br/> If "nothing" was passed into the validate function and it's required with no default value, then this will throw a parameter is required error.<br/><br/> The `additionalProperties` option is available to indicate if the object under validation is allowed to have only the properties that have been defined in the schema. This boolean option is `true` by default.
 | `string` | | If an enum is defined this ensures that the value is inside the enum list (which is case-sensitive). <br/><br/>If a pattern is defined this also ensures that the value adheres to it.<br/><br/> It has available the options minLength and maxLength to ensure the value match these restrictions.<br/><br/> If "nothing" was passed into the validate function and it's required with no default value, then this will throw a parameter is required error.<br/><br/> ***New in V3:*** If the `minLength` property is set, and an empty string is passed into the validate function for an optional parameter, then the string will be validated against the schema (it will be validated against the `minLength`, `pattern`, etc.)  Previously, if an empty string was provided for an optional parameter, validation would always succeed.
 | `string` | `byte` | This has no type validation, but it is valid. <br/><br/> If "nothing" was passed into the validate function and it's required with no default value, then this will throw a parameter is required error.
 | `string` | `date` | There is no definitive definition in the swagger spec as to what constitutes a valid date or date-time (more than likely due to the varied formats a date could have). Therefore, swagger-validation will accept a 'pattern' property on the Swagger Property/Parameter Objects, which is a moment.js format string, that specifies the explicit format expected for the date format. If no pattern property is detected, moment.ISO_8601 will be used by default. <br/><br/> If "nothing" was passed into the validate function and it's required with no default value, then this will throw a parameter is required error.

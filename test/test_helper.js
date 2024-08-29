@@ -1,4 +1,5 @@
-'use strict';
+const {expect} = require('chai');
+const {ValidationContext} = require('../lib/validation/validationContext');
 
 exports = module.exports = {};
 
@@ -55,23 +56,18 @@ exports.makeArrayParam = function(required, itemType, itemFormat, itemPattern, u
   };
 };
 
-/* jshint ignore:start */
-// JSHint has issues with expect library as not everything ends with or has methods
-
-var _ = require('lodash');
-var chai = require('chai');
-var expect = chai.expect;
-
 // helper method to run all the unit test checks when it should succeed
-exports.validateSuccess = function(ret, length, values) {
-  expect(ret).to.exist;
-  expect(_.isArray(ret)).to.be.true;
-  expect(ret).to.have.length(length);
+exports.assertValidationPassed = function(validationResults, values) {
+  expect(validationResults).to.exist;
+  expect(validationResults).to.be.an("array");
+  expect(validationResults.every((result) => !result.hasOwnProperty('error'))).to.be.true;
 
   // don't run this for certain checks (like the ones that convert strings to numbers)
   if (values) {
+    expect(values).to.have.length(validationResults.length);
+
     for (var i = 0; i < values.length; i++) {
-      var param = ret[i];
+      var param = validationResults[i];
       expect(param).to.be.an('object');
       expect(param).to.have.ownProperty('value');
 
@@ -82,20 +78,15 @@ exports.validateSuccess = function(ret, length, values) {
 };
 
 // helper method to run all the unit test checks when it should fail
-exports.validateError = function(ret, length, errors) {
-  expect(ret).to.exist;
-  expect(_.isArray(ret)).to.be.true;
-  expect(ret).to.have.length(length);
+exports.assertValidationFailed = function(validationResults, expectedErrorMessages) {
+  expect(validationResults).to.exist;
+  expect(validationResults).to.be.an("array");
+  expect(validationResults).to.have.length(expectedErrorMessages.length);
 
-  for (var i = 0; i < errors.length; i++) {
-    var param = ret[i];
-    expect(param).to.be.an('object');
-    expect(param).to.have.ownProperty('error');
-
-    var error = param.error;
-    expect(error).to.be.an.instanceof(Error);
-
-    var errMessage = error.message;
-    expect(errMessage).to.eql(errors[i]);
-  }
+  validationResults.forEach((result, index) => {
+    expect(result).to.be.an('object');
+    expect(result.error).to.be.an.instanceof(Error);
+    expect(result.error.message).to.eql(expectedErrorMessages[index]);
+    expect(result.context).to.be.an.instanceof(ValidationContext);
+  });
 };
