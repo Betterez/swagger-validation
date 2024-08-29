@@ -2,14 +2,17 @@ const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
 const {validateParameter} = require('../lib/validation/parameter');
 const {ValidationContext} = require('../lib/validation/validationContext');
+const {getValidationSettings} = require('../lib/validation/validationSettings');
 
 describe('file', function () {
   let models;
   let validationContext;
+  let validationSettings;
 
   beforeEach(() => {
     models = undefined;
     validationContext = new ValidationContext();
+    validationSettings = getValidationSettings();
   });
 
   it('should validate', function () {
@@ -18,7 +21,8 @@ describe('file', function () {
       schema: helper.makeParam('file', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -29,7 +33,8 @@ describe('file', function () {
       schema: helper.makeParam('file', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -40,7 +45,8 @@ describe('file', function () {
       schema: helper.makeParam('file', true),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -50,7 +56,8 @@ describe('file', function () {
       schema: helper.makeParam('file', true),
       value: undefined,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ['testParam is required']);
   });
@@ -61,7 +68,8 @@ describe('file', function () {
       schema: helper.makeParam('file', true),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ['testParam is required']);
   });

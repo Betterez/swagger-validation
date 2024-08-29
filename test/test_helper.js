@@ -1,5 +1,6 @@
 const {expect} = require('chai');
 const {ValidationContext} = require('../lib/validation/validationContext');
+const {getValidationSettings} = require('../lib/validation/validationSettings');
 
 exports = module.exports = {};
 

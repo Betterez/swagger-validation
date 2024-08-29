@@ -2,14 +2,17 @@ const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
 const {validateParameter} = require('../lib/validation/parameter');
 const {ValidationContext} = require('../lib/validation/validationContext');
+const {getValidationSettings} = require('../lib/validation/validationSettings');
 
 describe('boolean', function () {
   let models;
   let validationContext;
+  let validationSettings;
 
   beforeEach(() => {
     models = undefined;
     validationContext = new ValidationContext();
+    validationSettings = getValidationSettings();
   });
 
   it('should validate with true', function () {
@@ -18,7 +21,8 @@ describe('boolean', function () {
       schema: helper.makeParam('boolean', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -29,7 +33,8 @@ describe('boolean', function () {
       schema: helper.makeParam('boolean', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -41,7 +46,8 @@ describe('boolean', function () {
       schema: helper.makeParam('boolean', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [transformedValue]);
   });
@@ -53,7 +59,8 @@ describe('boolean', function () {
       schema: helper.makeParam('boolean', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [transformedValue]);
   });
@@ -64,7 +71,8 @@ describe('boolean', function () {
       schema: helper.makeParam('boolean', true),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -74,7 +82,8 @@ describe('boolean', function () {
       schema: helper.makeParam('boolean', true),
       value: undefined,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -85,7 +94,8 @@ describe('boolean', function () {
       schema: helper.makeParam('boolean', true),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -96,7 +106,8 @@ describe('boolean', function () {
       schema: helper.makeParam('boolean', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of boolean"]);
   });
@@ -107,7 +118,8 @@ describe('boolean', function () {
       schema: helper.makeParam('boolean', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of boolean"]);
   });
@@ -118,7 +130,8 @@ describe('boolean', function () {
       schema: helper.makeParam('boolean', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of boolean"]);
   });
@@ -129,7 +142,8 @@ describe('boolean', function () {
       schema: helper.makeParam('boolean', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of boolean"]);
   });
@@ -140,7 +154,8 @@ describe('boolean', function () {
       schema: helper.makeParam('boolean', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of boolean"]);
   });
@@ -151,7 +166,8 @@ describe('boolean', function () {
       schema: helper.makeParam('boolean', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of boolean"]);
   });
@@ -162,7 +178,8 @@ describe('boolean', function () {
       schema: helper.makeParam('boolean', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of boolean"]);
   });
@@ -175,7 +192,7 @@ describe('boolean', function () {
       nullable: false
     };
 
-    const result = validateParameter({schema, value: null, models, validationContext});
+    const result = validateParameter({schema, value: null, models, validationContext, validationSettings});
     assertValidationFailed(result, ['testParam cannot be null']);
   });
 });

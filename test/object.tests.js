@@ -3,13 +3,16 @@ const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
 const {validateParameter} = require('../lib/validation/parameter');
 const {ValidationContext} = require('../lib/validation/validationContext');
+const {getValidationSettings} = require('../lib/validation/validationSettings');
 const {expect} = require('chai');
 
 describe('object', function () {
   let validationContext;
+  let validationSettings;
 
   beforeEach(() => {
     validationContext = new ValidationContext();
+    validationSettings = getValidationSettings();
   });
 
   describe('basic tests', function () {
@@ -33,7 +36,13 @@ describe('object', function () {
         }
       };
 
-      const result = validateParameter({schema: models.BasicObject, value: {id: 1}, models, validationContext});
+      const result = validateParameter({
+        schema: models.BasicObject,
+        value: {id: 1},
+        models,
+        validationContext,
+        validationSettings
+      });
       assertValidationPassed(result, [{id: 1}]);
     });
 
@@ -43,7 +52,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -54,7 +64,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -65,7 +76,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -75,7 +87,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: null,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["testParam is required"]);
     });
@@ -85,7 +98,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: undefined,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["testParam is required"]);
     });
@@ -95,7 +109,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: [],
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["testParam is not a type of object"]);
     });
@@ -105,7 +120,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: 12,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["testParam is not a type of object"]);
     });
@@ -115,7 +131,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: 'thisisastring',
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["testParam is not a type of object"]);
     });
@@ -139,7 +156,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -149,7 +167,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value: {id: 'thisisastring'},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is not a type of number"]);
     });
@@ -173,7 +192,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -183,7 +203,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value: {id: 'thisisastring'},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is not a type of float"]);
     });
@@ -207,7 +228,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -217,7 +239,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value: {id: 'thisisastring'},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is not a type of double"]);
     });
@@ -241,7 +264,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -251,7 +275,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value: {id: 'thisisastring'},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is not a type of integer"]);
     });
@@ -275,7 +300,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -285,7 +311,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value: {id: 'thisisastring'},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is not a type of int32"]);
     });
@@ -309,7 +336,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -319,7 +347,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {id: '  '},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is not a type of int64"]);
     });
@@ -343,7 +372,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -353,7 +383,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value: {id: {}},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is not a type of string"]);
     });
@@ -377,7 +408,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -405,7 +437,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [transformedValue]);
     });
@@ -430,7 +463,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [transformedValue]);
     });
@@ -455,7 +489,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [transformedValue]);
     });
@@ -465,7 +500,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value: {id: 'thisisastring'},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is not a type of boolean"]);
     });
@@ -490,7 +526,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -500,7 +537,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is required"]);
     });
@@ -510,7 +548,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {id: 'thisisastring'},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is not a type of number"]);
     });
@@ -535,7 +574,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -545,7 +585,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is required"]);
     });
@@ -555,7 +596,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {id: 'thisisastring'},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is not a type of float"]);
     });
@@ -580,7 +622,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -590,7 +633,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is required"]);
     });
@@ -600,7 +644,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {id: 'thisisastring'},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is not a type of double"]);
     });
@@ -625,7 +670,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -635,7 +681,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is required"]);
     });
@@ -645,7 +692,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {id: 'thisisastring'},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is not a type of integer"]);
     });
@@ -670,7 +718,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -680,7 +729,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is required"]);
     });
@@ -690,7 +740,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {id: 'thisisastring'},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is not a type of int32"]);
     });
@@ -715,7 +766,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -725,7 +777,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is required"]);
     });
@@ -735,7 +788,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {id: ' '},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is not a type of int64"]);
     });
@@ -760,7 +814,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -770,7 +825,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is required"]);
     });
@@ -780,7 +836,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {id: {}},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is not a type of string"]);
     });
@@ -805,7 +862,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -815,7 +873,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is required"]);
     });
@@ -844,7 +903,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [transformedValue]);
     });
@@ -854,7 +914,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is required"]);
     });
@@ -883,7 +944,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [transformedValue]);
     });
@@ -893,7 +955,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is required"]);
     });
@@ -919,7 +982,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [transformedValue]);
     });
@@ -929,7 +993,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is required"]);
     });
@@ -939,7 +1004,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {id: 'thisisastring'},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ["id is not a type of boolean"]);
     });
@@ -998,7 +1064,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: models,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [transformedValue]);
     });
@@ -1020,7 +1087,8 @@ describe('object', function () {
           boolean: 'Not a boolean'
         },
         models,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, [
         'boolean is not a type of boolean',
@@ -1053,7 +1121,8 @@ describe('object', function () {
           boolean: true
         },
         models,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, [
         'double is not a type of double',
@@ -1080,7 +1149,8 @@ describe('object', function () {
           boolean: 'Not a boolean'
         },
         models,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, [
         'boolean is not a type of boolean',
@@ -1147,7 +1217,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [transformedValue]);
     });
@@ -1157,7 +1228,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value: {},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ['param1 is required', 'param10 is required', 'param11 is required', 'param2 is required', 'param3 is required', 'param4 is required', 'param5 is required', 'param6 is required', 'param7 is required', 'param8 is required', 'param9 is required']);
     });
@@ -1191,7 +1263,8 @@ describe('object', function () {
         schema: helper.makeParam('foo', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -1201,7 +1274,8 @@ describe('object', function () {
         schema: helper.makeParam('foo', true),
         value: {},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [
         {}
@@ -1217,7 +1291,8 @@ describe('object', function () {
         schema: helper.makeParam('foo', true),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -1231,7 +1306,8 @@ describe('object', function () {
         schema: helper.makeParam('foo', true),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ['integer is not a type of integer', 'obj is not a type of object']);
     });
@@ -1245,7 +1321,8 @@ describe('object', function () {
         schema: helper.makeParam('foo', true),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ['1 is not a type of boolean']);
     });
@@ -1281,7 +1358,8 @@ describe('object', function () {
         schema: helper.makeParam('foo', false),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
@@ -1295,7 +1373,8 @@ describe('object', function () {
         schema: helper.makeParam('foo', true),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ['array is required']);
     });
@@ -1309,7 +1388,8 @@ describe('object', function () {
         schema: helper.makeParam('foo', true),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ['integer is not a type of integer', 'obj is not a type of object']);
     });
@@ -1323,7 +1403,8 @@ describe('object', function () {
         schema: helper.makeParam('foo', true),
         value,
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ['1 is not a type of boolean']);
     });
@@ -1333,7 +1414,8 @@ describe('object', function () {
         schema: helper.makeParam('foo', true),
         value: {},
         models: model,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(ret, ['integer is required', 'obj is required']);
     });
@@ -1361,7 +1443,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value,
         models,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(result, [{id: '123'}]);
     });
@@ -1376,7 +1459,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value,
         models,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(result, ["testParam contains invalid properties: extraProperty, anotherProperty"]);
     });
@@ -1392,7 +1476,8 @@ describe('object', function () {
         schema: helper.makeParam('Test', true),
         value,
         models,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationPassed(result, [{}]);
     });
@@ -1415,7 +1500,8 @@ describe('object', function () {
         schema: models.ObjectWithString,
         value: {someProperty: 1},
         models,
-        validationContext
+        validationContext,
+        validationSettings
       });
       assertValidationFailed(result, ['someProperty is not a type of string']);
       expect(result[0].context.toLiteral()).to.eql({dataPath: ['someProperty']});
@@ -1440,7 +1526,13 @@ describe('object', function () {
         }
       };
 
-      result = validateParameter({schema: models.ObjectContainingAnotherObject, value: {someNestedObject: {someProperty: 1}}, models, validationContext});
+      result = validateParameter({
+        schema: models.ObjectContainingAnotherObject,
+        value: {someNestedObject: {someProperty: 1}},
+        models,
+        validationContext,
+        validationSettings
+      });
       assertValidationFailed(result, ['someProperty is not a type of string']);
       expect(result[0].context.toLiteral()).to.eql({dataPath: ['someNestedObject', 'someProperty']});
       expect(result[0].context.formatDataPath()).to.eql("someNestedObject.someProperty");

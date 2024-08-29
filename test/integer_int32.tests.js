@@ -2,14 +2,17 @@ const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
 const {validateParameter} = require('../lib/validation/parameter');
 const {ValidationContext} = require('../lib/validation/validationContext');
+const {getValidationSettings} = require('../lib/validation/validationSettings');
 
 describe('integer - int32', function () {
   let models;
   let validationContext;
+  let validationSettings;
 
   beforeEach(() => {
     models = undefined;
     validationContext = new ValidationContext();
+    validationSettings = getValidationSettings();
   });
 
   it('should validate', function () {
@@ -18,7 +21,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -29,7 +33,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -40,7 +45,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -51,7 +57,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -63,7 +70,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [transformedValue]);
   });
@@ -75,7 +83,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [transformedValue]);
   });
@@ -86,7 +95,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32', '0'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -97,7 +107,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32', null, '10'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -108,7 +119,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32', '0'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -119,7 +131,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32', null, '32465'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -130,7 +143,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32', '321', '32465'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -141,7 +155,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32', '-2'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is below the minimum value"]);
   });
@@ -152,7 +167,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32', null, '10'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is above the maximum value"]);
   });
@@ -163,7 +179,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32', '321', '32465'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is below the minimum value"]);
   });
@@ -174,7 +191,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32', '321', '32465'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is above the maximum value"]);
   });
@@ -185,7 +203,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', true, 'int32'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -195,7 +214,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', true, 'int32'),
       value: undefined,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -206,7 +226,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', true, 'int32'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -217,7 +238,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of int32"]);
   });
@@ -228,7 +250,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of int32"]);
   });
@@ -239,7 +262,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of int32"]);
   });
@@ -250,7 +274,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of int32"]);
   });
@@ -261,7 +286,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of int32"]);
   });
@@ -272,7 +298,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of int32"]);
   });
@@ -283,7 +310,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of int32"]);
   });
@@ -294,7 +322,8 @@ describe('integer - int32', function () {
       schema: helper.makeNumberParam('integer', false, 'int32'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of int32"]);
   });

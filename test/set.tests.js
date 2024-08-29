@@ -3,14 +3,17 @@ const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
 const {validateParameter} = require('../lib/validation/parameter');
 const {ValidationContext} = require('../lib/validation/validationContext');
+const {getValidationSettings} = require('../lib/validation/validationSettings');
 
 describe('set', function () {
   let models;
   let validationContext;
+  let validationSettings;
 
   beforeEach(() => {
     models = undefined;
     validationContext = new ValidationContext();
+    validationSettings = getValidationSettings();
   });
 
   it('should validate with number with no format', function () {
@@ -18,7 +21,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'number', null, true),
       value: ['1', '2'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [
       [1, 2]
@@ -30,7 +34,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'number', 'float', null, true),
       value: [1, '2.0'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [
       [1, 2.0]
@@ -42,7 +47,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'number', 'double', null, true),
       value: [1.265, '2.2352', 2e0, 0x88],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [
       [1.265, 2.2352, 2e0, 0x88]
@@ -54,7 +60,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'integer', null, null, true),
       value: ['1', '2'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [
       [1, 2]
@@ -66,7 +73,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'integer', 'int32', null, true),
       value: [1, '2.0'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [
       [1, 2.0]
@@ -78,7 +86,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'integer', 'int64', null, true),
       value: [123132, 2e0, 0x88],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [
       [123132, 2e0, 0x88]
@@ -90,7 +99,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'string', null, null, true),
       value: ['These', 'are', 'a', 'lot', 'of', 'strings'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [
       ['These', 'are', 'a', 'lot', 'of', 'strings']
@@ -102,7 +112,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'string', 'byte', null, true),
       value: [65, 35, 23],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [
       [65, 35, 23]
@@ -114,7 +125,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'string', 'date', 'M-D-YYYY', true),
       value: ['8-9-2014', '1-1-1970'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [
       [moment('2014-08-09').toDate(), moment('1970-01-01').toDate()]
@@ -126,7 +138,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'string', 'date-time', 'M-D-YYYY h:mmA', true),
       value: ['8-9-2014 12:00AM', '1-1-1970 1:32PM'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [
       [moment('2014-08-09T00:00:00').toDate(), moment('1970-01-01T13:32:00').toDate()]
@@ -152,7 +165,8 @@ describe('set', function () {
         {id: 1.25}
       ],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [
       [
@@ -183,7 +197,8 @@ describe('set', function () {
         {test1: 1, test2: 'string', test3: false}
       ],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [
       [
@@ -198,7 +213,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(true, 'string', null, null, true),
       value: null,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -208,7 +224,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(true, 'number', null, null, true),
       value: undefined,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -218,7 +235,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(true, 'integer', null, null, true),
       value: '',
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -228,7 +246,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'boolean', null, null, true),
       value: {},
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of set"]);
   });
@@ -238,7 +257,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'number', null, null, true),
       value: ['1', 'thisisastring'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["thisisastring is not a type of number"]);
   });
@@ -248,7 +268,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'number', 'float', null, true),
       value: [1, 'thisisastring'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["thisisastring is not a type of float"]);
   });
@@ -258,7 +279,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'number', 'double', null, true),
       value: [1.265, '2.2352', 2e0, 0x88, 'thisisastring'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["thisisastring is not a type of double"]);
   });
@@ -268,7 +290,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'integer', null, null, true),
       value: ['1', '2', 'thisisastring'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["thisisastring is not a type of integer"]);
   });
@@ -278,7 +301,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'integer', 'int32', null, true),
       value: [1, '2.0', 'thisisastring'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["thisisastring is not a type of int32"]);
   });
@@ -288,7 +312,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'integer', 'int64', null, true),
       value: [2e0, 0x88, 'thisisastring'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["thisisastring is not a type of int64"]);
   });
@@ -298,7 +323,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'string', null, null, true),
       value: ['These', 'are', 'a', 'lot', 'of', 'strings', 1],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["1 is not a type of string"]);
   });
@@ -308,7 +334,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'number', null, null, true),
       value: ['1', 'thisisastring', 'thisisalsoastring'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["thisisastring is not a type of number", "thisisalsoastring is not a type of number"]);
   });
@@ -318,7 +345,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'number', 'float', null, true),
       value: [1, 'thisisastring', 'thisisalsoastring'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["thisisastring is not a type of float", "thisisalsoastring is not a type of float"]);
   });
@@ -328,7 +356,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'number', 'double', null, true),
       value: [1.265, '2.2352', 2e0, 0x88, 'thisisastring', 'thisisalsoastring'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["thisisastring is not a type of double", "thisisalsoastring is not a type of double"]);
   });
@@ -338,7 +367,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'integer', null, null, true),
       value: ['1', '2', 'thisisastring', 'thisisalsoastring'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["thisisastring is not a type of integer", "thisisalsoastring is not a type of integer"]);
   });
@@ -348,7 +378,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'integer', 'int32', null, true),
       value: [1, '2.0', 'thisisastring', 'thisisalsoastring'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["thisisastring is not a type of int32", "thisisalsoastring is not a type of int32"]);
   });
@@ -358,7 +389,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'integer', 'int64', null, true),
       value: [2e0, 0x88, 'thisisastring', 'thisisalsoastring'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["thisisastring is not a type of int64", "thisisalsoastring is not a type of int64"]);
   });
@@ -368,7 +400,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'string', null, null, true),
       value: ['These', 'are', 'a', 'lot', 'of', 1, true, 'strings'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["1 is not a type of string", "true is not a type of string"]);
   });
@@ -378,7 +411,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'number', null, null, true),
       value: ['1', 1],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not unique. This may lead to an unintended loss of data"]);
   });
@@ -388,7 +422,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'number', 'float', null, true),
       value: [11.23213, '11.23213'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not unique. This may lead to an unintended loss of data"]);
   });
@@ -398,7 +433,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'number', 'double', null, true),
       value: [1.265, '2.2352', 2e0, 0x88, 2],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not unique. This may lead to an unintended loss of data"]);
   });
@@ -408,7 +444,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'integer', null, null, true),
       value: ['1', '2', 1],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not unique. This may lead to an unintended loss of data"]);
   });
@@ -418,7 +455,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'integer', 'int32', null, true),
       value: [1, '2.0', 2e0],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not unique. This may lead to an unintended loss of data"]);
   });
@@ -428,7 +466,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'integer', 'int64', null, true),
       value: [Number.MAX_VALUE, 2e0, 0x88, Number.MAX_VALUE],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not unique. This may lead to an unintended loss of data"]);
   });
@@ -438,7 +477,8 @@ describe('set', function () {
       schema: helper.makeArrayParam(false, 'string', null, null, true),
       value: ['These', 'are', 'a', 'lot', 'of', 'strings', 'strings'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not unique. This may lead to an unintended loss of data"]);
   });
@@ -461,7 +501,8 @@ describe('set', function () {
         {id: 'Yo'}
       ],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["id is not a type of number"]);
   });
@@ -486,7 +527,8 @@ describe('set', function () {
         {test1: 'No', test2: true, test3: 1}
       ],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["test1 is not a type of integer", "test2 is not a type of string", "test3 is not a type of boolean"]);
   });
@@ -511,7 +553,8 @@ describe('set', function () {
         {}
       ],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not unique. This may lead to an unintended loss of data"]);
   });
@@ -534,7 +577,8 @@ describe('set', function () {
         {test: 1}
       ],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not unique. This may lead to an unintended loss of data"]);
   });
@@ -559,7 +603,8 @@ describe('set', function () {
         {test1: 1, test2: 'string', test3: true}
       ],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not unique. This may lead to an unintended loss of data"]);
   });

@@ -4,14 +4,17 @@ const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
 const {validateParameter} = require('../lib/validation/parameter');
 const {ValidationContext} = require('../lib/validation/validationContext');
+const {getValidationSettings} = require('../lib/validation/validationSettings');
 
 describe('array', function () {
   let models;
   let validationContext;
+  let validationSettings;
 
   beforeEach(() => {
     models = undefined;
     validationContext = new ValidationContext();
+    validationSettings = getValidationSettings();
   });
 
   it('should validate with number with no format', function () {
@@ -21,7 +24,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'number'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [transformedValue]);
   });
@@ -33,7 +37,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'number', 'float'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [transformedValue]);
   });
@@ -45,7 +50,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'number', 'double'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [transformedValue]);
   });
@@ -57,7 +63,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'integer'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [transformedValue]);
   });
@@ -69,7 +76,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'integer', 'int32'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [transformedValue]);
   });
@@ -81,7 +89,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'integer', 'int64'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [transformedValue]);
   });
@@ -92,7 +101,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'string'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -103,7 +113,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'string', 'byte'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -115,7 +126,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'string', 'date', 'M-D-YYYY'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [transformedValue]);
   });
@@ -127,7 +139,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'string', 'date-time', 'M-D-YYYY h:mmA'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [transformedValue]);
   });
@@ -136,7 +149,7 @@ describe('array', function () {
     const value = ['allowed', 'strings'];
     const schema = helper.makeArrayParam(false, 'string');
     schema.items.enum = ['These', 'are', 'allowed', 'strings'];
-    const result = validateParameter({schema, value, models, validationContext});
+    const result = validateParameter({schema, value, models, validationContext, validationSettings});
     assertValidationPassed(result);
   });
 
@@ -144,7 +157,7 @@ describe('array', function () {
     const value = ['allowed', 'string'];
     const schema = helper.makeArrayParam(false, 'string');
     schema.items.pattern = '.*';
-    const result = validateParameter({schema, value, models, validationContext});
+    const result = validateParameter({schema, value, models, validationContext, validationSettings});
     assertValidationPassed(result);
   });
 
@@ -152,7 +165,7 @@ describe('array', function () {
     const value = ['allowed', 'string'];
     const schema = helper.makeArrayParam(false, 'string');
     schema.items.maxLength = 20;
-    const result = validateParameter({schema, value, models, validationContext});
+    const result = validateParameter({schema, value, models, validationContext, validationSettings});
     assertValidationPassed(result);
   });
 
@@ -160,7 +173,7 @@ describe('array', function () {
     const value = ['allowed', 'string'];
     const schema = helper.makeArrayParam(false, 'string');
     schema.items.minLength = 5;
-    const result = validateParameter({schema, value, models, validationContext});
+    const result = validateParameter({schema, value, models, validationContext, validationSettings});
     assertValidationPassed(result);
   });
 
@@ -168,7 +181,7 @@ describe('array', function () {
     const value = [6, 10];
     const schema = helper.makeArrayParam(false, 'number');
     schema.items.minimum = 5;
-    const result = validateParameter({schema, value, models, validationContext});
+    const result = validateParameter({schema, value, models, validationContext, validationSettings});
     assertValidationPassed(result);
   });
 
@@ -176,7 +189,7 @@ describe('array', function () {
     const value = [6, 10];
     const schema = helper.makeArrayParam(false, 'number');
     schema.items.maximum = 15;
-    const result = validateParameter({schema, value, models, validationContext});
+    const result = validateParameter({schema, value, models, validationContext, validationSettings});
     assertValidationPassed(result);
   });
 
@@ -199,7 +212,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'Test'),
       value,
       models: model,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -224,7 +238,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'Test'),
       value,
       models: model,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -234,7 +249,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(true, 'string'),
       value: null,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -244,7 +260,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(true, 'number'),
       value: undefined,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -254,7 +271,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(true, 'integer'),
       value: '',
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -264,7 +282,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'boolean'),
       value: {},
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of array"]);
   });
@@ -274,7 +293,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'number'),
       value: ['1', 'this is a string'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["this is a string is not a type of number"]);
   });
@@ -284,7 +304,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'number', 'float'),
       value: [1, 'this is a string'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["this is a string is not a type of float"]);
   });
@@ -294,7 +315,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'number', 'double'),
       value: [1.265, '2.2352', 2e0, 0x88, 'this is a string'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["this is a string is not a type of double"]);
   });
@@ -304,7 +326,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'integer'),
       value: ['1', '2', 'this is a string'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["this is a string is not a type of integer"]);
   });
@@ -314,7 +337,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'integer', 'int32'),
       value: [1, '2.0', 'this is a string'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["this is a string is not a type of int32"]);
   });
@@ -324,7 +348,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'integer', 'int64'),
       value: [1234, 2e0, 0x88, 'this is a string'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["this is a string is not a type of int64"]);
   });
@@ -334,7 +359,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'string'),
       value: ['These', 'are', 'a', 'lot', 'of', 'strings', 1],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["1 is not a type of string"]);
   });
@@ -344,7 +370,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'number'),
       value: ['1', 'this is a string', 'this is also a string'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["this is a string is not a type of number", "this is also a string is not a type of number"]);
   });
@@ -354,7 +381,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'number', 'float'),
       value: [1, 'this is a string', 'this is also a string'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["this is a string is not a type of float", "this is also a string is not a type of float"]);
   });
@@ -364,7 +392,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'number', 'double'),
       value: [1.265, '2.2352', 2e0, 0x88, 'this is a string', 'this is also a string'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["this is a string is not a type of double", "this is also a string is not a type of double"]);
   });
@@ -374,7 +403,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'integer'),
       value: ['1', '2', 'this is a string', 'this is also a string'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["this is a string is not a type of integer", "this is also a string is not a type of integer"]);
   });
@@ -384,7 +414,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'integer', 'int32'),
       value: [1, '2.0', 'this is a string', 'this is also a string'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["this is a string is not a type of int32", "this is also a string is not a type of int32"]);
   });
@@ -394,7 +425,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'integer', 'int64'),
       value: [Number.MAX_VALUE - 123123123123, 2e0, 0x88, 'this is a string', 'this is also a string'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["this is a string is not a type of int64", "this is also a string is not a type of int64"]);
   });
@@ -404,7 +436,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'string'),
       value: ['These', 'are', 'a', 'lot', 'of', 1, true, 'strings'],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["1 is not a type of string", "true is not a type of string"]);
   });
@@ -427,7 +460,8 @@ describe('array', function () {
         {id: 'Yo'}
       ],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["id is not a type of number"]);
   });
@@ -451,7 +485,8 @@ describe('array', function () {
         {test1: 'No', test2: true, test3: 1}
       ],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["test1 is not a type of integer", "test2 is not a type of string", "test3 is not a type of boolean"]);
   });
@@ -474,7 +509,8 @@ describe('array', function () {
       schema: helper.makeArrayParam(false, 'Test', undefined, undefined, undefined, "Legs", 1, 1),
       value: [],
       models: model,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["Legs should have at least 1 item(s)"]);
   });
@@ -496,7 +532,8 @@ describe('array', function () {
         {test2: "hello"}, {test2: "world"}, {test2: "today"}
       ],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["Legs should have at most 2 item(s)"]);
   });
@@ -523,7 +560,8 @@ describe('array', function () {
       schema: models.TestArray,
       value: [{someString: 'A'}, null],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(result, ["TestArrayItem cannot be null"]);
   })
@@ -532,7 +570,7 @@ describe('array', function () {
     const value = ['allowed', 'not_allowed'];
     const schema = helper.makeArrayParam(false, 'string');
     schema.items.enum = ['These', 'are', 'allowed', 'strings'];
-    const result = validateParameter({schema, value, models, validationContext});
+    const result = validateParameter({schema, value, models, validationContext, validationSettings});
     assertValidationFailed(result, ['not_allowed is not a valid entry']);
   });
 
@@ -540,7 +578,7 @@ describe('array', function () {
     const value = ['allowed', 'not_allowed'];
     const schema = helper.makeArrayParam(false, 'string');
     schema.items.maxLength = 9;
-    const result = validateParameter({schema, value, models, validationContext});
+    const result = validateParameter({schema, value, models, validationContext, validationSettings});
     assertValidationFailed(result, ['not_allowed requires a max length of 9']);
   });
 
@@ -548,7 +586,7 @@ describe('array', function () {
     const value = ['allowed', 'n-a'];
     const schema = helper.makeArrayParam(false, 'string');
     schema.items.minLength = 5;
-    const result = validateParameter({schema, value, models, validationContext});
+    const result = validateParameter({schema, value, models, validationContext, validationSettings});
     assertValidationFailed(result, ['n-a requires a min length of 5']);
   });
 
@@ -556,7 +594,7 @@ describe('array', function () {
     const value = [6, 10];
     const schema = helper.makeArrayParam(false, 'number');
     schema.items.minimum = 9;
-    const result = validateParameter({schema, value, models, validationContext});
+    const result = validateParameter({schema, value, models, validationContext, validationSettings});
     assertValidationFailed(result, ['6 is below the minimum value']);
   });
 
@@ -564,7 +602,7 @@ describe('array', function () {
     const value = [6, 10];
     const schema = helper.makeArrayParam(false, 'number');
     schema.items.maximum = 8;
-    const result = validateParameter({schema, value, models, validationContext});
+    const result = validateParameter({schema, value, models, validationContext, validationSettings});
     assertValidationFailed(result, ['10 is above the maximum value']);
   });
 
@@ -588,7 +626,8 @@ describe('array', function () {
       schema: models.ArrayContainingObjects,
       value: [{someString: 'A'}, {someString: 2}],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(result, ['someString is not a type of string']);
     expect(result[0].context.toLiteral()).to.eql({dataPath: [1, 'someString']});
@@ -607,7 +646,8 @@ describe('array', function () {
       schema: models.ArrayContainingStrings,
       value: ['A', 2],
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(result, ['2 is not a type of string']);
     expect(result[0].context.toLiteral()).to.eql({dataPath: [1]});

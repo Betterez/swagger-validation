@@ -3,14 +3,17 @@ const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
 const {validateParameter} = require('../lib/validation/parameter');
 const {ValidationContext} = require('../lib/validation/validationContext');
+const {getValidationSettings} = require('../lib/validation/validationSettings');
 
 describe('string - datetime', function () {
   let models;
   let validationContext;
+  let validationSettings;
 
   beforeEach(() => {
     models = undefined;
     validationContext = new ValidationContext();
+    validationSettings = getValidationSettings();
   });
 
   it('should validate', function () {
@@ -20,7 +23,8 @@ describe('string - datetime', function () {
       schema: helper.makeStringParam('string', false, 'date-time'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [expected]);
   });
@@ -31,7 +35,8 @@ describe('string - datetime', function () {
       schema: helper.makeStringParam('string', false, 'date-time'),
       value: expected,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [expected]);
   });
@@ -43,7 +48,8 @@ describe('string - datetime', function () {
       schema: helper.makeStringParam('string', false, 'date-time', 'M/D/YYYY h:mmA'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [expected]);
   });
@@ -54,7 +60,8 @@ describe('string - datetime', function () {
       schema: helper.makeStringParam('string', false, 'date-time'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not valid based on the pattern for moment.ISO 8601"]);
   });
@@ -65,7 +72,8 @@ describe('string - datetime', function () {
       schema: helper.makeStringParam('string', true, 'date-time'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -75,7 +83,8 @@ describe('string - datetime', function () {
       schema: helper.makeStringParam('string', true, 'date-time'),
       value: undefined,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -86,7 +95,8 @@ describe('string - datetime', function () {
       schema: helper.makeStringParam('string', true, 'date-time'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });

@@ -2,14 +2,17 @@ const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
 const {validateParameter} = require('../lib/validation/parameter');
 const {ValidationContext} = require('../lib/validation/validationContext');
+const {getValidationSettings} = require('../lib/validation/validationSettings');
 
 describe('number - float', function () {
   let models;
   let validationContext;
+  let validationSettings;
 
   beforeEach(() => {
     models = undefined;
     validationContext = new ValidationContext();
+    validationSettings = getValidationSettings();
   });
 
   it('should validate', function () {
@@ -18,7 +21,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -29,7 +33,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -40,7 +45,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -51,7 +57,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -63,7 +70,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [transformedValue]);
   });
@@ -75,7 +83,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [transformedValue]);
   });
@@ -86,7 +95,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -97,7 +107,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float', '0'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -108,7 +119,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float', '1.23'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -119,7 +131,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float', null, '10'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -130,7 +143,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float', null, '1.426541323432'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -141,7 +155,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float', '0'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -152,7 +167,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float', '1.2356895'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -163,7 +179,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float', null, '32465'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -174,7 +191,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float', null, '8569.26652323'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -185,7 +203,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float', '321', '32465'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -196,7 +215,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float', '-2.32333'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is below the minimum value"]);
   });
@@ -207,7 +227,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float', null, '10.278974132'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is above the maximum value"]);
   });
@@ -218,7 +239,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float', '321', '32465'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is below the minimum value"]);
   });
@@ -229,7 +251,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float', '321', '32465'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is above the maximum value"]);
   });
@@ -240,7 +263,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', true, 'float'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -250,7 +274,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', true, 'float'),
       value: undefined,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -261,7 +286,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', true, 'float'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -272,7 +298,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of float"]);
   });
@@ -283,7 +310,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of float"]);
   });
@@ -294,7 +322,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of float"]);
   });
@@ -305,7 +334,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of float"]);
   });
@@ -316,7 +346,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of float"]);
   });
@@ -327,7 +358,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of float"]);
   });
@@ -338,7 +370,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of float"]);
   });
@@ -349,7 +382,8 @@ describe('number - float', function () {
       schema: helper.makeNumberParam('number', false, 'float'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of float"]);
   });

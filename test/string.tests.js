@@ -3,14 +3,17 @@ const {assertValidationPassed, assertValidationFailed} = helper;
 const {validateParameter} = require('../lib/validation/parameter');
 const {expect} = require('chai');
 const {ValidationContext} = require('../lib/validation/validationContext');
+const {getValidationSettings} = require('../lib/validation/validationSettings');
 
 describe('string', function () {
   let models;
   let validationContext;
+  let validationSettings;
 
   beforeEach(() => {
     models = undefined;
     validationContext = new ValidationContext();
+    validationSettings = getValidationSettings();
   });
 
   it('should validate', function () {
@@ -19,7 +22,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -30,7 +34,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -41,7 +46,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false, undefined, undefined, ['Hi', 'Hello']),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -52,7 +58,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false, undefined, undefined, undefined, undefined, 3),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam requires a max length of 3"]);
   });
@@ -63,7 +70,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false, undefined, undefined, undefined, undefined, undefined, 2),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam requires a min length of 2"]);
   });
@@ -74,7 +82,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false, null, '^Heya$'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -86,7 +95,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false, null, complexPattern),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not valid based on the pattern ^/dev/[^/]+(/[^/]+)*$"]);
   });
@@ -97,7 +107,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false, null, complexPattern),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -109,7 +120,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false, null, basicUrlPattern),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not valid based on the pattern ^((https?|ftp|file)://[-a-zA-Z0-9+&@#%?=~_|!:,.;]+)?(/?[-a-zA-Z0-9+&@#%=~_|?]+)*$"]);
   });
@@ -120,7 +132,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false, null, basicUrlPattern),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationPassed(ret, [value]);
   });
@@ -130,7 +143,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false, null, true),
       value: 'Does not matter',
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ['testParam is specified with an invalid pattern true']);
   });
@@ -140,7 +154,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false, null, false),
       value: 'Does not matter',
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ['testParam is specified with an invalid pattern false']);
   });
@@ -150,7 +165,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false, null, {}),
       value: 'Does not matter',
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ['testParam is specified with an invalid pattern {}']);
   });
@@ -160,7 +176,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false, null, 'paosdaksnjkdashdjgad'),
       value: 'Does not matter',
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ['testParam is not valid based on the pattern paosdaksnjkdashdjgad']);
   });
@@ -171,7 +188,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', true),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -181,7 +199,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', true),
       value: undefined,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -192,7 +211,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', true),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is required"]);
   });
@@ -203,7 +223,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false, undefined, undefined, ['Hi', 'Hello']),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a valid entry"]);
   });
@@ -214,7 +235,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false, undefined, undefined, ['Hi', 'Hello']),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a valid entry"]);
   });
@@ -225,7 +247,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of string"]);
   });
@@ -236,7 +259,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of string"]);
   });
@@ -247,7 +271,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of string"]);
   });
@@ -257,7 +282,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of string"]);
   });
@@ -268,7 +294,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of string"]);
   });
@@ -279,7 +306,8 @@ describe('string', function () {
       schema: helper.makeStringParam('string', false, null, '/^Goodbye$/i'),
       value,
       models,
-      validationContext
+      validationContext,
+      validationSettings
     });
     assertValidationFailed(ret, ["testParam is not valid based on the pattern /^Goodbye$/i"]);
   });
@@ -293,7 +321,7 @@ describe('string', function () {
         required: false,
         name: 'testParam'
       };
-      const result = validateParameter({schema, value, models, validationContext});
+      const result = validateParameter({schema, value, models, validationContext, validationSettings});
       expect(result).to.eql([{value: ''}]);
     });
 
@@ -305,7 +333,7 @@ describe('string', function () {
         name: 'testParam',
         minLength: 0
       };
-      const result = validateParameter({schema, value, models, validationContext});
+      const result = validateParameter({schema, value, models, validationContext, validationSettings});
       expect(result).to.eql([{value: ''}]);
     });
 
@@ -317,7 +345,7 @@ describe('string', function () {
         name: 'testParam',
         minLength: 1
       };
-      var ret = validateParameter({schema, value, models, validationContext});
+      var ret = validateParameter({schema, value, models, validationContext, validationSettings});
       assertValidationFailed(ret, ['testParam requires a min length of 1']);
     });
 
@@ -329,7 +357,7 @@ describe('string', function () {
         nullable: false
       };
 
-      const result = validateParameter({schema, value: null, models, validationContext});
+      const result = validateParameter({schema, value: null, models, validationContext, validationSettings});
       assertValidationFailed(result, ['testParam cannot be null']);
     });
   });
