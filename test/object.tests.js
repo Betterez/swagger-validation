@@ -16,15 +16,18 @@ describe('object', function () {
   });
 
   describe('basic tests', function () {
-    var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
-        properties: {
-          id: {type: 'number'}
+    let models;
+
+    beforeEach(() => {
+      models = {
+        SomeObject: {
+          type: 'object',
+          properties: {
+            id: {type: 'number'}
+          }
         }
-      }
-    };
+      };
+    });
 
     it('should validate when the model has type: "object"', () => {
       const models = {
@@ -46,24 +49,79 @@ describe('object', function () {
       assertValidationPassed(result, [{id: 1}]);
     });
 
-    it('should validate with parameter null', function () {
-      var value = null;
-      var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
-        value,
-        models: model,
+    it('should allow an optional property to be null (legacy behaviour)', () => {
+      const result = validateParameter({
+        schema: models.SomeObject,
+        value: {id: null},
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [value]);
+      assertValidationPassed(result);
+    });
+
+    it('should not allow an optional property to be null when "nullable" is false', () => {
+      models.SomeObject.properties.id.nullable = false;
+
+      const result = validateParameter({
+        schema: models.SomeObject,
+        value: {id: null},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(result, ["id cannot be null"]);
+    });
+
+    it('should not allow a required parameter to be null', function () {
+      models.SomeObject.required = ['id'];
+
+      const result = validateParameter({
+        schema: models.SomeObject,
+        value: {id: null},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(result, ["id is required"]);
+    });
+
+    describe('when the validation settings specify that properties are not nullable by default', () => {
+      beforeEach(() => {
+        validationSettings.allPropertiesAreNullableByDefault = false;
+      });
+
+      it('should not allow a property to be null by default', () => {
+        const result = validateParameter({
+          schema: models.SomeObject,
+          value: {id: null},
+          models,
+          validationContext,
+          validationSettings
+        });
+        assertValidationFailed(result, ["id cannot be null"]);
+      });
+
+      it('should allow a property to be null when the schema specifies that the property is nullable', () => {
+        models.SomeObject.properties.id.nullable = true;
+
+        const result = validateParameter({
+          schema: models.SomeObject,
+          value: {id: null},
+          models,
+          validationContext,
+          validationSettings
+        });
+        assertValidationPassed(result);
+      });
     });
 
     it('should validate with parameter undefined', function () {
       var value = void (0);
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
-        models: model,
+        models: models,
         validationContext,
         validationSettings
       });
@@ -73,31 +131,20 @@ describe('object', function () {
     it('should validate with parameter empty', function () {
       var value = {};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
-        models: model,
+        models: models,
         validationContext,
         validationSettings
       });
       assertValidationPassed(ret, [value]);
     });
 
-    it('should not validate with required parameter null', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
-        value: null,
-        models: model,
-        validationContext,
-        validationSettings
-      });
-      assertValidationFailed(ret, ["testParam is required"]);
-    });
-
     it('should not validate with required parameter undefined', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: undefined,
-        models: model,
+        models: models,
         validationContext,
         validationSettings
       });
@@ -106,9 +153,9 @@ describe('object', function () {
 
     it('should not validate with array', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: [],
-        models: model,
+        models: models,
         validationContext,
         validationSettings
       });
@@ -117,9 +164,9 @@ describe('object', function () {
 
     it('should not validate with Number', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: 12,
-        models: model,
+        models: models,
         validationContext,
         validationSettings
       });
@@ -128,9 +175,9 @@ describe('object', function () {
 
     it('should not validate with string', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: 'thisisastring',
-        models: model,
+        models: models,
         validationContext,
         validationSettings
       });
@@ -141,9 +188,7 @@ describe('object', function () {
   describe('one number no format not required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         properties: {
           id: {type: 'number'}
         }
@@ -153,7 +198,7 @@ describe('object', function () {
     it('should validate', function () {
       var value = {id: 1};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -164,7 +209,7 @@ describe('object', function () {
 
     it('should not validate', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value: {id: 'thisisastring'},
         models: model,
         validationContext,
@@ -177,9 +222,7 @@ describe('object', function () {
   describe('one number float format not required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         properties: {
           id: {type: 'number', format: 'float'}
         }
@@ -189,7 +232,7 @@ describe('object', function () {
     it('should validate', function () {
       var value = {id: 1.233242};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -200,7 +243,7 @@ describe('object', function () {
 
     it('should not validate', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value: {id: 'thisisastring'},
         models: model,
         validationContext,
@@ -213,9 +256,7 @@ describe('object', function () {
   describe('one number double format not required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         properties: {
           id: {type: 'number', format: 'double'}
         }
@@ -225,7 +266,7 @@ describe('object', function () {
     it('should validate', function () {
       var value = {id: 1.233242};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -236,7 +277,7 @@ describe('object', function () {
 
     it('should not validate', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value: {id: 'thisisastring'},
         models: model,
         validationContext,
@@ -249,9 +290,7 @@ describe('object', function () {
   describe('one integer no format not required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         properties: {
           id: {type: 'integer'}
         }
@@ -261,7 +300,7 @@ describe('object', function () {
     it('should validate', function () {
       var value = {id: 1};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -272,7 +311,7 @@ describe('object', function () {
 
     it('should not validate', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value: {id: 'thisisastring'},
         models: model,
         validationContext,
@@ -285,9 +324,7 @@ describe('object', function () {
   describe('one integer int32 format not required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         properties: {
           id: {type: 'integer', format: 'int32'}
         }
@@ -297,7 +334,7 @@ describe('object', function () {
     it('should validate', function () {
       var value = {id: 1};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -308,7 +345,7 @@ describe('object', function () {
 
     it('should not validate', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value: {id: 'thisisastring'},
         models: model,
         validationContext,
@@ -321,9 +358,7 @@ describe('object', function () {
   describe('one integer int64 format not required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         properties: {
           id: {type: 'integer', format: 'int64'}
         }
@@ -333,7 +368,7 @@ describe('object', function () {
     it('should validate', function () {
       var value = {id: 1};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -344,7 +379,7 @@ describe('object', function () {
 
     it('should not validate', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {id: '  '},
         models: model,
         validationContext,
@@ -357,9 +392,7 @@ describe('object', function () {
   describe('one string no format not required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         properties: {
           id: {type: 'string'}
         }
@@ -369,7 +402,7 @@ describe('object', function () {
     it('should validate', function () {
       var value = {id: 'this is a string'};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -380,7 +413,7 @@ describe('object', function () {
 
     it('should not validate', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value: {id: {}},
         models: model,
         validationContext,
@@ -393,9 +426,7 @@ describe('object', function () {
   describe('one string byte format not required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         properties: {
           id: {type: 'string', format: 'byte'}
         }
@@ -405,7 +436,7 @@ describe('object', function () {
     it('should validate', function () {
       var value = {id: [65, 43]};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -418,9 +449,7 @@ describe('object', function () {
   describe('one string date format not required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         properties: {
           id: {
             type: 'string',
@@ -434,7 +463,7 @@ describe('object', function () {
       var value = {id: '2014-08-08'};
       var transformedValue = {id: moment('2014-08-08').toDate()};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -447,9 +476,7 @@ describe('object', function () {
   describe('one string date-time format not required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         properties: {
           id: {type: 'string', format: 'date-time'}
         }
@@ -460,7 +487,7 @@ describe('object', function () {
       var value = {id: '2014-08-09T12:43:00'};
       var transformedValue = {id: moment('2014-08-09T12:43:00').toDate()};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -473,9 +500,7 @@ describe('object', function () {
   describe('one boolean no format not required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         properties: {
           id: {type: 'boolean'}
         }
@@ -486,7 +511,7 @@ describe('object', function () {
       var value = {id: 'true'};
       var transformedValue = {id: true};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -497,7 +522,7 @@ describe('object', function () {
 
     it('should not validate', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value: {id: 'thisisastring'},
         models: model,
         validationContext,
@@ -510,9 +535,7 @@ describe('object', function () {
   describe('one number no format required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         required: ['id'],
         properties: {
           id: {type: 'number'}
@@ -523,7 +546,7 @@ describe('object', function () {
     it('should validate', function () {
       var value = {id: 1};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -534,7 +557,7 @@ describe('object', function () {
 
     it('should not validate with missing parameter', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {},
         models: model,
         validationContext,
@@ -545,7 +568,7 @@ describe('object', function () {
 
     it('should not validate', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {id: 'thisisastring'},
         models: model,
         validationContext,
@@ -558,9 +581,7 @@ describe('object', function () {
   describe('one number float format required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         required: ['id'],
         properties: {
           id: {type: 'number', format: 'float'}
@@ -571,7 +592,7 @@ describe('object', function () {
     it('should validate', function () {
       var value = {id: 1.233242};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -582,7 +603,7 @@ describe('object', function () {
 
     it('should not validate with missing parameter', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {},
         models: model,
         validationContext,
@@ -593,7 +614,7 @@ describe('object', function () {
 
     it('should not validate', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {id: 'thisisastring'},
         models: model,
         validationContext,
@@ -606,9 +627,7 @@ describe('object', function () {
   describe('one number double format required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         required: ['id'],
         properties: {
           id: {type: 'number', format: 'double'}
@@ -619,7 +638,7 @@ describe('object', function () {
     it('should validate', function () {
       var value = {id: 1.233242};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -630,7 +649,7 @@ describe('object', function () {
 
     it('should not validate with missing parameter', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {},
         models: model,
         validationContext,
@@ -641,7 +660,7 @@ describe('object', function () {
 
     it('should not validate', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {id: 'thisisastring'},
         models: model,
         validationContext,
@@ -654,9 +673,7 @@ describe('object', function () {
   describe('one integer no format required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         required: ['id'],
         properties: {
           id: {type: 'integer'}
@@ -667,7 +684,7 @@ describe('object', function () {
     it('should validate', function () {
       var value = {id: 1};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -678,7 +695,7 @@ describe('object', function () {
 
     it('should not validate with missing parameter', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {},
         models: model,
         validationContext,
@@ -689,7 +706,7 @@ describe('object', function () {
 
     it('should not validate', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {id: 'thisisastring'},
         models: model,
         validationContext,
@@ -702,9 +719,7 @@ describe('object', function () {
   describe('one integer int32 format required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         required: ['id'],
         properties: {
           id: {type: 'integer', format: 'int32'}
@@ -715,7 +730,7 @@ describe('object', function () {
     it('should validate', function () {
       var value = {id: 1};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -726,7 +741,7 @@ describe('object', function () {
 
     it('should not validate with missing parameter', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {},
         models: model,
         validationContext,
@@ -737,7 +752,7 @@ describe('object', function () {
 
     it('should not validate', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {id: 'thisisastring'},
         models: model,
         validationContext,
@@ -750,9 +765,7 @@ describe('object', function () {
   describe('one integer int64 format required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         required: ['id'],
         properties: {
           id: {type: 'integer', format: 'int64'}
@@ -763,7 +776,7 @@ describe('object', function () {
     it('should validate', function () {
       var value = {id: 1};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -774,7 +787,7 @@ describe('object', function () {
 
     it('should not validate with missing parameter', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {},
         models: model,
         validationContext,
@@ -785,7 +798,7 @@ describe('object', function () {
 
     it('should not validate', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {id: ' '},
         models: model,
         validationContext,
@@ -798,9 +811,7 @@ describe('object', function () {
   describe('one string no format required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         required: ['id'],
         properties: {
           id: {type: 'string'}
@@ -811,7 +822,7 @@ describe('object', function () {
     it('should validate', function () {
       var value = {id: 'this is a string'};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -822,7 +833,7 @@ describe('object', function () {
 
     it('should not validate with missing parameter', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {},
         models: model,
         validationContext,
@@ -833,7 +844,7 @@ describe('object', function () {
 
     it('should not validate', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {id: {}},
         models: model,
         validationContext,
@@ -846,9 +857,7 @@ describe('object', function () {
   describe('one string byte format required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         required: ['id'],
         properties: {
           id: {type: 'string', format: 'byte'}
@@ -859,7 +868,7 @@ describe('object', function () {
     it('should validate', function () {
       var value = {id: [65, 43]};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -870,7 +879,7 @@ describe('object', function () {
 
     it('should not validate with missing parameter', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {},
         models: model,
         validationContext,
@@ -883,9 +892,7 @@ describe('object', function () {
   describe('one string date format required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         required: ['id'],
         properties: {
           id: {
@@ -900,7 +907,7 @@ describe('object', function () {
       var value = {id: '2014-08-08'};
       var transformedValue = {id: moment('2014-08-08').toDate()};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -911,7 +918,7 @@ describe('object', function () {
 
     it('should not validate with missing parameter', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {},
         models: model,
         validationContext,
@@ -924,9 +931,7 @@ describe('object', function () {
   describe('one string date-time format required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         required: ['id'],
         properties: {
           id: {
@@ -941,7 +946,7 @@ describe('object', function () {
       var value = {id: '2014-08-09T12:43:00'};
       var transformedValue = {id: moment('2014-08-09T12:43:00').toDate()};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -952,7 +957,7 @@ describe('object', function () {
 
     it('should not validate with missing parameter', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {},
         models: model,
         validationContext,
@@ -965,9 +970,7 @@ describe('object', function () {
   describe('one boolean no format required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         required: ['id'],
         properties: {
           id: {type: 'boolean'}
@@ -979,7 +982,7 @@ describe('object', function () {
       var value = {id: 'true'};
       var transformedValue = {id: true};
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -990,7 +993,7 @@ describe('object', function () {
 
     it('should not validate with missing parameter', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {},
         models: model,
         validationContext,
@@ -1001,7 +1004,7 @@ describe('object', function () {
 
     it('should not validate', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {id: 'thisisastring'},
         models: model,
         validationContext,
@@ -1014,9 +1017,7 @@ describe('object', function () {
   describe('one of each type not required', function () {
     // each section defines it's own validation parameters
     var models = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         properties: {
           number: {type: 'number'},
           float: {type: 'number', format: 'float'},
@@ -1061,7 +1062,7 @@ describe('object', function () {
         boolean: true
       };
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: models,
         validationContext,
@@ -1072,7 +1073,7 @@ describe('object', function () {
 
     it('should not validate all invalid', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {
           number: 'Random String',
           float: true,
@@ -1106,7 +1107,7 @@ describe('object', function () {
 
     it('should not validate half invalid', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {
           number: 'Random String',
           float: true,
@@ -1134,7 +1135,7 @@ describe('object', function () {
 
     it('should not validate other half invalid', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {
           number: 0x33,
           float: -2.231231,
@@ -1166,9 +1167,7 @@ describe('object', function () {
   describe('one of each type required', function () {
     // each section defines it's own validation parameters
     var model = {
-      Test: {
-        id: 'Test',
-        name: 'Test',
+      SomeObject: {
         required: ['param1', 'param2', 'param3', 'param4', 'param5', 'param6', 'param7', 'param8', 'param9', 'param10', 'param11'],
         properties: {
           param1: {type: 'number'},
@@ -1214,7 +1213,7 @@ describe('object', function () {
         param11: true
       };
       var ret = validateParameter({
-        schema: helper.makeParam('Test', false),
+        schema: helper.makeParam('SomeObject', false),
         value,
         models: model,
         validationContext,
@@ -1225,7 +1224,7 @@ describe('object', function () {
 
     it('should not validate all missing', function () {
       var ret = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value: {},
         models: model,
         validationContext,
@@ -1426,9 +1425,7 @@ describe('object', function () {
 
     beforeEach(() => {
       models = {
-        Test: {
-          id: 'Test',
-          name: 'Test',
+        SomeObject: {
           properties: {
             id: {type: 'string'}
           },
@@ -1440,7 +1437,7 @@ describe('object', function () {
     it('should validate', () => {
       const value = {id: '123'};
       const result = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value,
         models,
         validationContext,
@@ -1456,7 +1453,7 @@ describe('object', function () {
         anotherProperty: 'some value'
       };
       const result = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value,
         models,
         validationContext,
@@ -1466,14 +1463,12 @@ describe('object', function () {
     });
 
     it('should return success when "additionalProperties" is false and there are no properties in the model or the value', () => {
-      models.Test = {
-        id: 'Test',
-        name: 'Test',
+      models.SomeObject = {
         additionalProperties: false
       };
       const value = {};
       const result = validateParameter({
-        schema: helper.makeParam('Test', true),
+        schema: helper.makeParam('SomeObject', true),
         value,
         models,
         validationContext,

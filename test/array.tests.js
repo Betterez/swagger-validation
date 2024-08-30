@@ -538,10 +538,34 @@ describe('array', function () {
     assertValidationFailed(ret, ["Legs should have at most 2 item(s)"]);
   });
 
-  it('should not allow null items when "nullable" is false', () => {
+  it('should allow items to be null by default (legacy behaviour)', () => {
     const models = {
       TestArray: {
-        name: 'testParam',
+        type: 'array',
+        items: {
+          $ref: 'TestArrayItem',
+        }
+      },
+      TestArrayItem: {
+        properties: {
+          someString: {type: 'string'},
+        }
+      }
+    };
+
+    const result = validateParameter({
+      schema: models.TestArray,
+      value: [{someString: 'A'}, null],
+      models,
+      validationContext,
+      validationSettings
+    });
+    assertValidationPassed(result);
+  });
+
+  it('should not allow items to be null when "nullable" is false', () => {
+    const models = {
+      TestArray: {
         type: 'array',
         items: {
           $ref: 'TestArrayItem',
@@ -549,7 +573,6 @@ describe('array', function () {
         }
       },
       TestArrayItem: {
-        name: 'TestArrayItem',
         properties: {
           someString: {type: 'string'},
         }
@@ -564,7 +587,53 @@ describe('array', function () {
       validationSettings
     });
     assertValidationFailed(result, ["TestArrayItem cannot be null"]);
-  })
+  });
+
+  describe('when the validation settings specify that properties are not nullable by default', () => {
+    let models;
+
+    beforeEach(() => {
+      validationSettings.allPropertiesAreNullableByDefault = false;
+
+      models = {
+        TestArray: {
+          type: 'array',
+          items: {
+            $ref: 'TestArrayItem',
+          }
+        },
+        TestArrayItem: {
+          properties: {
+            someString: {type: 'string'},
+          }
+        }
+      };
+    });
+
+    it('should not allow null items by default', () => {
+      const result = validateParameter({
+        schema: models.TestArray,
+        value: [{someString: 'A'}, null],
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(result, ["TestArrayItem cannot be null"]);
+    });
+
+    it('should allow null items when the schema specifies that items are nullable', () => {
+      models.TestArray.items.nullable = true;
+
+      const result = validateParameter({
+        schema: models.TestArray,
+        value: [{someString: 'A'}, null],
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationPassed(result);
+    });
+  });
 
   it('should not validate a string if it does not belong to a given enum', function () {
     const value = ['allowed', 'not_allowed'];
