@@ -1466,55 +1466,96 @@ describe('object', function () {
     beforeEach(() => {
       models = {
         SomeObject: {
+          type: 'object',
           properties: {
             id: {type: 'string'}
-          },
-          additionalProperties: false
+          }
         }
       };
     });
 
-    it('should validate', () => {
-      const value = {id: '123'};
+    it('should allow an object to have additional properties which are not specified in the schema (legacy behaviour)', () => {
       const result = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
-        value,
+        schema: models.SomeObject,
+        value: {
+          id: '123',
+          extraProperty: 'some value'
+        },
         models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(result, [{id: '123'}]);
+      assertValidationPassed(result, [{id: '123', extraProperty: 'some value'}]);
     });
 
     it('should return an error when "additionalProperties" is false and an additional property is provided', () => {
-      const value = {
-        id: '123',
-        extraProperty: 'some value',
-        anotherProperty: 'some value'
-      };
+      models.SomeObject.additionalProperties = false;
+
       const result = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
-        value,
+        schema: models.SomeObject,
+        value: {
+          id: '123',
+          extraProperty: 'some value',
+          anotherProperty: 'some value'
+        },
         models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(result, ["testParam contains invalid properties: extraProperty, anotherProperty"]);
+      assertValidationFailed(result, ['object contains invalid properties: extraProperty, anotherProperty']);
     });
 
     it('should return success when "additionalProperties" is false and there are no properties in the model or the value', () => {
       models.SomeObject = {
+        type: 'object',
         additionalProperties: false
       };
-      const value = {};
       const result = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
-        value,
+        schema: models.SomeObject,
+        value: {},
         models,
         validationContext,
         validationSettings
       });
       assertValidationPassed(result, [{}]);
+    });
+
+    describe('when the validation settings specify that objects are not allowed to have additional properties by default', () => {
+      beforeEach(() => {
+        validationSettings.objectsCanHaveAnyAdditionalPropertiesByDefault = false;
+      });
+
+      it('should not allow an object to have additional properties which are not specified in the schema', () => {
+        const result = validateParameter({
+          schema: models.SomeObject,
+          value: {
+            id: '123',
+            extraProperty: 'some value',
+            anotherProperty: 'some value'
+          },
+          models,
+          validationContext,
+          validationSettings
+        });
+        assertValidationFailed(result, ['object contains invalid properties: extraProperty, anotherProperty']);
+      });
+
+      it('should allow an object to have additional properties when "additionalProperties" is false', () => {
+        models.SomeObject.additionalProperties = true;
+
+        const result = validateParameter({
+          schema: models.SomeObject,
+          value: {
+            id: '123',
+            extraProperty: 'some value',
+            anotherProperty: 'some value'
+          },
+          models,
+          validationContext,
+          validationSettings
+        });
+        assertValidationPassed(result);
+      });
     });
   });
 

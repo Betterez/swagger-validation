@@ -73,4 +73,24 @@ describe('validateRequest', () => {
       });
     });
   });
+
+  describe('additional properties handling', () => {
+    it('should allow an object to have additional properties which are not specified in the schema (legacy behaviour)', () => {
+      req.body = {id: '1', someExtraProperty: 'some value'}
+      const result = validateRequest(requestSchema, req, models);
+      assertValidationPassed(result);
+    });
+
+    describe('when the validation settings specify that objects are not allowed to have additional properties by default', () => {
+      beforeEach(() => {
+        validationSettings.objectsCanHaveAnyAdditionalPropertiesByDefault = false;
+      });
+
+      it('should not allow an object to have additional properties which are not specified in the schema', () => {
+        req.body = {id: '1', someExtraProperty: 'some value'}
+        const result = validateRequest(requestSchema, req, models, {objectsCanHaveAnyAdditionalPropertiesByDefault: false});
+        assertValidationFailed(result, ['object contains invalid properties: someExtraProperty']);
+      });
+    });
+  });
 });
