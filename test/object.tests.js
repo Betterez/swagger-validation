@@ -49,49 +49,21 @@ describe('object', function () {
       assertValidationPassed(result, [{id: 1}]);
     });
 
-    it('should allow an optional property to be null (legacy behaviour)', () => {
-      const result = validateParameter({
-        schema: models.SomeObject,
-        value: {id: null},
-        models,
-        validationContext,
-        validationSettings
-      });
-      assertValidationPassed(result);
-    });
-
-    it('should not allow an optional property to be null when "nullable" is false', () => {
-      models.SomeObject.properties.id.nullable = false;
-
-      const result = validateParameter({
-        schema: models.SomeObject,
-        value: {id: null},
-        models,
-        validationContext,
-        validationSettings
-      });
-      assertValidationFailed(result, ["id cannot be null"]);
-    });
-
-    it('should not allow a required parameter to be null', function () {
-      models.SomeObject.required = ['id'];
-
-      const result = validateParameter({
-        schema: models.SomeObject,
-        value: {id: null},
-        models,
-        validationContext,
-        validationSettings
-      });
-      assertValidationFailed(result, ["id is required"]);
-    });
-
-    describe('when the validation settings specify that properties are not nullable by default', () => {
-      beforeEach(() => {
-        validationSettings.allPropertiesAreNullableByDefault = false;
+    describe('null value handling', () => {
+      it('should allow an optional property to be null (legacy behaviour)', () => {
+        const result = validateParameter({
+          schema: models.SomeObject,
+          value: {id: null},
+          models,
+          validationContext,
+          validationSettings
+        });
+        assertValidationPassed(result);
       });
 
-      it('should not allow a property to be null by default', () => {
+      it('should not allow an optional property to be null when "nullable" is false', () => {
+        models.SomeObject.properties.id.nullable = false;
+
         const result = validateParameter({
           schema: models.SomeObject,
           value: {id: null},
@@ -102,8 +74,8 @@ describe('object', function () {
         assertValidationFailed(result, ["id cannot be null"]);
       });
 
-      it('should allow a property to be null when the schema specifies that the property is nullable', () => {
-        models.SomeObject.properties.id.nullable = true;
+      it('should not allow a required parameter to be null', function () {
+        models.SomeObject.required = ['id'];
 
         const result = validateParameter({
           schema: models.SomeObject,
@@ -112,7 +84,75 @@ describe('object', function () {
           validationContext,
           validationSettings
         });
-        assertValidationPassed(result);
+        assertValidationFailed(result, ["id is required"]);
+      });
+
+      describe('when the validation settings specify that properties are not nullable by default', () => {
+        beforeEach(() => {
+          validationSettings.allPropertiesAreNullableByDefault = false;
+        });
+
+        it('should not allow a property to be null by default', () => {
+          const result = validateParameter({
+            schema: models.SomeObject,
+            value: {id: null},
+            models,
+            validationContext,
+            validationSettings
+          });
+          assertValidationFailed(result, ["id cannot be null"]);
+        });
+
+        it('should allow a property to be null when the schema specifies that the property is nullable', () => {
+          models.SomeObject.properties.id.nullable = true;
+
+          const result = validateParameter({
+            schema: models.SomeObject,
+            value: {id: null},
+            models,
+            validationContext,
+            validationSettings
+          });
+          assertValidationPassed(result);
+        });
+      });
+    });
+
+    describe('empty string handling', () => {
+      beforeEach(() => {
+        models.SomeObject.properties.id.type = 'string';
+      });
+
+      it('should not allow a required string parameter to be an empty string (legacy behaviour)', function () {
+        models.SomeObject.required = ['id'];
+
+        const result = validateParameter({
+          schema: models.SomeObject,
+          value: {id: ''},
+          models,
+          validationContext,
+          validationSettings
+        });
+        assertValidationFailed(result, ["id is required"]);
+      });
+
+      describe('when the validation settings specify that empty strings are not treated the same as undefined values', () => {
+        beforeEach(() => {
+          validationSettings.treatEmptyStringsLikeUndefinedValues = false;
+        });
+
+        it('should allow a required string parameter to be an empty string', function () {
+          models.SomeObject.required = ['id'];
+
+          const result = validateParameter({
+            schema: models.SomeObject,
+            value: {id: ''},
+            models,
+            validationContext,
+            validationSettings
+          });
+          assertValidationPassed(result);
+        });
       });
     });
 
