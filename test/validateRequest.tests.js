@@ -1,3 +1,4 @@
+const {expect} = require("chai");
 const {validateRequest} = require('../index');
 const {assertValidationPassed, assertValidationFailed} = require('./test_helper');
 
@@ -126,6 +127,109 @@ describe('validateRequest', () => {
         };
         result = validateRequest(requestSchema, req, models, {requestBodyCanHaveTwoContradictorySchemas: false});
         assertValidationFailed(result, ['id is required']);
+      });
+    });
+  });
+
+  describe('invalid schemas', () => {
+    it('should allow a schema to have an invalid "type", and validate that schema as if it were an object (legacy behaviour)', () => {
+      models = {
+        RequestBody: {
+          type: 'abcdefghijklmnop',
+          properties: {
+            someProperty: {
+              type: 'string'
+            }
+          }
+        }
+      };
+      req.body = {
+        someProperty: 'some value'
+      };
+      let result = validateRequest(requestSchema, req, models);
+      assertValidationPassed(result);
+    });
+
+    it('should allow a schema to declare both a "type" and a "$ref" which contradict each other (legacy behaviour)', () => {
+      models = {
+        RequestBody: {
+          type: 'object',
+          properties: {
+            someProperty: {
+              type: 'string', // This type intentionally contradicts the $ref below
+              $ref: 'SomeObject'
+            }
+          }
+        },
+        SomeObject: {
+          type: 'object',
+          properties: {
+            someOtherProperty: {
+              type: 'string'
+            }
+          }
+        }
+      };
+
+      req.body = {
+        someProperty: {
+          someOtherProperty: 'some value'
+        }
+      };
+      let result = validateRequest(requestSchema, req, models);
+      assertValidationPassed(result);
+    });
+
+    describe('when the validation settings specify that an error should be thrown when there is a problem with the swagger schema', () => {
+      it('should throw an error when a schema has both a "type" and a "$ref"', () => {
+        models = {
+          RequestBody: {
+            type: 'object',
+            properties: {
+              someProperty: {
+                type: 'string', // This type intentionally contradicts the $ref below
+                $ref: 'SomeObject'
+              }
+            }
+          },
+          SomeObject: {
+            type: 'object',
+            properties: {
+              someOtherProperty: {
+                type: 'string'
+              }
+            }
+          }
+        };
+
+        req.body = {
+          someProperty: {
+            someOtherProperty: 'some value'
+          }
+        };
+        expect(() => validateRequest(requestSchema, req, models, {throwErrorsWhenSchemaIsInvalid: true}))
+          .to.throw('Swagger schema is invalid: A schema can have either a "type" or a "$ref", but not both.');
+      });
+
+      it('should throw an error when a schema has a "$ref" that references a model which was not provided in the "models" argument', () => {
+        models = {
+          RequestBody: {
+            type: 'object',
+            properties: {
+              someProperty: {
+                $ref: 'SomeModelWhichDoesNotExist'
+              }
+            }
+          },
+        };
+
+        req.body = {
+          someProperty: {
+            someOtherProperty: 'some value'
+          }
+        };
+        expect(() => validateRequest(requestSchema, req, models, {throwErrorsWhenSchemaIsInvalid: true}))
+          .to.throw('Swagger schema is invalid: Unknown reference to model "SomeModelWhichDoesNotExist"');
       });
     });
   });

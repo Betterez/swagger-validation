@@ -361,4 +361,39 @@ describe('string', function () {
       assertValidationFailed(result, ['testParam cannot be null']);
     });
   });
+
+  describe('invalid schemas', () => {
+    it('should return a validation error when a string has an unknown format', () => {
+      const results = validateParameter({
+        schema: {
+          type: 'string',
+          format: 'day-of-week'
+        },
+        value: 'Some string',
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(results, ['Unknown param type day-of-week']);
+    });
+
+    describe('when the validation settings specify that an error should be thrown when there is a problem with the swagger schema', () => {
+      beforeEach(() => {
+        validationSettings.throwErrorsWhenSchemaIsInvalid = true;
+      });
+
+      it('should throw an error when a string has an unknown format', () => {
+        expect(() => validateParameter({
+          schema: {
+            type: 'string',
+            format: 'day-of-week'
+          },
+          value: 'Some string',
+          models,
+          validationContext,
+          validationSettings
+        })).to.throw('Swagger schema is invalid: string has unsupported format "day-of-week"');
+      });
+    });
+  });
 });

@@ -1,3 +1,4 @@
+const {expect} = require("chai");
 const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
 const {validateParameter} = require('../lib/validation/parameter');
@@ -398,5 +399,40 @@ describe('number', function () {
 
     const result = validateParameter({schema, value: null, models, validationContext, validationSettings});
     assertValidationFailed(result, ['testParam cannot be null']);
+  });
+
+  describe('invalid schemas', () => {
+    it('should return a validation error when a number has an unknown format', () => {
+      const results = validateParameter({
+        schema: {
+          type: 'number',
+          format: 'float16'
+        },
+        value: 1.5,
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(results, ['Unknown param type float16']);
+    });
+
+    describe('when the validation settings specify that an error should be thrown when there is a problem with the swagger schema', () => {
+      beforeEach(() => {
+        validationSettings.throwErrorsWhenSchemaIsInvalid = true;
+      });
+
+      it('should throw an error when a number has an unknown format', () => {
+        expect(() => validateParameter({
+          schema: {
+            type: 'number',
+            format: 'float16'
+          },
+          value: 1.5,
+          models,
+          validationContext,
+          validationSettings
+        })).to.throw('Swagger schema is invalid: number has unsupported format "float16"');
+      });
+    });
   });
 });

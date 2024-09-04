@@ -1,3 +1,4 @@
+const {expect} = require('chai');
 const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
 const {validateParameter} = require('../lib/validation/parameter');
@@ -302,5 +303,40 @@ describe('integer', function () {
       validationSettings
     });
     assertValidationFailed(ret, ["testParam is not a type of integer"]);
+  });
+
+  describe('invalid schemas', () => {
+    it('should return a validation error when an integer has an unknown format', () => {
+      const results = validateParameter({
+        schema: {
+          type: 'integer',
+          format: 'int99'
+        },
+        value: 1,
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(results, ['Unknown param type int99']);
+    });
+
+    describe('when the validation settings specify that an error should be thrown when there is a problem with the swagger schema', () => {
+      beforeEach(() => {
+        validationSettings.throwErrorsWhenSchemaIsInvalid = true;
+      });
+
+      it('should throw an error when an integer has an unknown format', () => {
+        expect(() => validateParameter({
+          schema: {
+            type: 'integer',
+            format: 'int99'
+          },
+          value: 1,
+          models,
+          validationContext,
+          validationSettings
+        })).to.throw('Swagger schema is invalid: integer has unsupported format "int99"');
+      });
+    });
   });
 });
