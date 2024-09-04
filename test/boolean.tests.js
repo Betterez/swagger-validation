@@ -39,31 +39,65 @@ describe('boolean', function () {
     assertValidationPassed(ret, [value]);
   });
 
-  it('should validate with true string', function () {
-    var value = 'true';
-    var transformedValue = true;
-    var ret = validateParameter({
-      schema: helper.makeParam('boolean', false),
-      value,
-      models,
-      validationContext,
-      validationSettings
+  describe('handling of string values', () => {
+    it('should allow a boolean to have the string value "true" (legacy behaviour)', function () {
+      const result = validateParameter({
+        schema: {
+          type: 'boolean'
+        },
+        value: 'true',
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationPassed(result, [true]);
     });
-    assertValidationPassed(ret, [transformedValue]);
-  });
 
-  it('should validate with false string', function () {
-    var value = 'false';
-    var transformedValue = false;
-    var ret = validateParameter({
-      schema: helper.makeParam('boolean', false),
-      value,
-      models,
-      validationContext,
-      validationSettings
+    it('should allow a boolean to have the string value "false" (legacy behaviour)', function () {
+      const result = validateParameter({
+        schema: {
+          type: 'boolean'
+        },
+        value: 'false',
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationPassed(result, [false]);
     });
-    assertValidationPassed(ret, [transformedValue]);
-  });
+
+    describe('when the validation settings specify that booleans cannot have string representations', () => {
+      beforeEach(() => {
+        validationSettings.allowStringRepresentationsOfBooleans = false;
+      });
+
+      it('should not allow a boolean to have the string value "true" (legacy behaviour)', function () {
+        const result = validateParameter({
+          schema: {
+            type: 'boolean'
+          },
+          value: 'true',
+          models,
+          validationContext,
+          validationSettings
+        });
+        assertValidationFailed(result, ['undefined is not a type of boolean']);
+      });
+
+      it('should not allow a boolean to have the string value "false" (legacy behaviour)', function () {
+        const result = validateParameter({
+          schema: {
+            type: 'boolean'
+          },
+          value: 'false',
+          models,
+          validationContext,
+          validationSettings
+        });
+        assertValidationFailed(result, ['undefined is not a type of boolean']);
+      });
+    });
+  })
 
   it('should not validate with required field null', function () {
     var value = null;
