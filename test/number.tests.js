@@ -435,4 +435,40 @@ describe('number', function () {
       });
     });
   });
+
+  describe('number formats', () => {
+    it('should allow a number to have a format, even though the format has no effect on the validation logic (legacy behaviour)', () => {
+      const results = validateParameter({
+        schema: {
+          type: 'number',
+          format: 'double'
+        },
+        value: 1,
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationPassed(results);
+    });
+
+    describe('when the validation settings specify that number formats with no equivalent representation in Javascript are disallowed', () => {
+      beforeEach(() => {
+        validationSettings.allowNumberFormatsWithNoEquivalentRepresentationInJavascript = false;
+        validationSettings.throwErrorsWhenSchemaIsInvalid = true;
+      });
+
+      it('should throw an error when a number has a format', () => {
+        expect(() => validateParameter({
+          schema: {
+            type: 'number',
+            format: 'double'
+          },
+          value: 1,
+          models,
+          validationContext,
+          validationSettings
+        })).to.throw(`Swagger schema is invalid: number has format "double", but number formats are not supported by this library.  Omit the format and use 'type: "number"' instead.`);
+      });
+    });
+  });
 });
