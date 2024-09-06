@@ -375,4 +375,64 @@ describe('integer', function () {
       });
     });
   });
+
+  describe('string validation', () => {
+    it('should allow an integer to be a string (legacy behaviour)', () => {
+      const result = validateParameter({
+        schema: {
+          type: 'integer'
+        },
+        value: "1238976",
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationPassed(result);
+    });
+
+    it('should allow an integer to be a number', () => {
+      const result = validateParameter({
+        schema: {
+          type: 'integer'
+        },
+        value: 1238976,
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationPassed(result);
+    });
+
+    describe('when the validation settings specify that numbers cannot be strings', () => {
+      beforeEach(() => {
+        validationSettings.allowNumbersToBeStrings = false;
+      });
+
+      it('should not allow an integer to be a string', () => {
+        const result = validateParameter({
+          schema: {
+            type: 'integer'
+          },
+          value: "1238976",
+          models,
+          validationContext,
+          validationSettings
+        });
+        assertValidationFailed(result, ['undefined is not a type of integer']);
+      });
+
+      it('should allow an integer to be a number', () => {
+        const result = validateParameter({
+          schema: {
+            type: 'integer'
+          },
+          value: 1238976,
+          models,
+          validationContext,
+          validationSettings
+        });
+        assertValidationPassed(result);
+      });
+    });
+  })
 });

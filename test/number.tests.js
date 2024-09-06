@@ -471,4 +471,64 @@ describe('number', function () {
       });
     });
   });
+
+  describe('string validation', () => {
+    it('should allow a number to be a string (legacy behaviour)', () => {
+      const result = validateParameter({
+        schema: {
+          type: 'number'
+        },
+        value: "7389.271",
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationPassed(result);
+    });
+
+    it('should allow a number to be a floating-point number', () => {
+      const result = validateParameter({
+        schema: {
+          type: 'number'
+        },
+        value: 7389.271,
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationPassed(result);
+    });
+
+    describe('when the validation settings specify that numbers cannot be strings', () => {
+      beforeEach(() => {
+        validationSettings.allowNumbersToBeStrings = false;
+      });
+
+      it('should not allow an number to be a string', () => {
+        const result = validateParameter({
+          schema: {
+            type: 'number'
+          },
+          value: "7389.271",
+          models,
+          validationContext,
+          validationSettings
+        });
+        assertValidationFailed(result, ['undefined is not a type of number']);
+      });
+
+      it('should allow a number to be a floating-point number', () => {
+        const result = validateParameter({
+          schema: {
+            type: 'number'
+          },
+          value: 7389.271,
+          models,
+          validationContext,
+          validationSettings
+        });
+        assertValidationPassed(result);
+      });
+    });
+  })
 });
