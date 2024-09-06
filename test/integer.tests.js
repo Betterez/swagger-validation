@@ -339,4 +339,40 @@ describe('integer', function () {
       });
     });
   });
+
+  describe('number formats', () => {
+    it('should allow an integer to have a format which has no equivalent representation in Javascript (legacy behaviour)', () => {
+      const results = validateParameter({
+        schema: {
+          type: 'integer',
+          format: 'int64' // Javascript does not support 64-bit integers
+        },
+        value: 1,
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationPassed(results);
+    });
+
+    describe('when the validation settings specify that number formats with no equivalent representation in Javascript are disallowed', () => {
+      beforeEach(() => {
+        validationSettings.allowNumberFormatsWithNoEquivalentRepresentationInJavascript = false;
+        validationSettings.throwErrorsWhenSchemaIsInvalid = true;
+      });
+
+      it('should throw an error when an integer has an unknown format', () => {
+        expect(() => validateParameter({
+          schema: {
+            type: 'integer',
+            format: 'int64'
+          },
+          value: 1,
+          models,
+          validationContext,
+          validationSettings
+        })).to.throw(`Swagger schema is invalid: integer has format "int64", but integer formats are not supported by this library.  Omit the format and use 'type: "integer"' instead.`);
+      });
+    });
+  });
 });
