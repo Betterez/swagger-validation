@@ -377,6 +377,34 @@ describe('string', function () {
       assertValidationFailed(results, ['Unknown param type day-of-week']);
     });
 
+    it('should return a validation error when a string has a "pattern" which is not a string', () => {
+      const results = validateParameter({
+        schema: {
+          type: 'string',
+          pattern: /.*/,
+        },
+        value: 'Some string',
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(results, ['undefined is specified with an invalid pattern /.*/']);
+    });
+
+    it('should return a validation error when a string has a "pattern" which is not a parseable regular expression', () => {
+      const results = validateParameter({
+        schema: {
+          type: 'string',
+          pattern: '****',
+        },
+        value: 'Some string',
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(results, ["undefined is specified with an invalid pattern '****'"]);
+    });
+
     describe('when the validation settings specify that an error should be thrown when there is a problem with the swagger schema', () => {
       beforeEach(() => {
         validationSettings.throwErrorsWhenSchemaIsInvalid = true;
@@ -393,6 +421,32 @@ describe('string', function () {
           validationContext,
           validationSettings
         })).to.throw('Swagger schema is invalid: string has unsupported format "day-of-week"');
+      });
+
+      it('should throw an error when a string has a "pattern" which is not a string', () => {
+        expect(() => validateParameter({
+          schema: {
+            type: 'string',
+            pattern: /.*/,
+          },
+          value: 'Some string',
+          models,
+          validationContext,
+          validationSettings
+        })).to.throw('Swagger schema is invalid: bad regular expression "/.*/".  Regular expressions must be provided as a string, and must have correct syntax')
+      });
+
+      it('should throw an error when a string has a "pattern" which is not a parseable regular expression', () => {
+        expect(() => validateParameter({
+          schema: {
+            type: 'string',
+            pattern: '****',
+          },
+          value: 'Some string',
+          models,
+          validationContext,
+          validationSettings
+        })).to.throw(`Swagger schema is invalid: bad regular expression "'****'".  Regular expressions must be provided as a string, and must have correct syntax`);
       });
     });
   });

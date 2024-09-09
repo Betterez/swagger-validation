@@ -1613,5 +1613,38 @@ describe('object', function () {
       expect(result[0].context.toLiteral()).to.eql({dataPath: ['someNestedObject', 'someProperty']});
       expect(result[0].context.formatDataPath()).to.eql("someNestedObject.someProperty");
     });
-  })
+  });
+
+  describe('invalid schemas', () => {
+    it('should return a validation error when the object has a $ref that refers to an unknown model', () => {
+      const results = validateParameter({
+        schema: {
+          $ref: 'SomeUnknownModel'
+        },
+        value: {},
+        models: {},
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(results, ['Unknown param type SomeUnknownModel']);
+    });
+
+    describe('when the validation settings specify that an error should be thrown when there is a problem with the swagger schema', () => {
+      beforeEach(() => {
+        validationSettings.throwErrorsWhenSchemaIsInvalid = true;
+      });
+
+      it('should throw an error when the object has a $ref that refers to an unknown model', () => {
+        expect(() => validateParameter({
+          schema: {
+            $ref: 'SomeUnknownModel'
+          },
+          value: {},
+          models: {},
+          validationContext,
+          validationSettings
+        })).to.throw('Swagger schema is invalid: Unknown reference to model "SomeUnknownModel"');
+      });
+    });
+  });
 });
