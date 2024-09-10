@@ -79,4 +79,39 @@ describe('paramType - path', function () {
       expect(req.params.someNumber).to.equal(someNumber);
     });
   });
+
+  it('should validate a path parameter using the embedded schema, when one is available', () => {
+    const requestSchema = {
+      description: 'A mock endpoint',
+      path: '/some-endpoint/{someParameter}',
+      method: 'POST',
+      parameters: [
+        {
+          in: 'path',
+          name: 'someParameter',
+          schema: {
+            type: 'string'
+          },
+          required: true
+        }
+      ],
+    };
+
+    const req = {
+      params: {
+        someParameter: 'ABC'
+      }
+    };
+
+    let result = validateRequest(requestSchema, req);
+    assertValidationPassed(result);
+
+    req.params.someParameter = null;
+    result = validateRequest(requestSchema, req);
+    assertValidationFailed(result, ['someParameter is required']);
+
+    req.params.someParameter = 1;
+    result = validateRequest(requestSchema, req);
+    assertValidationFailed(result, ['someParameter is not a type of string']);
+  });
 });

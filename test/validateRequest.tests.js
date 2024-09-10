@@ -180,6 +180,31 @@ describe('validateRequest', () => {
       assertValidationPassed(result);
     });
 
+    it('should allow a request parameter to declare both a "type" and a "schema" which contradict each other (legacy behaviour)', () => {
+      requestSchema = {
+        description: 'A mock endpoint',
+        path: '/some-endpoint/{someParameter}',
+        method: 'POST',
+        parameters: [
+          {
+            in: 'path',
+            name: 'someParameter',
+            type: 'number',
+            schema: {
+              type: 'string'
+            },
+            required: true
+          }
+        ],
+      };
+
+      req.params = {
+        someParameter: 'ABC'
+      };
+      let result = validateRequest(requestSchema, req, models);
+      assertValidationPassed(result);
+    });
+
     describe('when the validation settings specify that an error should be thrown when there is a problem with the swagger schema', () => {
       it('should throw an error when a schema has both a "type" and a "$ref"', () => {
         models = {
@@ -230,6 +255,31 @@ describe('validateRequest', () => {
         };
         expect(() => validateRequest(requestSchema, req, models, {throwErrorsWhenSchemaIsInvalid: true}))
           .to.throw('Swagger schema is invalid: Unknown reference to model "SomeModelWhichDoesNotExist"');
+      });
+
+      it('should throw an error when a request parameter declares both a "type" and a "schema"', () => {
+        requestSchema = {
+          description: 'A mock endpoint',
+          path: '/some-endpoint/{someParameter}',
+          method: 'POST',
+          parameters: [
+            {
+              in: 'path',
+              name: 'someParameter',
+              type: 'number',
+              schema: {
+                type: 'string'
+              },
+              required: true
+            }
+          ],
+        };
+
+        req.params = {
+          someParameter: 'ABC'
+        };
+        expect(() => validateRequest(requestSchema, req, models, {throwErrorsWhenSchemaIsInvalid: true}))
+          .to.throw('Swagger schema is invalid: request parameter "someParameter" can have either a "type" or a "schema", but not both.');
       });
     });
   });

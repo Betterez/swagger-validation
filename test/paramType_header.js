@@ -366,4 +366,39 @@ describe('paramType - header', function () {
       expect(req.header.someDate).to.eql(someDate);
     });
   });
+
+  it('should validate a header parameter using the embedded schema, when one is available', () => {
+    const requestSchema = {
+      description: 'A mock endpoint',
+      path: '/some-endpoint',
+      method: 'POST',
+      parameters: [
+        {
+          in: 'header',
+          name: 'x-some-header',
+          schema: {
+            type: 'string'
+          },
+          required: true
+        }
+      ],
+    };
+
+    const req = {
+      header: {
+        'x-some-header': 'ABC'
+      }
+    };
+
+    let result = validateRequest(requestSchema, req);
+    assertValidationPassed(result);
+
+    req.header['x-some-header'] = null;
+    result = validateRequest(requestSchema, req);
+    assertValidationFailed(result, ['x-some-header is required']);
+
+    req.header['x-some-header'] = 1;
+    result = validateRequest(requestSchema, req);
+    assertValidationFailed(result, ['x-some-header is not a type of string']);
+  });
 });

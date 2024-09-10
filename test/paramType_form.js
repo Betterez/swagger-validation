@@ -366,4 +366,39 @@ describe('paramType - form', function () {
       expect(req.form.someDate).to.eql(someDate);
     });
   });
+
+  it('should validate a form parameter using the embedded schema, when one is available', () => {
+    const requestSchema = {
+      description: 'A mock endpoint',
+      path: '/some-endpoint',
+      method: 'POST',
+      parameters: [
+        {
+          in: 'form',
+          name: 'someParameter',
+          schema: {
+            type: 'string'
+          },
+          required: true
+        }
+      ],
+    };
+
+    const req = {
+      form: {
+        someParameter: 'ABC'
+      }
+    };
+
+    let result = validateRequest(requestSchema, req);
+    assertValidationPassed(result);
+
+    req.form.someParameter = null;
+    result = validateRequest(requestSchema, req);
+    assertValidationFailed(result, ['someParameter is required']);
+
+    req.form.someParameter = 1;
+    result = validateRequest(requestSchema, req);
+    assertValidationFailed(result, ['someParameter is not a type of string']);
+  });
 });
