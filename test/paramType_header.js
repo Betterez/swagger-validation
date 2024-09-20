@@ -12,13 +12,13 @@ describe('paramType - header', function () {
           {
             name: 'someModel',
             $ref: 'SomeModel',
-            paramType: 'header'
+            in: 'header'
           }
         ]
       };
       var models = {
         SomeModel: {
-          id: 'SomeModel',
+          type: 'object',
           properties: {
             someDate: {
               type: 'string',
@@ -53,13 +53,13 @@ describe('paramType - header', function () {
           {
             name: 'someModel',
             $ref: 'SomeModel',
-            paramType: 'header'
+            in: 'header'
           }
         ]
       };
       var models = {
         SomeModel: {
-          id: 'SomeModel',
+          type: 'object',
           properties: {
             someDate: {
               type: 'string',
@@ -71,7 +71,7 @@ describe('paramType - header', function () {
           }
         },
         NestedModel: {
-          id: 'NestedModel',
+          type: 'object',
           properties: {
             anotherDate: {
               type: 'string',
@@ -105,13 +105,13 @@ describe('paramType - header', function () {
           {
             name: 'someModel',
             $ref: 'SomeModel',
-            paramType: 'header'
+            in: 'header'
           }
         ]
       };
       var models = {
         SomeModel: {
-          id: 'SomeModel',
+          type: 'object',
           properties: {
             someDate: {
               type: 'string',
@@ -149,7 +149,7 @@ describe('paramType - header', function () {
       };
       var models = {
         SomeModel: {
-          id: 'SomeModel',
+          type: 'object',
           properties: {
             someDate: {
               type: 'string',
@@ -190,7 +190,7 @@ describe('paramType - header', function () {
       };
       var models = {
         SomeModel: {
-          id: 'SomeModel',
+          type: 'object',
           properties: {
             someDate: {
               type: 'string',
@@ -202,7 +202,7 @@ describe('paramType - header', function () {
           }
         },
         NestedModel: {
-          id: 'NestedModel',
+          type: 'object',
           properties: {
             anotherDate: {
               type: 'string',
@@ -242,7 +242,7 @@ describe('paramType - header', function () {
       };
       var models = {
         SomeModel: {
-          id: 'SomeModel',
+          type: 'object',
           properties: {
             someDate: {
               type: 'string',
@@ -301,7 +301,7 @@ describe('paramType - header', function () {
             name: 'someDate',
             type: 'string',
             format: 'date',
-            paramType: 'header'
+            in: 'header'
           }
         ]
       };
@@ -400,5 +400,74 @@ describe('paramType - header', function () {
     req.header['x-some-header'] = 1;
     result = validateRequest(requestSchema, req);
     assertValidationFailed(result, ['x-some-header is not a type of string']);
+  });
+
+  it('should apply a default value if a header parameter is not provided, and a default value is specified for the parameter', function () {
+    const requestSchema = {
+      description: 'A mock endpoint',
+      path: '/some-endpoint',
+      method: 'POST',
+      parameters: [
+        {
+          in: 'header',
+          name: 'x-some-header',
+          schema: {
+            type: 'string'
+          },
+          defaultValue: 'someDefaultValue'
+        }
+      ],
+    };
+
+    const req = {
+      header: {}
+    };
+
+    const result = validateRequest(requestSchema, req);
+    assertValidationPassed(result);
+
+    expect(req.header['x-some-header']).to.eql('someDefaultValue');
+  });
+
+  it('should allow an optional header parameter to be omitted from the request', () => {
+    const spec = {
+      parameters: [
+        {
+          in: 'header',
+          name: 'x-some-header',
+          schema: {
+            type: 'string'
+          },
+          required: false
+        },
+      ]
+    };
+
+    const req = {
+      header: {}
+    };
+    const validationResults = validateRequest(spec, req);
+    assertValidationPassed(validationResults);
+  });
+
+  it('should fail validation when a header parameter is required, but no value is present in the request', function () {
+    const spec = {
+      parameters: [
+        {
+          in: 'header',
+          name: 'x-some-header',
+          schema: {
+            type: 'string'
+          },
+          required: true
+        }
+      ]
+    };
+
+    const req = {
+      header: {}
+    };
+    const validationResults = validateRequest(spec, req);
+    assertValidationFailed(validationResults, ['x-some-header is required']);
   });
 });

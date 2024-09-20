@@ -13,13 +13,13 @@ describe('paramType - query', function () {
             name: 'someDate',
             type: 'string',
             format: 'date',
-            paramType: 'query'
+            in: 'query'
           },
           {
             name: 'someNumber',
             type: 'number',
             format: 'float',
-            paramType: 'query'
+            in: 'query'
           }
         ]
       };
@@ -40,7 +40,7 @@ describe('paramType - query', function () {
       expect(req.query.someNumber).to.equal(someNumberTransformed);
     });
 
-    it('should convert strings to defaultValue', function () {
+    it('should apply a default value to strings', function () {
       var spec = {
         parameters: [
           {
@@ -48,14 +48,14 @@ describe('paramType - query', function () {
             type: 'string',
             format: 'date',
             defaultValue: '2014-11-23',
-            paramType: 'query'
+            in: 'query'
           },
           {
             name: 'someNumber',
             type: 'number',
-            defaultValue: "233.2354",
+            defaultValue: '233.2354',
             format: 'float',
-            paramType: 'query'
+            in: 'query'
           }
         ]
       };
@@ -65,8 +65,8 @@ describe('paramType - query', function () {
       };
       var ret = validateRequest(spec, req);
       assertValidationPassed(ret);
-      expect(req.query.someDate).to.eql("2014-11-23");
-      expect(req.query.someNumber).to.equal("233.2354");
+      expect(req.query.someDate).to.eql('2014-11-23');
+      expect(req.query.someNumber).to.equal('233.2354');
     });
 
     it('should not convert strings with date format to Date object', function () {
@@ -79,13 +79,13 @@ describe('paramType - query', function () {
             name: 'someDate',
             type: 'string',
             format: 'date',
-            paramType: 'query'
+            in: 'query'
           },
           {
             name: 'someNumber',
             type: 'number',
             format: 'float',
-            paramType: 'query'
+            in: 'query'
           }
         ]
       };
@@ -110,7 +110,7 @@ describe('paramType - query', function () {
           {
             name: 'someString',
             type: 'string',
-            paramType: 'query',
+            in: 'query',
             pattern: '/^hi/i'
           }
         ]
@@ -160,7 +160,7 @@ describe('paramType - query', function () {
       expect(req.query.someNumber).to.equal(someNumberTransformed);
     });
 
-    it('should convert strings to defaultValue', function () {
+    it('should apply a default value to strings', function () {
       var spec = {
         parameters: [
           {
@@ -173,7 +173,7 @@ describe('paramType - query', function () {
           {
             name: 'someNumber',
             type: 'number',
-            defaultValue: "233.2354",
+            defaultValue: '233.2354',
             format: 'float',
             in: 'query'
           }
@@ -187,6 +187,44 @@ describe('paramType - query', function () {
       assertValidationPassed(ret);
       expect(req.query.someDate).to.eql("2014-11-23");
       expect(req.query.someNumber).to.equal("233.2354");
+    });
+
+    it('should allow an optional query parameter to be omitted from the request', () => {
+      const spec = {
+        parameters: [
+          {
+            name: 'someQueryParameter',
+            type: 'string',
+            in: 'query',
+            required: false
+          },
+        ]
+      };
+
+      const req = {
+        query: {}
+      };
+      const validationResults = validateRequest(spec, req);
+      assertValidationPassed(validationResults);
+    });
+
+    it('should fail validation when a query parameter is required, but no value is present in the request', function () {
+      const spec = {
+        parameters: [
+          {
+            name: 'someQueryParameter',
+            type: 'string',
+            in: 'query',
+            required: true
+          },
+        ]
+      };
+
+      const req = {
+        query: {}
+      };
+      const validationResults = validateRequest(spec, req);
+      assertValidationFailed(validationResults, ['someQueryParameter is required']);
     });
 
     it('should not convert strings with date format to Date object', function () {

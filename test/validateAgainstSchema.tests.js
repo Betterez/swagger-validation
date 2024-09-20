@@ -9,7 +9,7 @@ const someDateTransformed = moment(someDate).toDate();
 const someString = "blah blah";
 const models = {
   SomeModel: {
-    id: "SomeModel",
+    type: 'object',
     required: ["someDate"],
     properties: {
       someDate: {
@@ -25,7 +25,7 @@ const models = {
     }
   },
   NestedModel: {
-    id: "NestedModel",
+    type: 'object',
     properties: {
       anotherDate: {
         type: "string",

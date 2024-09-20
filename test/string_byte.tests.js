@@ -38,39 +38,4 @@ describe('string - byte', function () {
     });
     assertValidationPassed(ret, [value]);
   });
-
-  it('should not validate with required field null', function () {
-    var value = null;
-    var ret = validateParameter({
-      schema: helper.makeStringParam('string', true, 'byte'),
-      value,
-      models,
-      validationContext,
-      validationSettings
-    });
-    assertValidationFailed(ret, ["testParam is required"]);
-  });
-
-  it('should not validate with required field undefined', function () {
-    var ret = validateParameter({
-      schema: helper.makeStringParam('string', true, 'byte'),
-      value: undefined,
-      models,
-      validationContext,
-      validationSettings
-    });
-    assertValidationFailed(ret, ["testParam is required"]);
-  });
-
-  it('should not validate with required field empty string', function () {
-    var value = '';
-    var ret = validateParameter({
-      schema: helper.makeStringParam('string', true, 'byte'),
-      value,
-      models,
-      validationContext,
-      validationSettings
-    });
-    assertValidationFailed(ret, ["testParam is required"]);
-  });
 });

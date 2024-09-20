@@ -12,13 +12,13 @@ describe('paramType - body', function () {
           {
             name: 'someModel',
             $ref: 'SomeModel',
-            paramType: 'body'
+            in: 'body'
           }
         ]
       };
       var models = {
         SomeModel: {
-          id: 'SomeModel',
+          type: 'object',
           properties: {
             someDate: {
               type: 'string',
@@ -53,13 +53,13 @@ describe('paramType - body', function () {
           {
             name: 'someModel',
             $ref: 'SomeModel',
-            paramType: 'body'
+            in: 'body'
           }
         ]
       };
       var models = {
         SomeModel: {
-          id: 'SomeModel',
+          type: 'object',
           properties: {
             someDate: {
               type: 'string',
@@ -71,7 +71,7 @@ describe('paramType - body', function () {
           }
         },
         NestedModel: {
-          id: 'NestedModel',
+          type: 'object',
           properties: {
             anotherDate: {
               type: 'string',
@@ -104,13 +104,13 @@ describe('paramType - body', function () {
           {
             name: 'someModel',
             $ref: 'SomeModel',
-            paramType: 'body'
+            in: 'body'
           }
         ]
       };
       var models = {
         SomeModel: {
-          id: 'SomeModel',
+          type: 'object',
           properties: {
             someDate: {
               type: 'string',
@@ -148,7 +148,7 @@ describe('paramType - body', function () {
       };
       var models = {
         SomeModel: {
-          id: 'SomeModel',
+          type: 'object',
           properties: {
             someDate: {
               type: 'string',
@@ -183,13 +183,13 @@ describe('paramType - body', function () {
           {
             name: 'someModel',
             $ref: 'SomeModel',
-            paramType: 'body'
+            in: 'body'
           }
         ]
       };
       var models = {
         SomeModel: {
-          id: 'SomeModel',
+          type: 'object',
           properties: {
             someDate: {
               type: 'string',
@@ -201,7 +201,7 @@ describe('paramType - body', function () {
           }
         },
         NestedModel: {
-          id: 'NestedModel',
+          type: 'object',
           properties: {
             anotherDate: {
               type: 'string',
@@ -240,7 +240,7 @@ describe('paramType - body', function () {
       };
       var models = {
         SomeModel: {
-          id: 'SomeModel',
+          type: 'object',
           properties: {
             someDate: {
               type: 'string',
@@ -347,7 +347,7 @@ describe('paramType - body', function () {
             name: 'someDate',
             type: 'string',
             format: 'date',
-            paramType: 'body'
+            in: 'body'
           }
         ]
       };

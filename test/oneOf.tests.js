@@ -2,13 +2,13 @@ const {expect} = require('chai');
 const {validateParameter} = require('../lib/validation/parameter');
 const {ValidationContext} = require('../lib/validation/validationContext');
 const {getValidationSettings} = require('../lib/validation/validationSettings');
+const {assertValidationFailed} = require("./test_helper");
 
 describe('oneOf', function () {
   describe('basic tests', function () {
     let models = {
       Test: {
-        id: 'Test',
-        name: 'Test',
+        type: 'object',
         properties: {
           id: {
             oneOf: [
@@ -37,11 +37,15 @@ describe('oneOf', function () {
       validationSettings = getValidationSettings();
     });
 
-    it('should return all errors because is required and not given', function () {
-      var value = null;
-      var ret = validateParameter({schema, value, models, validationContext, validationSettings});
-      expect(ret).to.be.an('array');
-      expect(ret).to.have.length(3);
+    it('should fail validation and return all errors if the value does not match any of the schemas', function () {
+      const validationResults = validateParameter({
+        schema,
+        value: {},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ['value is not a type of string', 'value is not a type of number', 'value is not a type of boolean']);
     });
 
     it('should return all errors because is wrong type', function () {

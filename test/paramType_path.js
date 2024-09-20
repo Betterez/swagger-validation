@@ -13,13 +13,13 @@ describe('paramType - path', function () {
             name: 'someDate',
             type: 'string',
             format: 'date',
-            paramType: 'path'
+            in: 'path'
           },
           {
             name: 'someNumber',
             type: 'number',
             format: 'float',
-            paramType: 'path'
+            in: 'path'
           },
           {
             name: 'someString',
@@ -55,13 +55,13 @@ describe('paramType - path', function () {
             name: 'someDate',
             type: 'string',
             format: 'date',
-            paramType: 'path'
+            in: 'path'
           },
           {
             name: 'someNumber',
             type: 'number',
             format: 'float',
-            paramType: 'path'
+            in: 'path'
           }
         ]
       };
@@ -113,5 +113,74 @@ describe('paramType - path', function () {
     req.params.someParameter = 1;
     result = validateRequest(requestSchema, req);
     assertValidationFailed(result, ['someParameter is not a type of string']);
+  });
+
+  it('should apply a default value if a path parameter is not provided, and a default value is specified for the parameter', function () {
+    const requestSchema = {
+      description: 'A mock endpoint',
+      path: '/some-endpoint/{someParameter}',
+      method: 'POST',
+      parameters: [
+        {
+          in: 'path',
+          name: 'someParameter',
+          schema: {
+            type: 'string'
+          },
+          defaultValue: 'someDefaultValue'
+        }
+      ],
+    };
+
+    const req = {
+      params: {}
+    };
+
+    const result = validateRequest(requestSchema, req);
+    assertValidationPassed(result);
+
+    expect(req.params.someParameter).to.eql('someDefaultValue');
+  });
+
+  it('should allow an optional path parameter to be omitted from the request', () => {
+    const spec = {
+      parameters: [
+        {
+          in: 'path',
+          name: 'someParameter',
+          schema: {
+            type: 'string'
+          },
+          required: false
+        },
+      ]
+    };
+
+    const req = {
+      params: {}
+    };
+    const validationResults = validateRequest(spec, req);
+    assertValidationPassed(validationResults);
+  });
+
+  it('should fail validation when a path parameter is required, but no value is present in the request', function () {
+    const spec = {
+      parameters: [
+        {
+          in: 'path',
+          name: 'someParameter',
+          schema: {
+            type: 'string'
+          },
+          required: true
+        }
+      ]
+    };
+
+    const req = {
+      params: {}
+    };
+    const validationResults = validateRequest(spec, req);
+    assertValidationFailed(validationResults, ['someParameter is required']);
   });
 });

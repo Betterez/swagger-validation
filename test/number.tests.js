@@ -258,41 +258,6 @@ describe('number', function () {
     assertValidationFailed(ret, ["testParam is above the maximum value"]);
   });
 
-  it('should not validate with required field null', function () {
-    var value = null;
-    var ret = validateParameter({
-      schema: helper.makeNumberParam('number', true),
-      value,
-      models,
-      validationContext,
-      validationSettings
-    });
-    assertValidationFailed(ret, ["testParam is required"]);
-  });
-
-  it('should not validate with required field undefined', function () {
-    var ret = validateParameter({
-      schema: helper.makeNumberParam('number', true),
-      value: undefined,
-      models,
-      validationContext,
-      validationSettings
-    });
-    assertValidationFailed(ret, ["testParam is required"]);
-  });
-
-  it('should not validate with required field empty string', function () {
-    var value = '';
-    var ret = validateParameter({
-      schema: helper.makeNumberParam('number', true),
-      value,
-      models,
-      validationContext,
-      validationSettings
-    });
-    assertValidationFailed(ret, ["testParam is required"]);
-  });
-
   it('should not validate with true boolean', function () {
     var value = true;
     var ret = validateParameter({
@@ -389,16 +354,20 @@ describe('number', function () {
     assertValidationFailed(ret, ["testParam is not a type of number"]);
   });
 
-  it('should not validate with null if nullable is false', function () {
+  it('should not allow a null value when nullable is false, even when the number is optional', function () {
     const schema = {
-      type: 'number',
-      required: false,
-      name: 'testParam',
-      nullable: false
+      type: 'object',
+      required: [],
+      properties: {
+        someNumber: {
+          type: 'number',
+          nullable: false
+        }
+      }
     };
-
-    const result = validateParameter({schema, value: null, models, validationContext, validationSettings});
-    assertValidationFailed(result, ['testParam cannot be null']);
+    const value = {someNumber: null};
+    const result = validateParameter({schema, value, models, validationContext, validationSettings});
+    assertValidationFailed(result, ['someNumber cannot be null']);
   });
 
   describe('invalid schemas', () => {

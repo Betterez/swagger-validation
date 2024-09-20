@@ -1,12 +1,12 @@
+const {expect} = require('chai');
 const moment = require('moment');
 const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
 const {validateParameter} = require('../lib/validation/parameter');
 const {ValidationContext} = require('../lib/validation/validationContext');
 const {getValidationSettings} = require('../lib/validation/validationSettings');
-const {expect} = require('chai');
 
-describe('object', function () {
+describe('object', () => {
   let validationContext;
   let validationSettings;
 
@@ -15,7 +15,7 @@ describe('object', function () {
     validationSettings = getValidationSettings();
   });
 
-  describe('basic tests', function () {
+  describe('basic tests', () => {
     let models;
 
     beforeEach(() => {
@@ -29,7 +29,7 @@ describe('object', function () {
       };
     });
 
-    it('should validate when the model has type: "object"', () => {
+    it('should accept the value when the schema has type: "object" and the value matches the schema', () => {
       const models = {
         BasicObject: {
           type: 'object',
@@ -47,6 +47,56 @@ describe('object', function () {
         validationSettings
       });
       assertValidationPassed(result, [{id: 1}]);
+    });
+
+    it('should allow an optional property to be undefined', () => {
+      const value = {};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            someProperty: {type: 'string'}
+          }
+        },
+        value,
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationPassed(validationResults, [value]);
+    });
+
+    it('should not allow a required property to be undefined', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['someProperty'],
+          properties: {
+            someProperty: {type: 'string'}
+          }
+        },
+        value: {},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["someProperty is required"]);
+    });
+
+    it('should not throw an error when the object schema does not declare any "properties"', () => {
+      it('should not allow a required property to be undefined', () => {
+        const validationResults = validateParameter({
+          schema: {
+            type: 'object',
+            required: [],
+          },
+          value: {},
+          models,
+          validationContext,
+          validationSettings
+        });
+        assertValidationPassed(validationResults);
+      });
     });
 
     describe('null value handling', () => {
@@ -74,7 +124,7 @@ describe('object', function () {
         assertValidationFailed(result, ["id cannot be null"]);
       });
 
-      it('should not allow a required parameter to be null', function () {
+      it('should not allow a required parameter to be null', () => {
         models.SomeObject.required = ['id'];
 
         const result = validateParameter({
@@ -123,7 +173,25 @@ describe('object', function () {
         models.SomeObject.properties.id.type = 'string';
       });
 
-      it('should not allow a required string parameter to be an empty string (legacy behaviour)', function () {
+      it('should allow an optional parameter to be an empty string, even when that parameter does not have the "string" type (legacy behaviour)', () => {
+        const value = {someProperty: ''};
+        const validationResults = validateParameter({
+          schema: {
+            type: 'object',
+            required: [],
+            properties: {
+              someProperty: {type: 'number'}
+            }
+          },
+          value,
+          models: models,
+          validationContext,
+          validationSettings
+        });
+        assertValidationPassed(validationResults, [value]);
+      });
+
+      it('should not allow a required string parameter to be an empty string (legacy behaviour)', () => {
         models.SomeObject.required = ['id'];
 
         const result = validateParameter({
@@ -141,7 +209,7 @@ describe('object', function () {
           validationSettings.treatEmptyStringsLikeUndefinedValues = false;
         });
 
-        it('should allow a required string parameter to be an empty string', function () {
+        it('should allow a required string parameter to be an empty string', () => {
           models.SomeObject.required = ['id'];
 
           const result = validateParameter({
@@ -156,926 +224,1810 @@ describe('object', function () {
       });
     });
 
-    it('should validate with parameter undefined', function () {
-      var value = void (0);
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
-        value,
+    it('should not allow a property which has type: "object" to be an array', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['someProperty'],
+          properties: {
+            someProperty: {type: 'object'}
+          }
+        },
+        value: {someProperty: []},
         models: models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [value]);
+      assertValidationFailed(validationResults, ["someProperty is not a type of object"]);
     });
 
-    it('should validate with parameter empty', function () {
-      var value = {};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
-        value,
+    it('should not allow a property which has type: "object" to be a number', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['someProperty'],
+          properties: {
+            someProperty: {type: 'object'}
+          }
+        },
+        value: {someProperty: 12},
         models: models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [value]);
+      assertValidationFailed(validationResults, ["someProperty is not a type of object"]);
     });
 
-    it('should not validate with required parameter undefined', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
-        value: undefined,
+    it('should not allow a property which has type: "object" to be a string', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['someProperty'],
+          properties: {
+            someProperty: {type: 'object'}
+          }
+        },
+        value: {someProperty: 'thisisastring'},
         models: models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["testParam is required"]);
-    });
-
-    it('should not validate with array', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
-        value: [],
-        models: models,
-        validationContext,
-        validationSettings
-      });
-      assertValidationFailed(ret, ["testParam is not a type of object"]);
-    });
-
-    it('should not validate with Number', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
-        value: 12,
-        models: models,
-        validationContext,
-        validationSettings
-      });
-      assertValidationFailed(ret, ["testParam is not a type of object"]);
-    });
-
-    it('should not validate with string', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
-        value: 'thisisastring',
-        models: models,
-        validationContext,
-        validationSettings
-      });
-      assertValidationFailed(ret, ["testParam is not a type of object"]);
+      assertValidationFailed(validationResults, ["someProperty is not a type of object"]);
     });
   });
 
-  describe('one number no format not required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        properties: {
-          id: {type: 'number'}
-        }
-      }
-    };
+  describe('when the schema contains an optional number property with no format', () => {
+    let models;
 
-    it('should validate', function () {
-      var value = {id: 1};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept the value when the value is a number', () => {
+      const value = {id: 1};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            id: {type: 'number'}
+          }
+        },
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [value]);
+      assertValidationPassed(validationResults, [value]);
     });
 
-    it('should not validate', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    it('should not allow the value to be a string', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            id: {type: 'number'}
+          }
+        },
         value: {id: 'thisisastring'},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is not a type of number"]);
+      assertValidationFailed(validationResults, ["id is not a type of number"]);
     });
   });
 
-  describe('one number float format not required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        properties: {
-          id: {type: 'number', format: 'float'}
-        }
-      }
-    };
+  describe('when the schema contains an optional number property with float format', () => {
+    let models;
 
-    it('should validate', function () {
-      var value = {id: 1.233242};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept the value when the value is a number', () => {
+      const value = {id: 1.233242};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            id: {type: 'number', format: 'float'}
+          }
+        },
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [value]);
+      assertValidationPassed(validationResults, [value]);
     });
 
-    it('should not validate', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    it('should not allow the value when it is a string', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            id: {type: 'number', format: 'float'}
+          }
+        },
         value: {id: 'thisisastring'},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is not a type of float"]);
+      assertValidationFailed(validationResults, ["id is not a type of float"]);
     });
   });
 
-  describe('one number double format not required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        properties: {
-          id: {type: 'number', format: 'double'}
-        }
-      }
-    };
+  describe('when the schema contains an optional number property with double format', () => {
+    let models;
 
-    it('should validate', function () {
-      var value = {id: 1.233242};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept the value when the value is a number', () => {
+      const value = {id: 1.233242};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            id: {type: 'number', format: 'double'}
+          }
+        },
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [value]);
+      assertValidationPassed(validationResults, [value]);
     });
 
-    it('should not validate', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    it('should not allow the value when it is a string', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            id: {type: 'number', format: 'double'}
+          }
+        },
         value: {id: 'thisisastring'},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is not a type of double"]);
+      assertValidationFailed(validationResults, ["id is not a type of double"]);
     });
   });
 
-  describe('one integer no format not required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        properties: {
-          id: {type: 'integer'}
-        }
-      }
-    };
+  describe('when the schema contains an optional integer property', () => {
+    let models;
 
-    it('should validate', function () {
-      var value = {id: 1};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept the value when the value is an integer', () => {
+      const value = {id: 1};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            id: {type: 'integer'}
+          }
+        },
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [value]);
+      assertValidationPassed(validationResults, [value]);
     });
 
-    it('should not validate', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    it('should not allow the value when it is a string', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            id: {type: 'integer'}
+          }
+        },
         value: {id: 'thisisastring'},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is not a type of integer"]);
+      assertValidationFailed(validationResults, ["id is not a type of integer"]);
     });
   });
 
-  describe('one integer int32 format not required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        properties: {
-          id: {type: 'integer', format: 'int32'}
-        }
-      }
-    };
+  describe('when the schema contains an optional integer property with int32 format', () => {
+    let models;
 
-    it('should validate', function () {
-      var value = {id: 1};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept the value when the value is an integer', () => {
+      const value = {id: 1};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            id: {type: 'integer', format: 'int32'}
+          }
+        },
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [value]);
+      assertValidationPassed(validationResults, [value]);
     });
 
-    it('should not validate', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    it('should not allow the value when it is a string', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            id: {type: 'integer', format: 'int32'}
+          }
+        },
         value: {id: 'thisisastring'},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is not a type of int32"]);
+      assertValidationFailed(validationResults, ["id is not a type of int32"]);
     });
   });
 
-  describe('one integer int64 format not required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        properties: {
-          id: {type: 'integer', format: 'int64'}
-        }
-      }
-    };
+  describe('when the schema contains an optional integer property with int64 format', () => {
+    let models;
 
-    it('should validate', function () {
-      var value = {id: 1};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept the value when it is an integer', () => {
+      const value = {id: 1};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            id: {type: 'integer', format: 'int64'}
+          }
+        },
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [value]);
+      assertValidationPassed(validationResults, [value]);
     });
 
-    it('should not validate', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should not allow the value when it is a string', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            id: {type: 'integer', format: 'int64'}
+          }
+        },
         value: {id: '  '},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is not a type of int64"]);
+      assertValidationFailed(validationResults, ["id is not a type of int64"]);
     });
   });
 
-  describe('one string no format not required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        properties: {
-          id: {type: 'string'}
-        }
-      }
-    };
+  describe('when the schema contains an optional string property', () => {
+    let models;
 
-    it('should validate', function () {
-      var value = {id: 'this is a string'};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
-        value,
-        models: model,
-        validationContext,
-        validationSettings
-      });
-      assertValidationPassed(ret, [value]);
+    beforeEach(() => {
+      models = {};
     });
 
-    it('should not validate', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
-        value: {id: {}},
-        models: model,
-        validationContext,
-        validationSettings
-      });
-      assertValidationFailed(ret, ["id is not a type of string"]);
-    });
-  });
-
-  describe('one string byte format not required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        properties: {
-          id: {type: 'string', format: 'byte'}
-        }
-      }
-    };
-
-    it('should validate', function () {
-      var value = {id: [65, 43]};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
-        value,
-        models: model,
-        validationContext,
-        validationSettings
-      });
-      assertValidationPassed(ret, [value]);
-    });
-  });
-
-  describe('one string date format not required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        properties: {
-          id: {
-            type: 'string',
-            format: 'date'
+    it('should accept the value when it is a string', () => {
+      const value = {id: 'this is a string'};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            id: {type: 'string'}
           }
-        }
-      }
-    };
-
-    it('should validate', function () {
-      var value = {id: '2014-08-08'};
-      var transformedValue = {id: moment('2014-08-08').toDate()};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+        },
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [transformedValue]);
+      assertValidationPassed(validationResults, [value]);
+    });
+
+    it('should not allow the value when it is an object', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            id: {type: 'string'}
+          }
+        },
+        value: {id: {}},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is not a type of string"]);
     });
   });
 
-  describe('one string date-time format not required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        properties: {
-          id: {type: 'string', format: 'date-time'}
-        }
-      }
-    };
+  describe('when the schema contains an optional string property with byte format', () => {
+    let models;
 
-    it('should validate', function () {
-      var value = {id: '2014-08-09T12:43:00'};
-      var transformedValue = {id: moment('2014-08-09T12:43:00').toDate()};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept the value when it is an array of integers that can be converted to bytes', () => {
+      const value = {id: [65, 43]};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            id: {type: 'string', format: 'byte'}
+          }
+        },
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [transformedValue]);
+      assertValidationPassed(validationResults, [value]);
     });
   });
 
-  describe('one boolean no format not required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        properties: {
-          id: {type: 'boolean'}
-        }
-      }
-    };
+  describe('when the schema contains an optional string property with date format', () => {
+    let models;
 
-    it('should validate', function () {
-      var value = {id: 'true'};
-      var transformedValue = {id: true};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept the value when the value is a date in YYYY-MM-DD format', () => {
+      const value = {someDate: '2014-08-08'};
+      const transformedValue = {someDate: moment('2014-08-08').toDate()};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            someDate: {type: 'string', format: 'date'}
+          }
+        },
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [transformedValue]);
+      assertValidationPassed(validationResults, [transformedValue]);
+    });
+  });
+
+  describe('when the schema contains an optional string property with date-time format', () => {
+    let models;
+
+    beforeEach(() => {
+      models = {};
     });
 
-    it('should not validate', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    it('should accept the value when it is a string with the format of an ISO 8601 timestamp', () => {
+      const value = {someDateTime: '2014-08-09T12:43:06.123Z'};
+      const transformedValue = {someDateTime: new Date('2014-08-09T12:43:06.123Z')};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            someDateTime: {type: 'string', format: 'date-time'}
+          }
+        },
+        value,
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationPassed(validationResults, [transformedValue]);
+    });
+  });
+
+  describe('when the schema contains an optional boolean property', () => {
+    let models;
+
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept the value when the value is the string "true"', () => {
+      const value = {id: 'true'};
+      const transformedValue = {id: true};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            id: {type: 'boolean'}
+          }
+        },
+        value,
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationPassed(validationResults, [transformedValue]);
+    });
+
+    it('should not allow the value when it is not a boolean', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          properties: {
+            id: {type: 'boolean'}
+          }
+        },
         value: {id: 'thisisastring'},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is not a type of boolean"]);
+      assertValidationFailed(validationResults, ["id is not a type of boolean"]);
     });
   });
 
-  describe('one number no format required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        required: ['id'],
-        properties: {
-          id: {type: 'number'}
-        }
-      }
-    };
+  describe('when the schema contains a required number property with no format', () => {
+    let models;
 
-    it('should validate', function () {
-      var value = {id: 1};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept the value when the value is a number', () => {
+      const value = {id: 1};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'number'}
+          }
+        },
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [value]);
+      assertValidationPassed(validationResults, [value]);
     });
 
-    it('should not validate with missing parameter', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should fail validation when the property is missing', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'number'}
+          }
+        },
         value: {},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(validationResults, ["id is required"]);
     });
 
-    it('should not validate', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should fail validation when the property is null', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'number'}
+          }
+        },
+        value: {id: null},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is undefined', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'number'}
+          }
+        },
+        value: {id: undefined},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is an empty string', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'number'}
+          }
+        },
+        value: {id: ''},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is not a number', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'number'}
+          }
+        },
         value: {id: 'thisisastring'},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is not a type of number"]);
+      assertValidationFailed(validationResults, ["id is not a type of number"]);
     });
   });
 
-  describe('one number float format required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        required: ['id'],
-        properties: {
-          id: {type: 'number', format: 'float'}
-        }
-      }
-    };
+  describe('when the schema contains a required number property with float format', () => {
+    let models;
 
-    it('should validate', function () {
-      var value = {id: 1.233242};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept the value when the value is a number', () => {
+      const value = {id: 1.233242};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'number', format: 'float'}
+          }
+        },
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [value]);
+      assertValidationPassed(validationResults, [value]);
     });
 
-    it('should not validate with missing parameter', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should fail validation when the property is missing', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'number', format: 'float'}
+          }
+        },
         value: {},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(validationResults, ["id is required"]);
     });
 
-    it('should not validate', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should fail validation when the property is null', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'number', format: 'float'}
+          }
+        },
+        value: {id: null},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is undefined', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'number', format: 'float'}
+          }
+        },
+        value: {id: undefined},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is an empty string', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'number', format: 'float'}
+          }
+        },
+        value: {id: ''},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is not a number', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'number', format: 'float'}
+          }
+        },
         value: {id: 'thisisastring'},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is not a type of float"]);
+      assertValidationFailed(validationResults, ["id is not a type of float"]);
     });
   });
 
-  describe('one number double format required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        required: ['id'],
-        properties: {
-          id: {type: 'number', format: 'double'}
-        }
-      }
-    };
+  describe('when the schema contains a required number property with double format', () => {
+    let models;
 
-    it('should validate', function () {
-      var value = {id: 1.233242};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept the value when the value is a number', () => {
+      const value = {id: 1.233242};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'number', format: 'double'}
+          }
+        },
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [value]);
+      assertValidationPassed(validationResults, [value]);
     });
 
-    it('should not validate with missing parameter', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should fail validation when the property is missing', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'number', format: 'double'}
+          }
+        },
         value: {},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(validationResults, ["id is required"]);
     });
 
-    it('should not validate', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should fail validation when the property is null', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'number', format: 'double'}
+          }
+        },
+        value: {id: null},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is undefined', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'number', format: 'double'}
+          }
+        },
+        value: {id: undefined},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is an empty string', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'number', format: 'double'}
+          }
+        },
+        value: {id: ''},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is not a number', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'number', format: 'double'}
+          }
+        },
         value: {id: 'thisisastring'},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is not a type of double"]);
+      assertValidationFailed(validationResults, ["id is not a type of double"]);
     });
   });
 
-  describe('one integer no format required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        required: ['id'],
-        properties: {
-          id: {type: 'integer'}
-        }
-      }
-    };
+  describe('when the schema contains a required integer property with no format', () => {
+    let models;
 
-    it('should validate', function () {
-      var value = {id: 1};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept the value when the value is an integer', () => {
+      const value = {id: 1};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'integer'}
+          }
+        },
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [value]);
+      assertValidationPassed(validationResults, [value]);
     });
 
-    it('should not validate with missing parameter', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should fail validation when the property is missing', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'integer'}
+          }
+        },
         value: {},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(validationResults, ["id is required"]);
     });
 
-    it('should not validate', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should fail validation when the property is null', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'integer'}
+          }
+        },
+        value: {id: null},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is undefined', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'integer'}
+          }
+        },
+        value: {id: undefined},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is an empty string', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'integer'}
+          }
+        },
+        value: {id: ''},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is not an integer', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'integer'}
+          }
+        },
         value: {id: 'thisisastring'},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is not a type of integer"]);
+      assertValidationFailed(validationResults, ["id is not a type of integer"]);
     });
   });
 
-  describe('one integer int32 format required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        required: ['id'],
-        properties: {
-          id: {type: 'integer', format: 'int32'}
-        }
-      }
-    };
+  describe('when the schema contains a required integer property with int32 format', () => {
+    let models;
 
-    it('should validate', function () {
-      var value = {id: 1};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept the value when the value is an integer', () => {
+      const value = {id: 1};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'integer', format: 'int32'}
+          }
+        },
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [value]);
+      assertValidationPassed(validationResults, [value]);
     });
 
-    it('should not validate with missing parameter', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should fail validation when the property is missing', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'integer', format: 'int32'}
+          }
+        },
         value: {},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(validationResults, ["id is required"]);
     });
 
-    it('should not validate', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should fail validation when the property is null', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'integer', format: 'int32'}
+          }
+        },
+        value: {id: null},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is undefined', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'integer', format: 'int32'}
+          }
+        },
+        value: {id: undefined},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is an empty string', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'integer', format: 'int32'}
+          }
+        },
+        value: {id: ''},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is not an integer', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'integer', format: 'int32'}
+          }
+        },
         value: {id: 'thisisastring'},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is not a type of int32"]);
+      assertValidationFailed(validationResults, ["id is not a type of int32"]);
     });
   });
 
-  describe('one integer int64 format required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        required: ['id'],
-        properties: {
-          id: {type: 'integer', format: 'int64'}
-        }
-      }
-    };
+  describe('when the schema contains a required integer property with int64 format', () => {
+    let models;
 
-    it('should validate', function () {
-      var value = {id: 1};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept the value when the value is an integer', () => {
+      const value = {id: 1};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'integer', format: 'int64'}
+          }
+        },
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [value]);
+      assertValidationPassed(validationResults, [value]);
     });
 
-    it('should not validate with missing parameter', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should fail validation when the property is missing', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'integer', format: 'int64'}
+          }
+        },
         value: {},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(validationResults, ["id is required"]);
     });
 
-    it('should not validate', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should fail validation when the property is null', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'integer', format: 'int64'}
+          }
+        },
+        value: {id: null},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is undefined', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'integer', format: 'int64'}
+          }
+        },
+        value: {id: undefined},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is an empty string', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'integer', format: 'int64'}
+          }
+        },
+        value: {id: ''},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is not an integer', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'integer', format: 'int64'}
+          }
+        },
         value: {id: ' '},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is not a type of int64"]);
+      assertValidationFailed(validationResults, ["id is not a type of int64"]);
     });
   });
 
-  describe('one string no format required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        required: ['id'],
-        properties: {
-          id: {type: 'string'}
-        }
-      }
-    };
+  describe('when the schema contains a required string property with no format', () => {
+    let models;
 
-    it('should validate', function () {
-      var value = {id: 'this is a string'};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept the value when the value is a string', () => {
+      const value = {id: 'this is a string'};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'string'}
+          }
+        },
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [value]);
+      assertValidationPassed(validationResults, [value]);
     });
 
-    it('should not validate with missing parameter', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should fail validation when the property is missing', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'string'}
+          }
+        },
         value: {},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(validationResults, ["id is required"]);
     });
 
-    it('should not validate', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should fail validation when the property is undefined', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'string'}
+          }
+        },
+        value: {id: undefined},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is null', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'string'}
+          }
+        },
+        value: {id: null},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is an empty string (legacy behaviour)', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'string'}
+          }
+        },
+        value: {id: ''},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is not a string', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'string'}
+          }
+        },
         value: {id: {}},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is not a type of string"]);
+      assertValidationFailed(validationResults, ["id is not a type of string"]);
     });
   });
 
-  describe('one string byte format required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        required: ['id'],
-        properties: {
-          id: {type: 'string', format: 'byte'}
-        }
-      }
-    };
+  describe('when the schema contains a required string property with byte format', () => {
+    let models;
 
-    it('should validate', function () {
-      var value = {id: [65, 43]};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
-        value,
-        models: model,
-        validationContext,
-        validationSettings
-      });
-      assertValidationPassed(ret, [value]);
+    beforeEach(() => {
+      models = {};
     });
 
-    it('should not validate with missing parameter', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
-        value: {},
-        models: model,
-        validationContext,
-        validationSettings
-      });
-      assertValidationFailed(ret, ["id is required"]);
-    });
-  });
-
-  describe('one string date format required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        required: ['id'],
-        properties: {
-          id: {
-            type: 'string',
-            format: 'date'
+    it('should accept the value when the value is an array of integers representing bytes', () => {
+      const value = {id: [65, 43]};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'string', format: 'byte'}
           }
-        }
-      }
-    };
-
-    it('should validate', function () {
-      var value = {id: '2014-08-08'};
-      var transformedValue = {id: moment('2014-08-08').toDate()};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+        },
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [transformedValue]);
+      assertValidationPassed(validationResults, [value]);
     });
 
-    it('should not validate with missing parameter', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
-        value: {},
-        models: model,
-        validationContext,
-        validationSettings
-      });
-      assertValidationFailed(ret, ["id is required"]);
-    });
-  });
-
-  describe('one string date-time format required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        required: ['id'],
-        properties: {
-          id: {
-            type: 'string',
-            format: 'date-time'
+    it('should fail validation when the property is missing', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'string', format: 'byte'}
           }
-        }
-      }
-    };
-
-    it('should validate', function () {
-      var value = {id: '2014-08-09T12:43:00'};
-      var transformedValue = {id: moment('2014-08-09T12:43:00').toDate()};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
-        value,
-        models: model,
+        },
+        value: {},
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [transformedValue]);
+      assertValidationFailed(validationResults, ["id is required"]);
     });
 
-    it('should not validate with missing parameter', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
-        value: {},
-        models: model,
+    it('should fail validation when the property is undefined', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'string', format: 'byte'}
+          }
+        },
+        value: {id: undefined},
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is null', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'string', format: 'byte'}
+          }
+        },
+        value: {id: null},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is an empty string', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'string', format: 'byte'}
+          }
+        },
+        value: {id: ''},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
     });
   });
 
-  describe('one boolean no format required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        required: ['id'],
-        properties: {
-          id: {type: 'boolean'}
-        }
-      }
-    };
+  describe('when the schema contains a required string property with date format', () => {
+    let models;
 
-    it('should validate', function () {
-      var value = {id: 'true'};
-      var transformedValue = {id: true};
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept a value when the value is a date in YYYY-MM-DD format', () => {
+      const value = {id: '2014-08-08'};
+      const transformedValue = {id: moment('2014-08-08').toDate()};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'string', format: 'date'}
+          }
+        },
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [transformedValue]);
+      assertValidationPassed(validationResults, [transformedValue]);
     });
 
-    it('should not validate with missing parameter', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should fail validation when the property is missing', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'string', format: 'date'}
+          }
+        },
         value: {},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is required"]);
+      assertValidationFailed(validationResults, ["id is required"]);
     });
 
-    it('should not validate', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should fail validation when the property is undefined', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'string', format: 'date'}
+          }
+        },
+        value: {id: undefined},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is null', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'string', format: 'date'}
+          }
+        },
+        value: {id: null},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is an empty string', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'string', format: 'date'}
+          }
+        },
+        value: {id: ''},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+  });
+
+  describe('when the schema contains a required string property with date-time format', () => {
+    let models;
+
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept the value when it is a string with the format of an ISO 8601 timestamp', () => {
+      const value = {someDateTime: '2014-08-09T12:43:06.123Z'};
+      const transformedValue = {someDateTime: new Date('2014-08-09T12:43:06.123Z')};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['someDateTime'],
+          properties: {
+            someDateTime: {
+              type: 'string',
+              format: 'date-time'
+            }
+          }
+        },
+        value,
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationPassed(validationResults, [transformedValue]);
+    });
+
+    it('should fail validation when the property is missing', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['someDateTime'],
+          properties: {
+            someDateTime: {
+              type: 'string',
+              format: 'date-time'
+            }
+          }
+        },
+        value: {},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["someDateTime is required"]);
+    });
+
+    it('should fail validation when the property is null', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['someDateTime'],
+          properties: {
+            someDateTime: {
+              type: 'string',
+              format: 'date-time'
+            }
+          }
+        },
+        value: {someDateTime: null},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["someDateTime is required"]);
+    });
+
+    it('should fail validation when the property is undefined', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['someDateTime'],
+          properties: {
+            someDateTime: {
+              type: 'string',
+              format: 'date-time'
+            }
+          }
+        },
+        value: {someDateTime: undefined},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["someDateTime is required"]);
+    });
+
+    it('should fail validation when the property is an empty string', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['someDateTime'],
+          properties: {
+            someDateTime: {
+              type: 'string',
+              format: 'date-time'
+            }
+          }
+        },
+        value: {someDateTime: ''},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["someDateTime is required"]);
+    });
+  });
+
+  describe('when the schema contains a required boolean property with no format', () => {
+    let models;
+
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept a value when the value is the string "true"', () => {
+      const value = {id: 'true'};
+      const transformedValue = {id: true};
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'boolean'}
+          }
+        },
+        value,
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationPassed(validationResults, [transformedValue]);
+    });
+
+    it('should fail validation when the property is missing', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'boolean'}
+          }
+        },
+        value: {},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is undefined', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'boolean'}
+          }
+        },
+        value: {id: undefined},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is null', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'boolean'}
+          }
+        },
+        value: {id: null},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is an empty string', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'boolean'}
+          }
+        },
+        value: {id: ''},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is required"]);
+    });
+
+    it('should fail validation when the property is not a boolean', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'boolean'}
+          }
+        },
         value: {id: 'thisisastring'},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ["id is not a type of boolean"]);
+      assertValidationFailed(validationResults, ["id is not a type of boolean"]);
     });
   });
 
-  describe('one of each type not required', function () {
-    // each section defines it's own validation parameters
-    var models = {
-      SomeObject: {
+  describe('when the schema contains a required file property with no format', () => {
+    let models;
+
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept any value', () => {
+      const schema = {
+        type: 'object',
+        required: ['someFile'],
         properties: {
-          number: {type: 'number'},
-          float: {type: 'number', format: 'float'},
-          double: {type: 'number', format: 'double'},
-          integer: {type: 'integer'},
-          int32: {type: 'integer', format: 'int32'},
-          int64: {type: 'integer', format: 'int64'},
-          string: {type: 'string'},
-          byte: {type: 'string', format: 'byte'},
-          date: {type: 'string', format: 'date'},
-          datetime: {type: 'string', format: 'date-time'},
-          boolean: {type: 'boolean'}
+          someFile: {type: 'file'}
         }
+      };
+
+      let value = {someFile: 'this is a file'};
+      let validationResults = validateParameter({
+        schema,
+        value,
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationPassed(validationResults, [value]);
+
+      value = {someFile: 1};
+      validationResults = validateParameter({
+        schema,
+        value,
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationPassed(validationResults, [value]);
+
+      value = {someFile: {someProperty: [1, '2', true, 0x34b, null]}};
+      validationResults = validateParameter({
+        schema,
+        value,
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationPassed(validationResults, [value]);
+    });
+
+    it('should fail validation when the property is missing', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['someFile'],
+          properties: {
+            someFile: {type: 'file'}
+          }
+        },
+        value: {},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["someFile is required"]);
+    });
+
+    it('should fail validation when the property is undefined', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['someFile'],
+          properties: {
+            someFile: {type: 'file'}
+          }
+        },
+        value: {someFile: undefined},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["someFile is required"]);
+    });
+
+    it('should fail validation when the property is null', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['someFile'],
+          properties: {
+            someFile: {type: 'file'}
+          }
+        },
+        value: {someFile: null},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["someFile is required"]);
+    });
+
+    it('should fail validation when the property is an empty string (legacy behaviour)', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['someFile'],
+          properties: {
+            someFile: {type: 'file'}
+          }
+        },
+        value: {someFile: ''},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["someFile is required"]);
+    });
+
+    it('should fail validation when the property is not a string', () => {
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {type: 'string'}
+          }
+        },
+        value: {id: {}},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(validationResults, ["id is not a type of string"]);
+    });
+  });
+
+  describe('when the schema contains many optional properties of different types', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        number: {type: 'number'},
+        float: {type: 'number', format: 'float'},
+        double: {type: 'number', format: 'double'},
+        integer: {type: 'integer'},
+        int32: {type: 'integer', format: 'int32'},
+        int64: {type: 'integer', format: 'int64'},
+        string: {type: 'string'},
+        byte: {type: 'string', format: 'byte'},
+        date: {type: 'string', format: 'date'},
+        datetime: {type: 'string', format: 'date-time'},
+        boolean: {type: 'boolean'}
       }
     };
+    let models;
 
-    it('should validate', function () {
-      var value = {
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept a value when the value contains all of the optional properties, and all properties are of the correct type', () => {
+      const value = {
         number: 0x33,
         float: -2.231231,
         double: Number.MIN_VALUE,
@@ -1088,7 +2040,7 @@ describe('object', function () {
         datetime: '2014-01-01T17:00',
         boolean: true
       };
-      var transformedValue = {
+      const transformedValue = {
         number: 0x33,
         float: -2.231231,
         double: Number.MIN_VALUE,
@@ -1101,19 +2053,19 @@ describe('object', function () {
         datetime: moment('2014-01-01T17:00').toDate(),
         boolean: true
       };
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+      const validationResults = validateParameter({
+        schema,
         value,
-        models: models,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [transformedValue]);
+      assertValidationPassed(validationResults, [transformedValue]);
     });
 
-    it('should not validate all invalid', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should fail validation when all of the optional properties are of the incorrect type', () => {
+      const validationResults = validateParameter({
+        schema,
         value: {
           number: 'Random String',
           float: true,
@@ -1131,7 +2083,7 @@ describe('object', function () {
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, [
+      assertValidationFailed(validationResults, [
         'boolean is not a type of boolean',
         'date is not valid based on the pattern for moment.ISO 8601',
         'datetime is not valid based on the pattern for moment.ISO 8601',
@@ -1145,9 +2097,9 @@ describe('object', function () {
       ]);
     });
 
-    it('should not validate half invalid', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should fail validation when some of the properties are of the incorrect type, and some others have the correct type', () => {
+      let validationResults = validateParameter({
+        schema,
         value: {
           number: 'Random String',
           float: true,
@@ -1165,17 +2117,16 @@ describe('object', function () {
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, [
+      assertValidationFailed(validationResults, [
         'double is not a type of double',
         'float is not a type of float',
         'integer is not a type of integer',
         'number is not a type of number'
       ]);
-    });
 
-    it('should not validate other half invalid', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+      // Check that the correct errors are thrown when the other half of the properties are invalid
+      validationResults = validateParameter({
+        schema,
         value: {
           number: 0x33,
           float: -2.231231,
@@ -1193,7 +2144,7 @@ describe('object', function () {
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, [
+      assertValidationFailed(validationResults, [
         'boolean is not a type of boolean',
         'date is not valid based on the pattern for moment.ISO 8601',
         'datetime is not valid based on the pattern for moment.ISO 8601',
@@ -1204,29 +2155,32 @@ describe('object', function () {
     });
   });
 
-  describe('one of each type required', function () {
-    // each section defines it's own validation parameters
-    var model = {
-      SomeObject: {
-        required: ['param1', 'param2', 'param3', 'param4', 'param5', 'param6', 'param7', 'param8', 'param9', 'param10', 'param11'],
-        properties: {
-          param1: {type: 'number'},
-          param2: {type: 'number', format: 'float'},
-          param3: {type: 'number', format: 'double'},
-          param4: {type: 'integer'},
-          param5: {type: 'integer', format: 'int32'},
-          param6: {type: 'integer', format: 'int64'},
-          param7: {type: 'string'},
-          param8: {type: 'string', format: 'byte'},
-          param9: {type: 'string', format: 'date'},
-          param10: {type: 'string', format: 'date-time'},
-          param11: {type: 'boolean'}
-        }
+  describe('when the schema contains many required properties of different types', () => {
+    const schema = {
+      type: 'object',
+      required: ['param1', 'param2', 'param3', 'param4', 'param5', 'param6', 'param7', 'param8', 'param9', 'param10', 'param11'],
+      properties: {
+        param1: {type: 'number'},
+        param2: {type: 'number', format: 'float'},
+        param3: {type: 'number', format: 'double'},
+        param4: {type: 'integer'},
+        param5: {type: 'integer', format: 'int32'},
+        param6: {type: 'integer', format: 'int64'},
+        param7: {type: 'string'},
+        param8: {type: 'string', format: 'byte'},
+        param9: {type: 'string', format: 'date'},
+        param10: {type: 'string', format: 'date-time'},
+        param11: {type: 'boolean'}
       }
     };
+    let models;
 
-    it('should validate', function () {
-      var value = {
+    beforeEach(() => {
+      models = {};
+    });
+
+    it('should accept a value when the value contains all of the required properties, and all properties are of the correct type', () => {
+      const value = {
         param1: 0x33,
         param2: -2.231231,
         param3: Number.MIN_VALUE,
@@ -1239,7 +2193,7 @@ describe('object', function () {
         param10: '2014-01-01T17:00:00',
         param11: true
       };
-      var transformedValue = {
+      const transformedValue = {
         param1: 0x33,
         param2: -2.231231,
         param3: Number.MIN_VALUE,
@@ -1252,40 +2206,43 @@ describe('object', function () {
         param10: moment('2014-01-01T17:00:00').toDate(),
         param11: true
       };
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', false),
+      const validationResults = validateParameter({
+        schema,
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [transformedValue]);
+      assertValidationPassed(validationResults, [transformedValue]);
     });
 
-    it('should not validate all missing', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('SomeObject', true),
+    it('should fail validation when all of the required properties are missing', () => {
+      const validationResults = validateParameter({
+        schema,
         value: {},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ['param1 is required', 'param10 is required', 'param11 is required', 'param2 is required', 'param3 is required', 'param4 is required', 'param5 is required', 'param6 is required', 'param7 is required', 'param8 is required', 'param9 is required']);
+      assertValidationFailed(validationResults, ['param1 is required', 'param10 is required', 'param11 is required', 'param2 is required', 'param3 is required', 'param4 is required', 'param5 is required', 'param6 is required', 'param7 is required', 'param8 is required', 'param9 is required']);
     });
   });
 
-  describe('one with object parameter not required', function () {
-    var model = {
+  describe('when the schema contains a deep reference to another model which has type: "object" and which is an optional property', () => {
+    const models = {
       bar: {
-        id: 'bar',
-        name: 'bar',
+        type: 'object',
         properties: {
-          array: helper.makeArrayParam(false, 'boolean')
+          array: {
+            type: 'array',
+            items: {
+              type: 'boolean'
+            }
+          }
         }
       },
       foo: {
-        id: 'foo',
-        name: 'foo',
+        type: 'object',
         properties: {
           obj: {$ref: 'bar'},
           integer: {type: 'integer'}
@@ -1293,93 +2250,94 @@ describe('object', function () {
       }
     };
 
-    it('should validate', function () {
-      var value = {
+    it('should accept a value when all properties are provided', () => {
+      const value = {
         obj: {array: [true, false, true]},
         integer: 1
       };
-      var ret = validateParameter({
-        schema: helper.makeParam('foo', false),
+      const validationResults = validateParameter({
+        schema: models.foo,
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [value]);
+      assertValidationPassed(validationResults, [value]);
     });
 
-    it('should validate all missing', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('foo', true),
+    it('should accept a value when all properties are missing', () => {
+      const validationResults = validateParameter({
+        schema: models.foo,
         value: {},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [
-        {}
-      ]);
+      assertValidationPassed(validationResults, [{}]);
     });
 
-    it('should validate array missing', function () {
-      var value = {
+    it('should accept a value when a deeply-nested optional property is missing', () => {
+      const value = {
         obj: {},
         integer: 1
       };
-      var ret = validateParameter({
-        schema: helper.makeParam('foo', true),
+      const validationResults = validateParameter({
+        schema: models.foo,
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [value]);
+      assertValidationPassed(validationResults, [value]);
     });
 
-    it('should not validate all invalid', function () {
-      var value = {
+    it('should fail validation when all of the properties are of the wrong type', () => {
+      const value = {
         obj: [true, false, true],
         integer: false
       };
-      var ret = validateParameter({
-        schema: helper.makeParam('foo', true),
+      const validationResults = validateParameter({
+        schema: models.foo,
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ['integer is not a type of integer', 'obj is not a type of object']);
+      assertValidationFailed(validationResults, ['integer is not a type of integer', 'obj is not a type of object']);
     });
 
-    it('should not validate array invalid', function () {
-      var value = {
+    it('should fail validation when a deeply-nested property is of the wrong type', () => {
+      const value = {
         obj: {array: ['1']},
         integer: 1
       };
-      var ret = validateParameter({
-        schema: helper.makeParam('foo', true),
+      const validationResults = validateParameter({
+        schema: models.foo,
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ['1 is not a type of boolean']);
+      assertValidationFailed(validationResults, ['1 is not a type of boolean']);
     });
   });
 
-  describe('one with required object parameter', function () {
-    var model = {
+  describe('when the schema contains a deep reference to another model which has type: "object" and which is a required property', () => {
+    const models = {
       bar: {
-        id: 'bar',
-        name: 'bar',
+        type: 'object',
         required: ['array'],
         properties: {
-          array: helper.makeArrayParam(false, 'boolean')
+          array: {
+            type: 'array',
+            items: {
+              type: 'boolean'
+            }
+          }
         }
       },
       foo: {
-        id: 'foo',
-        name: 'foo',
+        type: 'object',
         required: ['obj', 'integer'],
         properties: {
           obj: {$ref: 'bar'},
@@ -1388,79 +2346,79 @@ describe('object', function () {
       }
     };
 
-    it('should validate', function () {
-      var value = {
+    it('should accept a value when all properties are provided', () => {
+      const value = {
         obj: {array: [true, false, true]},
         integer: 1
       };
-      var ret = validateParameter({
-        schema: helper.makeParam('foo', false),
+      const validationResults = validateParameter({
+        schema: models.foo,
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(ret, [value]);
+      assertValidationPassed(validationResults, [value]);
     });
 
-    it('should not validate array missing', function () {
-      var value = {
+    it('should fail validation when a deeply-nested required property is missing', () => {
+      const value = {
         obj: {},
         integer: 1
       };
-      var ret = validateParameter({
-        schema: helper.makeParam('foo', true),
+      const validationResults = validateParameter({
+        schema: models.foo,
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ['array is required']);
+      assertValidationFailed(validationResults, ['array is required']);
     });
 
-    it('should not validate all invalid', function () {
-      var value = {
+    it('should fail validation when all properties are of the wrong type', () => {
+      const value = {
         obj: [true, false, true],
         integer: false
       };
-      var ret = validateParameter({
-        schema: helper.makeParam('foo', true),
+      const validationResults = validateParameter({
+        schema: models.foo,
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ['integer is not a type of integer', 'obj is not a type of object']);
+      assertValidationFailed(validationResults, ['integer is not a type of integer', 'obj is not a type of object']);
     });
 
-    it('should not validate array invalid', function () {
-      var value = {
+    it('should fail validation when a deeply-nested property is of the wrong type', () => {
+      const value = {
         obj: {array: ['1']},
         integer: 1
       };
-      var ret = validateParameter({
-        schema: helper.makeParam('foo', true),
+      const validationResults = validateParameter({
+        schema: models.foo,
         value,
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ['1 is not a type of boolean']);
+      assertValidationFailed(validationResults, ['1 is not a type of boolean']);
     });
 
-    it('should not validate all missing', function () {
-      var ret = validateParameter({
-        schema: helper.makeParam('foo', true),
+    it('should fail validation when multiple required properties are missing', () => {
+      const validationResults = validateParameter({
+        schema: models.foo,
         value: {},
-        models: model,
+        models,
         validationContext,
         validationSettings
       });
-      assertValidationFailed(ret, ['integer is required', 'obj is required']);
+      assertValidationFailed(validationResults, ['integer is required', 'obj is required']);
     });
   });
 
-  describe('additional properties', function () {
+  describe('additional properties', () => {
     let models;
 
     beforeEach(() => {
@@ -1580,7 +2538,8 @@ describe('object', function () {
         validationSettings
       });
       assertValidationFailed(result, ['someProperty is not a type of string']);
-      expect(result[0].context.toLiteral()).to.eql({dataPath: ['someProperty']});
+      expect(result[0].context.toLiteral()).to.have.property('dataPath');
+      expect(result[0].context.toLiteral().dataPath).to.eql(['someProperty']);
       expect(result[0].context.formatDataPath()).to.eql("someProperty");
 
       models = {
@@ -1610,7 +2569,8 @@ describe('object', function () {
         validationSettings
       });
       assertValidationFailed(result, ['someProperty is not a type of string']);
-      expect(result[0].context.toLiteral()).to.eql({dataPath: ['someNestedObject', 'someProperty']});
+      expect(result[0].context.toLiteral()).to.have.property('dataPath');
+      expect(result[0].context.toLiteral().dataPath).to.eql(['someNestedObject', 'someProperty']);
       expect(result[0].context.formatDataPath()).to.eql("someNestedObject.someProperty");
     });
   });
@@ -1634,10 +2594,22 @@ describe('object', function () {
         validationSettings.throwErrorsWhenSchemaIsInvalid = true;
       });
 
-      it('should throw an error when the object has a $ref that refers to an unknown model', () => {
+      it('should throw an error when the object has a "$ref" that refers to an unknown model', () => {
         expect(() => validateParameter({
           schema: {
             $ref: 'SomeUnknownModel'
+          },
+          value: {},
+          models: {},
+          validationContext,
+          validationSettings
+        })).to.throw('Swagger schema is invalid: Unknown reference to model "SomeUnknownModel"');
+      });
+
+      it('should throw an error when the object has a "type" that refers to an unknown model when the "type" field is used like a "$ref" pointing to another model (legacy behaviour)', () => {
+        expect(() => validateParameter({
+          schema: {
+            type: 'SomeUnknownModel'
           },
           value: {},
           models: {},

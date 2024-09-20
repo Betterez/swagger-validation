@@ -65,39 +65,4 @@ describe('string - datetime', function () {
     });
     assertValidationFailed(ret, ["testParam is not valid based on the pattern for moment.ISO 8601"]);
   });
-
-  it('should not validate with required field null', function () {
-    var value = null;
-    var ret = validateParameter({
-      schema: helper.makeStringParam('string', true, 'date-time'),
-      value,
-      models,
-      validationContext,
-      validationSettings
-    });
-    assertValidationFailed(ret, ["testParam is required"]);
-  });
-
-  it('should not validate with required field undefined', function () {
-    var ret = validateParameter({
-      schema: helper.makeStringParam('string', true, 'date-time'),
-      value: undefined,
-      models,
-      validationContext,
-      validationSettings
-    });
-    assertValidationFailed(ret, ["testParam is required"]);
-  });
-
-  it('should not validate with required field empty string', function () {
-    var value = '';
-    var ret = validateParameter({
-      schema: helper.makeStringParam('string', true, 'date-time'),
-      value,
-      models,
-      validationContext,
-      validationSettings
-    });
-    assertValidationFailed(ret, ["testParam is required"]);
-  });
 });

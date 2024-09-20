@@ -99,41 +99,6 @@ describe('boolean', function () {
     });
   })
 
-  it('should not validate with required field null', function () {
-    var value = null;
-    var ret = validateParameter({
-      schema: helper.makeParam('boolean', true),
-      value,
-      models,
-      validationContext,
-      validationSettings
-    });
-    assertValidationFailed(ret, ["testParam is required"]);
-  });
-
-  it('should not validate with required field undefined', function () {
-    var ret = validateParameter({
-      schema: helper.makeParam('boolean', true),
-      value: undefined,
-      models,
-      validationContext,
-      validationSettings
-    });
-    assertValidationFailed(ret, ["testParam is required"]);
-  });
-
-  it('should not validate with required field empty string', function () {
-    var value = '';
-    var ret = validateParameter({
-      schema: helper.makeParam('boolean', true),
-      value,
-      models,
-      validationContext,
-      validationSettings
-    });
-    assertValidationFailed(ret, ["testParam is required"]);
-  });
-
   it('should not validate with empty object', function () {
     var value = {};
     var ret = validateParameter({
@@ -218,15 +183,19 @@ describe('boolean', function () {
     assertValidationFailed(ret, ["testParam is not a type of boolean"]);
   });
 
-  it('should not validate with null if nullable is false', function () {
+  it('should not allow a null value if nullable is false, even if the boolean is optional', function () {
     const schema = {
-      type: 'boolean',
-      required: false,
-      name: 'testParam',
-      nullable: false
+      type: 'object',
+      required: [],
+      properties: {
+        someBoolean: {
+          type: 'boolean',
+          nullable: false
+        }
+      }
     };
-
-    const result = validateParameter({schema, value: null, models, validationContext, validationSettings});
-    assertValidationFailed(result, ['testParam cannot be null']);
+    const value = {someBoolean: null};
+    const result = validateParameter({schema, value, models, validationContext, validationSettings});
+    assertValidationFailed(result, ['someBoolean cannot be null']);
   });
 });

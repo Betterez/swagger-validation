@@ -149,8 +149,7 @@ describe('set', function () {
   it('should validate with simple objects', function () {
     var models = {
       Test: {
-        id: 'Test',
-        name: 'Test',
+        type: 'object',
         properties: {
           id: {type: 'number'}
         }
@@ -180,8 +179,7 @@ describe('set', function () {
   it('should validate with complex objects', function () {
     var models = {
       Test: {
-        id: 'Test',
-        name: 'Test',
+        type: 'object',
         properties: {
           test1: {type: 'integer'},
           test2: {type: 'string'},
@@ -206,39 +204,6 @@ describe('set', function () {
         {test1: 1, test2: 'string', test3: false}
       ]
     ]);
-  });
-
-  it('should not validate with required field null', function () {
-    var ret = validateParameter({
-      schema: helper.makeArrayParam(true, 'string', null, null, true),
-      value: null,
-      models,
-      validationContext,
-      validationSettings
-    });
-    assertValidationFailed(ret, ["testParam is required"]);
-  });
-
-  it('should not validate with required field undefined', function () {
-    var ret = validateParameter({
-      schema: helper.makeArrayParam(true, 'number', null, null, true),
-      value: undefined,
-      models,
-      validationContext,
-      validationSettings
-    });
-    assertValidationFailed(ret, ["testParam is required"]);
-  });
-
-  it('should not validate with required field empty string', function () {
-    var ret = validateParameter({
-      schema: helper.makeArrayParam(true, 'integer', null, null, true),
-      value: '',
-      models,
-      validationContext,
-      validationSettings
-    });
-    assertValidationFailed(ret, ["testParam is required"]);
   });
 
   it('should not validate with empty object', function () {
@@ -486,8 +451,7 @@ describe('set', function () {
   it('should not validate with simple objects', function () {
     var models = {
       Test: {
-        id: 'Test',
-        name: 'Test',
+        type: 'object',
         properties: {
           id: {type: 'number'}
         }
@@ -511,8 +475,7 @@ describe('set', function () {
 
     var models = {
       Test: {
-        id: 'Test',
-        name: 'Test',
+        type: 'object',
         properties: {
           test1: {type: 'integer'},
           test2: {type: 'string'},
@@ -536,8 +499,7 @@ describe('set', function () {
   it('should not validate with non-uniqueness with empty objects', function () {
     var models = {
       Test: {
-        id: 'Test',
-        name: 'Test',
+        type: 'object',
         properties: {
           test1: {type: 'integer'},
           test2: {type: 'string'},
@@ -562,8 +524,7 @@ describe('set', function () {
   it('should not validate with non-uniqueness with simple objects', function () {
     var models = {
       Test: {
-        id: 'Test',
-        name: 'Test',
+        type: 'object',
         properties: {
           id: {type: 'number'}
         }
@@ -586,8 +547,7 @@ describe('set', function () {
   it('should not validate with non-uniqueness with complicated objects', function () {
     var models = {
       Test: {
-        id: 'Test',
-        name: 'Test',
+        type: 'object',
         properties: {
           test1: {type: 'integer'},
           test2: {type: 'string'},

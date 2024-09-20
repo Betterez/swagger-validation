@@ -261,8 +261,8 @@ In addition to validating the req, it will replace the value on the req accordin
 ** The date conversions are done using the [moment.js](//momentjs.com/) library. 
 By default, it uses the `moment.ISO_8601()` format for parsing dates, but can be overridden by changing the `pattern` property
 
-In addition, if a defaultValue is specified for the param and the value is null, undefined, or an empty string, swagger-validation 
-will replace the value on the req with the defaultValue for that parameter.
+In addition, if a default value is specified for the param using the "defaultValue" field, and the value is null, undefined, or an empty string, swagger-validation 
+will replace the value on the req with the default value for that parameter.
 
 ### Validation object
 

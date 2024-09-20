@@ -37,6 +37,90 @@ describe('validateRequest', () => {
     validationSettings = {};
   });
 
+  describe('validation errors', () => {
+    it('should include the path of the data which failed validation in the result', () => {
+      req.body = {id: 1};
+      let result = validateRequest(requestSchema, req, models);
+      assertValidationFailed(result, ['id is not a type of string']);
+      expect(result[0].context.toLiteral()).to.have.property('dataPath');
+      expect(result[0].context.toLiteral().dataPath).to.eql(['id']);
+      expect(result[0].context.formatDataPath()).to.eql("id");
+
+      models = {
+        RequestBody: {
+          type: 'object',
+          properties: {
+            someNestedObject: {
+              $ref: 'ObjectWithArray'
+            }
+          }
+        },
+        ObjectWithArray: {
+          type: 'object',
+          properties: {
+            someArray: {
+              $ref: 'ArrayOfStrings'
+            }
+          }
+        },
+        ArrayOfStrings: {
+          type: 'array',
+          items: {
+            type: 'string'
+          }
+        }
+      };
+
+      req.body = {someNestedObject: {someArray: [1]}};
+      result = validateRequest(requestSchema, req, models);
+      assertValidationFailed(result, ['1 is not a type of string']);
+      expect(result[0].context.toLiteral()).to.have.property('dataPath');
+      expect(result[0].context.toLiteral().dataPath).to.eql(['someNestedObject', 'someArray', 0]);
+      expect(result[0].context.formatDataPath()).to.eql("someNestedObject.someArray[0]");
+    });
+
+    it('should include the path of the model which failed validation in the result', () => {
+      req.body = {id: 1};
+      let result = validateRequest(requestSchema, req, models);
+      assertValidationFailed(result, ['id is not a type of string']);
+      expect(result[0].context.toLiteral()).to.have.property('modelPath');
+      expect(result[0].context.toLiteral().modelPath).to.eql(['RequestBody']);
+      expect(result[0].context.formatModelPath()).to.eql("RequestBody");
+
+      models = {
+        RequestBody: {
+          type: 'object',
+          properties: {
+            someNestedObject: {
+              $ref: 'ObjectWithArray'
+            }
+          }
+        },
+        ObjectWithArray: {
+          type: 'object',
+          properties: {
+            someArray: {
+              $ref: 'ArrayOfStrings'
+            }
+          }
+        },
+        ArrayOfStrings: {
+          type: 'array',
+          items: {
+            type: 'string'
+          }
+        }
+      };
+
+      req.body = {someNestedObject: {someArray: [1]}};
+      result = validateRequest(requestSchema, req, models);
+      assertValidationFailed(result, ['1 is not a type of string']);
+      expect(result[0].context.toLiteral()).to.have.property('modelPath');
+      expect(result[0].context.toLiteral().modelPath).to.eql(['RequestBody', 'ObjectWithArray', 'ArrayOfStrings']);
+      expect(result[0].context.formatModelPath()).to.eql("RequestBody → ObjectWithArray → ArrayOfStrings");
+    });
+  });
+
   describe('null value handling', () => {
     it('should allow null values by default (legacy behaviour)', () => {
       req.body = {id: null};
@@ -44,8 +128,76 @@ describe('validateRequest', () => {
       assertValidationPassed(result);
     });
 
+    it('should allow null values by default for a property which is specified with a $ref (legacy behaviour)', () => {
+      models = {
+        RequestBody: {
+          type: 'object',
+          properties: {
+            id: {
+              $ref: 'IdProperty'
+            }
+          }
+        },
+        IdProperty: {
+          type: 'string'
+        }
+      };
+
+      req.body = {id: null};
+      const result = validateRequest(requestSchema, req, models);
+      assertValidationPassed(result);
+    });
+
+    it('should not allow a value to be null when "nullable" is false', () => {
+      models.RequestBody.properties.id.nullable = false;
+      req.body = {id: null};
+      const result = validateRequest(requestSchema, req, models);
+      assertValidationFailed(result, ["id cannot be null"]);
+    });
+
+    it('should not allow a value to be null when a property is specified with a $ref, and the referenced model has "nullable" set to false', () => {
+      models = {
+        RequestBody: {
+          type: 'object',
+          properties: {
+            id: {
+              $ref: 'IdProperty'
+            }
+          }
+        },
+        IdProperty: {
+          type: 'string',
+          nullable: false
+        }
+      };
+
+      req.body = {id: null};
+      const result = validateRequest(requestSchema, req, models);
+      assertValidationFailed(result, ["id cannot be null"]);
+    });
+
     describe('when the validation options specify that properties are not nullable by default', () => {
       it('should not allow a property to be null by default', () => {
+        req.body = {id: null};
+        const result = validateRequest(requestSchema, req, models, {allPropertiesAreNullableByDefault: false});
+        assertValidationFailed(result, ["id cannot be null"]);
+      });
+
+      it('should not allow a property to be null by default when the property is specified with a $ref', () => {
+        models = {
+          RequestBody: {
+            type: 'object',
+            properties: {
+              id: {
+                $ref: 'IdProperty'
+              }
+            }
+          },
+          IdProperty: {
+            type: 'string'
+          }
+        };
+
         req.body = {id: null};
         const result = validateRequest(requestSchema, req, models, {allPropertiesAreNullableByDefault: false});
         assertValidationFailed(result, ["id cannot be null"]);

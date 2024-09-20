@@ -182,41 +182,6 @@ describe('string', function () {
     assertValidationFailed(ret, ['testParam is not valid based on the pattern paosdaksnjkdashdjgad']);
   });
 
-  it('should not validate with required field null', function () {
-    var value = null;
-    var ret = validateParameter({
-      schema: helper.makeStringParam('string', true),
-      value,
-      models,
-      validationContext,
-      validationSettings
-    });
-    assertValidationFailed(ret, ["testParam is required"]);
-  });
-
-  it('should not validate with required field undefined', function () {
-    var ret = validateParameter({
-      schema: helper.makeStringParam('string', true),
-      value: undefined,
-      models,
-      validationContext,
-      validationSettings
-    });
-    assertValidationFailed(ret, ["testParam is required"]);
-  });
-
-  it('should not validate with required field empty string', function () {
-    var value = '';
-    var ret = validateParameter({
-      schema: helper.makeStringParam('string', true),
-      value,
-      models,
-      validationContext,
-      validationSettings
-    });
-    assertValidationFailed(ret, ["testParam is required"]);
-  });
-
   it('should not validate with enum', function () {
     var value = 'Hola';
     var ret = validateParameter({
@@ -312,53 +277,68 @@ describe('string', function () {
     assertValidationFailed(ret, ["testParam is not valid based on the pattern /^Goodbye$/i"]);
   });
 
-
-  describe('string - when required is false and an empty string is provided', function () {
+  describe('when the string is not required and an empty string is provided', function () {
     it('should allow an empty string when no "minLength" is specified', function () {
-      const value = '';
       const schema = {
-        type: 'string',
-        required: false,
-        name: 'testParam'
+        type: 'object',
+        required: [],
+        properties: {
+          someString: {
+            type: 'string'
+          }
+        }
       };
+      const value = {someString: ''};
       const result = validateParameter({schema, value, models, validationContext, validationSettings});
-      expect(result).to.eql([{value: ''}]);
+      expect(result).to.eql([{value: {someString: ''}}]);
     });
 
     it('should allow an empty string when a "minLength" of 0 is specified', function () {
-      const value = '';
       const schema = {
-        type: 'string',
-        required: false,
-        name: 'testParam',
-        minLength: 0
+        type: 'object',
+        required: [],
+        properties: {
+          someString: {
+            type: 'string',
+            minLength: 0
+          }
+        }
       };
+      const value = {someString: ''};
       const result = validateParameter({schema, value, models, validationContext, validationSettings});
-      expect(result).to.eql([{value: ''}]);
+      expect(result).to.eql([{value: {someString: ''}}]);
     });
 
     it('should not validate an empty string if a minLength greater than 0 is given', function () {
-      var value = '';
-      var schema = {
-        type: 'string',
-        required: false,
-        name: 'testParam',
-        minLength: 1
+      const schema = {
+        type: 'object',
+        required: [],
+        properties: {
+          someString: {
+            type: 'string',
+            minLength: 1
+          }
+        }
       };
+      const value = {someString: ''};
       var ret = validateParameter({schema, value, models, validationContext, validationSettings});
-      assertValidationFailed(ret, ['testParam requires a min length of 1']);
+      assertValidationFailed(ret, ['someString requires a min length of 1']);
     });
 
-    it('should not validate a null if nullable is false', function () {
+    it('should not allow a null value if nullable is false, even when the string is optional', function () {
       const schema = {
-        type: 'string',
-        required: false,
-        name: 'testParam',
-        nullable: false
+        type: 'object',
+        required: [],
+        properties: {
+          someString: {
+            type: 'string',
+            nullable: false
+          }
+        }
       };
-
-      const result = validateParameter({schema, value: null, models, validationContext, validationSettings});
-      assertValidationFailed(result, ['testParam cannot be null']);
+      const value = {someString: null};
+      const result = validateParameter({schema, value, models, validationContext, validationSettings});
+      assertValidationFailed(result, ['someString cannot be null']);
     });
   });
 

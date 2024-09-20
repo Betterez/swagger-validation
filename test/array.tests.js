@@ -201,8 +201,7 @@ describe('array', function () {
     ];
     var model = {
       Test: {
-        id: 'Test',
-        name: 'Test',
+        type: 'object',
         properties: {
           id: {type: 'number'}
         }
@@ -225,8 +224,7 @@ describe('array', function () {
     ];
     var model = {
       Test: {
-        id: 'Test',
-        name: 'Test',
+        type: 'object',
         properties: {
           test1: {type: 'integer'},
           test2: {type: 'string'},
@@ -244,37 +242,70 @@ describe('array', function () {
     assertValidationPassed(ret, [value]);
   });
 
-  it('should not validate with required field null', function () {
-    var ret = validateParameter({
-      schema: helper.makeArrayParam(true, 'string'),
-      value: null,
+  it('should not allow the array itself to be null when it is a required property of an object', function () {
+    const ret = validateParameter({
+      schema: {
+        type: 'object',
+        required: ['someArray'],
+        properties: {
+          someArray: {
+            type: 'array',
+            items: {
+              type: 'string',
+            }
+          }
+        }
+      },
+      value: {someArray: null},
       models,
       validationContext,
       validationSettings
     });
-    assertValidationFailed(ret, ["testParam is required"]);
+    assertValidationFailed(ret, ["someArray is required"]);
   });
 
-  it('should not validate with required field undefined', function () {
-    var ret = validateParameter({
-      schema: helper.makeArrayParam(true, 'number'),
-      value: undefined,
+  it('should not allow the array itself to be undefined when it is a required property of an object', function () {
+    const ret = validateParameter({
+      schema: {
+        type: 'object',
+        required: ['someArray'],
+        properties: {
+          someArray: {
+            type: 'array',
+            items: {
+              type: 'string',
+            }
+          }
+        }
+      },
+      value: {someArray: undefined},
       models,
       validationContext,
       validationSettings
     });
-    assertValidationFailed(ret, ["testParam is required"]);
+    assertValidationFailed(ret, ["someArray is required"]);
   });
 
-  it('should not validate with required field empty string', function () {
-    var ret = validateParameter({
-      schema: helper.makeArrayParam(true, 'integer'),
-      value: '',
+  it('should not allow the array itself to be an empty string when it is a required property of an object', function () {
+    const ret = validateParameter({
+      schema: {
+        type: 'object',
+        required: ['someArray'],
+        properties: {
+          someArray: {
+            type: 'array',
+            items: {
+              type: 'string',
+            }
+          }
+        }
+      },
+      value: {someArray: ''},
       models,
       validationContext,
       validationSettings
     });
-    assertValidationFailed(ret, ["testParam is required"]);
+    assertValidationFailed(ret, ["someArray is required"]);
   });
 
   it('should not validate with empty object', function () {
@@ -445,8 +476,7 @@ describe('array', function () {
   it('should not validate with simple objects', function () {
     var models = {
       Test: {
-        id: 'Test',
-        name: 'Test',
+        type: 'object',
         properties: {
           id: {type: 'number'}
         }
@@ -469,8 +499,7 @@ describe('array', function () {
   it('should not validate with complex objects', function () {
     var models = {
       Test: {
-        id: 'Test',
-        name: 'Test',
+        type: 'object',
         properties: {
           test1: {type: 'integer'},
           test2: {type: 'string'},
@@ -495,7 +524,6 @@ describe('array', function () {
 
     var model = {
       Test: {
-        id: 'Test',
         name: 'Test',
         properties: {
           test1: {type: 'integer'},
@@ -518,7 +546,6 @@ describe('array', function () {
   it('should validate maxItems', function () {
     var models = {
       Test: {
-        id: 'Test',
         name: 'Test',
         properties: {
           test2: {type: 'string'},
@@ -548,6 +575,7 @@ describe('array', function () {
           }
         },
         TestArrayItem: {
+          type: 'object',
           properties: {
             someString: {type: 'string'},
           }
@@ -564,19 +592,51 @@ describe('array', function () {
       assertValidationPassed(result);
     });
 
+    it('should allow the array itself to be null when it is an optional property of an object (legacy behaviour)', () => {
+      const models = {
+        SomeObject: {
+          type: 'object',
+          properties: {
+            someArray: {
+              $ref: 'TestArray',
+            }
+          }
+        },
+        TestArray: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              someString: {type: 'string'},
+            }
+          }
+        }
+      };
+
+      const result = validateParameter({
+        schema: models.SomeObject,
+        value: {someArray: null},
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationPassed(result);
+    });
+
     it('should not allow items to be null when "nullable" is false', () => {
       const models = {
         TestArray: {
           type: 'array',
           items: {
             $ref: 'TestArrayItem',
-            nullable: false
           }
         },
         TestArrayItem: {
+          type: 'object',
           properties: {
             someString: {type: 'string'},
-          }
+          },
+          nullable: false
         }
       };
 
@@ -588,6 +648,30 @@ describe('array', function () {
         validationSettings
       });
       assertValidationFailed(result, ["TestArrayItem cannot be null"]);
+    });
+
+    it('should not allow the array itself to be null when "nullable" is false', () => {
+      const models = {
+        TestArray: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              someString: {type: 'string'},
+            }
+          },
+          nullable: false
+        }
+      };
+
+      const result = validateParameter({
+        schema: models.TestArray,
+        value: null,
+        models,
+        validationContext,
+        validationSettings
+      });
+      assertValidationFailed(result, ["undefined cannot be null"]);
     });
 
     describe('when the validation settings specify that properties are not nullable by default', () => {
@@ -604,6 +688,7 @@ describe('array', function () {
             }
           },
           TestArrayItem: {
+            type: 'object',
             properties: {
               someString: {type: 'string'},
             }
@@ -622,12 +707,36 @@ describe('array', function () {
         assertValidationFailed(result, ["TestArrayItem cannot be null"]);
       });
 
+      it('should not allow the array itself to be null by default', () => {
+        const result = validateParameter({
+          schema: models.TestArray,
+          value: null,
+          models,
+          validationContext,
+          validationSettings
+        });
+        assertValidationFailed(result, ["undefined cannot be null"]);
+      });
+
       it('should allow null items when the schema specifies that items are nullable', () => {
-        models.TestArray.items.nullable = true;
+        models.TestArrayItem.nullable = true;
 
         const result = validateParameter({
           schema: models.TestArray,
           value: [{someString: 'A'}, null],
+          models,
+          validationContext,
+          validationSettings
+        });
+        assertValidationPassed(result);
+      });
+
+      it('should allow the array itself to be null when the schema specifies that the array is nullable', () => {
+        models.TestArray.nullable = true;
+
+        const result = validateParameter({
+          schema: models.TestArray,
+          value: null,
           models,
           validationContext,
           validationSettings
@@ -728,6 +837,7 @@ describe('array', function () {
         }
       },
       TestArrayItem: {
+        type: 'object',
         properties: {
           someString: {type: 'string'},
         }
@@ -742,7 +852,8 @@ describe('array', function () {
       validationSettings
     });
     assertValidationFailed(result, ['someString is not a type of string']);
-    expect(result[0].context.toLiteral()).to.eql({dataPath: [1, 'someString']});
+    expect(result[0].context.toLiteral()).to.have.property('dataPath');
+    expect(result[0].context.toLiteral().dataPath).to.eql([1, 'someString']);
     expect(result[0].context.formatDataPath()).to.eql("[1].someString");
 
     models = {
@@ -762,7 +873,8 @@ describe('array', function () {
       validationSettings
     });
     assertValidationFailed(result, ['2 is not a type of string']);
-    expect(result[0].context.toLiteral()).to.eql({dataPath: [1]});
+    expect(result[0].context.toLiteral()).to.have.property('dataPath');
+    expect(result[0].context.toLiteral().dataPath).to.eql([1]);
     expect(result[0].context.formatDataPath()).to.eql("[1]");
   });
 });
