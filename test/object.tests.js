@@ -2603,7 +2603,7 @@ describe('object', () => {
           models: {},
           validationContext,
           validationSettings
-        })).to.throw('Swagger schema is invalid: Unknown reference to model "SomeUnknownModel"');
+        })).to.throw('Swagger schema is invalid: Schema contains unknown reference to model "SomeUnknownModel"');
       });
 
       it('should throw an error when the object has a "type" that refers to an unknown model when the "type" field is used like a "$ref" pointing to another model (legacy behaviour)', () => {
@@ -2615,7 +2615,7 @@ describe('object', () => {
           models: {},
           validationContext,
           validationSettings
-        })).to.throw('Swagger schema is invalid: Unknown reference to model "SomeUnknownModel"');
+        })).to.throw('Swagger schema is invalid: Schema contains unknown reference to model "SomeUnknownModel"');
       });
     });
   });

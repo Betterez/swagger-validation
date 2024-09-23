@@ -16,7 +16,9 @@ describe('validateRequest', () => {
       parameters: [
         {
           in: 'body',
-          type: 'RequestBody',
+          schema: {
+            $ref: 'RequestBody',
+          },
           required: true
         }
       ],
@@ -284,7 +286,28 @@ describe('validateRequest', () => {
   });
 
   describe('invalid schemas', () => {
-    it('should allow a schema to have an invalid "type", and validate that schema as if it were an object (legacy behaviour)', () => {
+    it('should allow a schema to have an invalid "type" which points to another model, as if the "type" were a "$ref" (legacy behaviour)', () => {
+      models = {
+        RequestBody: {
+          type: 'SomeModel'
+        },
+        SomeModel: {
+          type: 'object',
+          properties: {
+            someProperty: {
+              type: 'string'
+            }
+          }
+        }
+      };
+      req.body = {
+        someProperty: 'some value'
+      };
+      let result = validateRequest(requestSchema, req, models);
+      assertValidationPassed(result);
+    });
+
+    it('should not allow a schema to have an invalid "type"', () => {
       models = {
         RequestBody: {
           type: 'abcdefghijklmnop',
@@ -299,7 +322,7 @@ describe('validateRequest', () => {
         someProperty: 'some value'
       };
       let result = validateRequest(requestSchema, req, models);
-      assertValidationPassed(result);
+      assertValidationFailed(result, ['Unknown param type abcdefghijklmnop']);
     });
 
     it('should allow a schema to declare both a "type" and a "$ref" which contradict each other (legacy behaviour)', () => {
@@ -357,7 +380,74 @@ describe('validateRequest', () => {
       assertValidationPassed(result);
     });
 
+    describe('when the validation settings specify that schemas with invalid types are not allowed', () => {
+      beforeEach(() => {
+        requestSchema.parameters = [
+          {
+            in: 'body',
+            schema: {
+              $ref: 'RequestBody'
+            },
+            required: true
+          }
+        ];
+
+        models = {
+          RequestBody: {
+            type: 'SomeModel'
+          },
+          SomeModel: {
+            type: 'object',
+            properties: {
+              someProperty: {
+                type: 'string'
+              }
+            }
+          }
+        };
+        req.body = {
+          someProperty: 'some value'
+        };
+      });
+
+      it('should return an error when a schema has a "type" which is not one of the types recognized in the OpenAPI spec', () => {
+        let result = validateRequest(requestSchema, req, models, {allowSchemasWithInvalidTypesAndTreatThemLikeRefs: false});
+        assertValidationFailed(result, ['Swagger schema is invalid: RequestBody has bad type "SomeModel".  Allowed types are: array, boolean, file, integer, number, string, object']);
+      });
+
+      describe('when the validation settings specify that an error should be thrown when there is a problem with the swagger schema', () => {
+        it('should throw an error when a schema has a "type" which is not one of the types recognized in the OpenAPI spec', () => {
+          expect(() => validateRequest(requestSchema, req, models, {
+            allowSchemasWithInvalidTypesAndTreatThemLikeRefs: false,
+            throwErrorsWhenSchemaIsInvalid: true
+          }))
+            .to.throw('Swagger schema is invalid: RequestBody has bad type "SomeModel".  Allowed types are: array, boolean, file, integer, number, string, object');
+        });
+      });
+    });
+
     describe('when the validation settings specify that an error should be thrown when there is a problem with the swagger schema', () => {
+      it('should throw an error when a schema has an invalid "type"', () => {
+        models = {
+          RequestBody: {
+            type: 'abcdefghijklmnop',
+            properties: {
+              someProperty: {
+                type: 'string'
+              }
+            }
+          }
+        };
+        req.body = {
+          someProperty: 'some value'
+        };
+        expect(() => validateRequest(requestSchema, req, models, {
+          allowSchemasWithInvalidTypesAndTreatThemLikeObjects: false,
+          throwErrorsWhenSchemaIsInvalid: true
+        }))
+          .to.throw('Swagger schema is invalid: RequestBody contains unknown reference to model "abcdefghijklmnop"');
+      });
+
       it('should throw an error when a schema has both a "type" and a "$ref"', () => {
         models = {
           RequestBody: {
@@ -406,7 +496,7 @@ describe('validateRequest', () => {
           }
         };
         expect(() => validateRequest(requestSchema, req, models, {throwErrorsWhenSchemaIsInvalid: true}))
-          .to.throw('Swagger schema is invalid: Unknown reference to model "SomeModelWhichDoesNotExist"');
+          .to.throw('Swagger schema is invalid: RequestBody contains unknown reference to model "SomeModelWhichDoesNotExist"');
       });
 
       it('should throw an error when a request parameter declares both a "type" and a "schema"', () => {
@@ -437,20 +527,23 @@ describe('validateRequest', () => {
   });
 
   describe('when the validation settings specify that errors should have improved messages', () => {
-    const validationSettings = {
-      allPropertiesAreNullableByDefault: false,
-      treatEmptyStringsLikeUndefinedValues: false,
-      objectsCanHaveAnyAdditionalPropertiesByDefault: false,
-      requestBodyCanHaveTwoContradictorySchemas: false,
-      throwErrorsWhenSchemaIsInvalid: true,
-      allowStringRepresentationsOfBooleans: false,
-      strictDateParsing: true,
-      allowNumbersToBeStrings: false,
-      allowNumberFormatsWithNoEquivalentRepresentationInJavascript: false,
-      improvedErrorMessages: true,
-    };
+    let validationSettings;
 
     beforeEach(() => {
+      validationSettings = {
+        allPropertiesAreNullableByDefault: false,
+        treatEmptyStringsLikeUndefinedValues: false,
+        objectsCanHaveAnyAdditionalPropertiesByDefault: false,
+        requestBodyCanHaveTwoContradictorySchemas: false,
+        throwErrorsWhenSchemaIsInvalid: true,
+        allowStringRepresentationsOfBooleans: false,
+        strictDateParsing: true,
+        allowNumbersToBeStrings: false,
+        allowNumberFormatsWithNoEquivalentRepresentationInJavascript: false,
+        allowSchemasWithInvalidTypesAndTreatThemLikeRefs: false,
+        improvedErrorMessages: true,
+      };
+
       models = {
         RequestBody: {
           type: 'object',
@@ -581,18 +674,26 @@ describe('validateRequest', () => {
       };
     });
 
-    function expectValueToCauseError(value, expectedErrorMessage) {
+    function performValidation(value) {
       const defaultRequestBody = {
         requiredBoolean: true,
         requiredFile: 'ABC',
       };
 
       req.body = {...defaultRequestBody, ...value};
-      const result = validateRequest(requestSchema, req, models, validationSettings);
+      return validateRequest(requestSchema, req, models, validationSettings);
+    }
+
+    function expectValueToCauseError(value, expectedErrorMessage) {
+      const result = performValidation(value);
       assertValidationFailed(result, [expectedErrorMessage]);
     }
 
-    it('should throw errors with the expected error message under a variety of circumstances', () => {
+    function expectValueToThrowError(value, expectedErrorMessage) {
+      expect(() => performValidation(value)).to.throw(expectedErrorMessage);
+    }
+
+    it('should return errors with the expected error message under a variety of circumstances', () => {
       // boolean validation
       expectValueToCauseError({boolean: null}, 'Request body is invalid: boolean cannot be null');
       expectValueToCauseError({boolean: 'true'}, 'Request body is invalid: expected boolean to be a boolean, but it is a string');
@@ -622,13 +723,13 @@ describe('validateRequest', () => {
 
       // integer validation
       expectValueToCauseError({integer: null}, 'Request body is invalid: integer cannot be null');
-      expectValueToCauseError({integer: "1"}, 'Request body is invalid: expected integer to be a number, but it is a string');
+      expectValueToCauseError({integer: '1'}, 'Request body is invalid: expected integer to be a number, but it is a string');
       expectValueToCauseError({integer: 1.1}, 'Request body is invalid: expected integer to be an integer, but it is a floating-point number');
       expectValueToCauseError({integerAboveZero: 0}, 'Request body is invalid: expected integerAboveZero to have a value of 1 or greater, but it has a value of 0');
       expectValueToCauseError({integerBelowZero: 0}, 'Request body is invalid: expected integerBelowZero to have a value of -1 or lower, but it has a value of 0');
 
       // number validation
-      expectValueToCauseError({number: "1"}, 'Request body is invalid: expected number to be a number, but it is a string');
+      expectValueToCauseError({number: '1'}, 'Request body is invalid: expected number to be a number, but it is a string');
       expectValueToCauseError({number: NaN}, 'Request body is invalid: expected number to be a number, but it is NaN');
       expectValueToCauseError({number: Infinity}, 'Request body is invalid: expected number to be a number, but it is Infinity');
       expectValueToCauseError({number: -Infinity}, 'Request body is invalid: expected number to be a number, but it is -Infinity');
@@ -652,6 +753,24 @@ describe('validateRequest', () => {
 
       // deeply-nested property validation
       expectValueToCauseError({deepProperty: {deepArray: [{anotherProperty: true}, {anotherProperty: 1}]}}, 'Request body is invalid: expected deepProperty.deepArray[1].anotherProperty to be a boolean, but it is a number');
+    });
+
+    it('should throw the expected error message when the schema contains a property with a bad "type"', () => {
+      models.RequestBody = {
+        type: 'object',
+        properties: {
+          propertyWithBadType: {
+            type: 'someInvalidType'
+          }
+        }
+      };
+
+      expectValueToThrowError({propertyWithBadType: '1'}, 'Swagger schema is invalid: RequestBody has bad type "someInvalidType".  Allowed types are: array, boolean, file, integer, number, string, object');
+    });
+
+    it('should throw the expected error message when the schema contains a string property with the "date" type', () => {
+      validationSettings.allowStringsToHaveUnreliableDateFormat = false;
+      expectValueToThrowError({date: '2024-01-01'}, 'Swagger schema is invalid: string has "date" format, but this format is unreliable because it parses dates without considering timezones.  Use the "date-time" format instead, or define a "pattern" to validate the format of the date string, and parse it yourself.');
     });
   });
 });

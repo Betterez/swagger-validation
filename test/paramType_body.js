@@ -5,6 +5,84 @@ const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
 
 describe('paramType - body', function () {
+  it('should validate a body parameter using the "type" of the body parameter as if it was a "$ref" pointing to another model (legacy behaviour)', () => {
+    const requestSchema = {
+      description: 'A mock endpoint',
+      path: '/some-endpoint',
+      method: 'POST',
+      parameters: [
+        {
+          in: 'body',
+          name: 'someParameter',
+          type: 'SchemaForBody',
+          required: true
+        }
+      ],
+    };
+
+    const models = {
+      SchemaForBody: {
+        type: 'object',
+        required: ['someProperty'],
+        properties: {
+          someProperty: {
+            type: 'string'
+          }
+        }
+      }
+    };
+
+    const req = {
+      body: {
+        someProperty: 'ABC'
+      }
+    };
+
+    let result = validateRequest(requestSchema, req, models);
+    assertValidationPassed(result);
+
+    req.body.someProperty = null;
+    result = validateRequest(requestSchema, req, models);
+    assertValidationFailed(result, ['someProperty is required']);
+  });
+
+  it('should validate a body parameter using the embedded schema, when one is available', () => {
+    const requestSchema = {
+      description: 'A mock endpoint',
+      path: '/some-endpoint',
+      method: 'POST',
+      parameters: [
+        {
+          in: 'body',
+          name: 'someParameter',
+          schema: {
+            type: 'object',
+            required: ['someProperty'],
+            properties: {
+              someProperty: {
+                type: 'string'
+              }
+            }
+          },
+          required: true
+        }
+      ],
+    };
+
+    const req = {
+      body: {
+        someProperty: 'ABC'
+      }
+    };
+
+    let result = validateRequest(requestSchema, req);
+    assertValidationPassed(result);
+
+    req.body.someProperty = null;
+    result = validateRequest(requestSchema, req);
+    assertValidationFailed(result, ['someProperty is required']);
+  });
+
   describe('with models', function () {
     it('should convert strings', function () {
       var spec = {
