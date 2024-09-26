@@ -690,7 +690,9 @@ describe('array', function () {
           TestArrayItem: {
             type: 'object',
             properties: {
-              someString: {type: 'string'},
+              someString: {
+                type: 'string'
+              },
             }
           }
         };
@@ -761,12 +763,12 @@ describe('array', function () {
     it('should allow empty strings to exist in an array which does not contain strings (legacy behaviour - this is a bug which is intentionally left in the code to avoid changing existing behaviour)', () => {
       const result = validateParameter({
         schema: models.TestArray,
-        value: [1, 2, ''],
+        value: [1, 2, '', 4, 5],
         models,
         validationContext,
         validationSettings
       });
-      assertValidationPassed(result);
+      assertValidationPassed(result, [[1, 2, '', 4, 5]]);
     });
 
     describe('when the validation settings specify that empty strings are not treated the same as undefined values', () => {
