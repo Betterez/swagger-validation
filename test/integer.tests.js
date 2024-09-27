@@ -305,6 +305,71 @@ describe('integer', function () {
     });
   });
 
+  describe('integers with an extremely large magnitude', () => {
+    it('should allow an integer to be a very large negative number which cannot be represented as a Number in Javascript (legacy behaviour)', () => {
+      const results = validateParameter({
+        schema: {
+          type: 'integer'
+        },
+        value: -9007199254740993,
+        models,
+        validationContext,
+        validationSettings
+      });
+      // Note that the value below differs from the input
+      assertValidationPassed(results, [-9007199254740992]);
+    });
+
+    it('should allow an integer to be a very large positive number which cannot be represented as a Number in Javascript (legacy behaviour)', () => {
+      const results = validateParameter({
+        schema: {
+          type: 'integer'
+        },
+        value: 9007199254740993,
+        models,
+        validationContext,
+        validationSettings
+      });
+      // Note that the value below differs from the input
+      assertValidationPassed(results, [9007199254740992]);
+    });
+
+    describe('when the validation settings specify that integers which cannot be parsed correctly in Javascript are disallowed', () => {
+      beforeEach(() => {
+        validationSettings.allowIntegerValuesWhichMayBeParsedIncorrectly = false;
+        validationSettings.improvedErrorMessages = true;
+      });
+
+      it('should not allow an integer to be a very large negative number which cannot be represented as a Number in Javascript', () => {
+        const results = validateParameter({
+          schema: {
+            type: 'integer'
+          },
+          value: -9007199254740993,
+          models,
+          validationContext,
+          validationSettings
+        });
+        // Note that the value below differs from the input
+        assertValidationFailed(results, ["Input is invalid: input has a value of -9007199254740992 which is below the minimum possible value for an integer (-9007199254740991)"]);
+      });
+
+      it('should not allow an integer to be a very large positive number which cannot be represented as a Number in Javascript', () => {
+        const results = validateParameter({
+          schema: {
+            type: 'integer'
+          },
+          value: 9007199254740993,
+          models,
+          validationContext,
+          validationSettings
+        });
+        // Note that the value below differs from the input
+        assertValidationFailed(results, ["Input is invalid: input has a value of 9007199254740992 which is above the maximum possible value for an integer (9007199254740991)"]);
+      });
+    });
+  });
+
   describe('number formats', () => {
     it('should allow an integer to have a format which has no equivalent representation in Javascript (legacy behaviour)', () => {
       const results = validateParameter({
