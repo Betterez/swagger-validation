@@ -2,7 +2,7 @@ const {expect} = require('chai');
 const {validateParameter} = require('../lib/validation/parameter');
 const {ValidationContext} = require('../lib/validation/validationContext');
 const {getValidationSettings} = require('../lib/validation/validationSettings');
-const {assertValidationFailed} = require("./test_helper");
+const {assertValidationFailed, assertValidationPassed} = require("./test_helper");
 
 describe('oneOf', function () {
   describe('basic tests', function () {
@@ -96,6 +96,56 @@ describe('oneOf', function () {
       var ret = validateParameter({schema, value, models, validationContext, validationSettings});
       expect(ret).to.be.an('array');
       expect(ret).to.have.length(1);
+    });
+
+    describe('when the validation settings specify that unrecognized properties in objects should be removed', () => {
+      beforeEach(() => {
+        validationSettings.removeUnrecognizedPropertiesFromObjects = true;
+        validationSettings.replaceValues = true;
+
+        schema = {
+          oneOf: [
+            {
+              type: 'object',
+              required: ['propertyA'],
+              properties: {
+                propertyA: {type: 'string'}
+              }
+            },
+            {
+              type: 'object',
+              required: ['propertyB'],
+              properties: {
+                propertyB: {type: 'string'}
+              }
+            },
+            {
+              type: 'object',
+              required: ['propertyC'],
+              properties: {
+                propertyC: {type: 'string'}
+              }
+            }
+          ],
+          description: 'The value to compare the fact against',
+          name: 'value',
+          required: true
+        };
+      });
+
+      it('should not modify the value if it does not match any of the schemas', () => {
+        const value = {someUnrecognizedProperty: 'some value'};
+        const validationResults = validateParameter({schema, value, models, validationContext, validationSettings});
+        assertValidationFailed(validationResults, ['propertyA is required', 'propertyB is required', 'propertyC is required']);
+        expect(value).to.eql({someUnrecognizedProperty: 'some value'});
+      });
+
+      it('should remove unknown properties from the object when it matches one of the schemas, keeping only those properties which are present in the schema', () => {
+        const value = {propertyB: 'B', someUnrecognizedProperty: 'some value'};
+        const validationResults = validateParameter({schema, value, models, validationContext, validationSettings});
+        assertValidationPassed(validationResults);
+        expect(value).to.eql({propertyB: 'B'});
+      });
     });
   });
 });
