@@ -239,6 +239,42 @@ describe('validateRequest', () => {
         assertValidationFailed(result, ['object contains invalid properties: someExtraProperty']);
       });
     });
+
+    describe('when the validation settings specify that unrecognized properties in objects should be removed', () => {
+      it('should remove any unrecognized properties which are not specified in the schema', () => {
+        const validationSettings = {removeUnrecognizedPropertiesFromObjects: true, replaceValues: true};
+        req.body = {id: '1', someExtraProperty: 'some value', anotherExtraProperty: 'another value'};
+
+        const result = validateRequest(requestSchema, req, models, validationSettings);
+        assertValidationPassed(result);
+        expect(req.body).to.eql({id: '1'});
+      });
+
+      it('should not remove any unrecognized properties from an object when the schema specifies "additionalProperties: true"', () => {
+        models.RequestBody.additionalProperties = true;
+
+        const validationSettings = {removeUnrecognizedPropertiesFromObjects: true, replaceValues: true};
+        req.body = {id: '1', someExtraProperty: 'some value', anotherExtraProperty: 'another value'};
+
+        const result = validateRequest(requestSchema, req, models, validationSettings);
+        assertValidationPassed(result);
+        expect(req.body).to.eql({id: '1', someExtraProperty: 'some value', anotherExtraProperty: 'another value'});
+      });
+
+      it('should throw an error if the "removeUnrecognizedPropertiesFromObjects" validation setting is enabled, but the "replaceValues" setting is not', () => {
+        const validationSettings = {removeUnrecognizedPropertiesFromObjects: true, replaceValues: false};
+        req.body = {id: '1'};
+        expect(() => validateRequest(requestSchema, req, models, validationSettings))
+          .to.throw('Incompatible validation settings.  When using the "removeUnrecognizedPropertiesFromObjects" setting, you must also enable the "replaceValues" setting because the "removeUnrecognizedPropertiesFromObjects" setting will replace values in objects (it will delete object properties).');
+      });
+
+      it('should throw an error if both the "removeUnrecognizedPropertiesFromObjects" validation setting is enabled, and the "objectsCanHaveAnyAdditionalPropertiesByDefault" validation settings is disabled', () => {
+        const validationSettings = {removeUnrecognizedPropertiesFromObjects: true, objectsCanHaveAnyAdditionalPropertiesByDefault: false};
+        req.body = {id: '1'};
+        expect(() => validateRequest(requestSchema, req, models, validationSettings))
+          .to.throw('Incompatible validation settings.  When disabling the "objectsCanHaveAnyAdditionalPropertiesByDefault" setting, you cannot enable the "removeUnrecognizedPropertiesFromObjects" setting.  Disabling the "objectsCanHaveAnyAdditionalPropertiesByDefault" setting will cause errors to be thrown when an object contains unrecognized properties.  Enabling the "removeUnrecognizedPropertiesFromObjects" setting will cause unrecognized properties to be removed from objects, thereby preventing any errors from being thrown.');
+      });
+    });
   });
 
   describe('validation of the request body', () => {
