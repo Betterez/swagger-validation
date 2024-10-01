@@ -2,7 +2,7 @@ const moment = require('moment');
 const {expect} = require('chai');
 const {validateRequest} = require('../lib/validation/validateRequest');
 const helper = require('./test_helper');
-const {assertValidationPassed, assertValidationFailed} = helper;
+const {expectValidationPassed, expectValidationFailed} = helper;
 
 describe('paramType - query', function () {
   describe('without models', function () {
@@ -35,7 +35,7 @@ describe('paramType - query', function () {
         }
       };
       var ret = validateRequest(spec, req);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.query.someDate).to.eql(someDateTransformed);
       expect(req.query.someNumber).to.equal(someNumberTransformed);
     });
@@ -64,7 +64,7 @@ describe('paramType - query', function () {
         query: {}
       };
       var ret = validateRequest(spec, req);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.query.someDate).to.eql('2014-11-23');
       expect(req.query.someNumber).to.equal('233.2354');
     });
@@ -99,7 +99,7 @@ describe('paramType - query', function () {
         }
       };
       var ret = validateRequest(spec, req);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.query.someDate).to.eql(someDate);
       expect(req.query.someNumber).to.equal(someNumber);
     });
@@ -121,7 +121,7 @@ describe('paramType - query', function () {
         }
       };
       var ret = validateRequest(spec, req);
-      assertValidationFailed(ret, ["someString is not valid based on the pattern /^hi/i"]);
+      expectValidationFailed(ret, ["someString is not valid based on the pattern /^hi/i"]);
     });
   });
 
@@ -155,7 +155,7 @@ describe('paramType - query', function () {
         }
       };
       var ret = validateRequest(spec, req);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.query.someDate).to.eql(someDateTransformed);
       expect(req.query.someNumber).to.equal(someNumberTransformed);
     });
@@ -184,7 +184,7 @@ describe('paramType - query', function () {
         query: {}
       };
       var ret = validateRequest(spec, req);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.query.someDate).to.eql("2014-11-23");
       expect(req.query.someNumber).to.equal("233.2354");
     });
@@ -205,7 +205,7 @@ describe('paramType - query', function () {
         query: {}
       };
       const validationResults = validateRequest(spec, req);
-      assertValidationPassed(validationResults);
+      expectValidationPassed(validationResults);
     });
 
     it('should fail validation when a query parameter is required, but no value is present in the request', function () {
@@ -224,7 +224,7 @@ describe('paramType - query', function () {
         query: {}
       };
       const validationResults = validateRequest(spec, req);
-      assertValidationFailed(validationResults, ['someQueryParameter is required']);
+      expectValidationFailed(validationResults, ['someQueryParameter is required']);
     });
 
     it('should not convert strings with date format to Date object', function () {
@@ -257,7 +257,7 @@ describe('paramType - query', function () {
         }
       };
       var ret = validateRequest(spec, req);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.query.someDate).to.eql(someDate);
       expect(req.query.someNumber).to.equal(someNumber);
     });
@@ -279,7 +279,7 @@ describe('paramType - query', function () {
         }
       };
       var ret = validateRequest(spec, req);
-      assertValidationFailed(ret, ["someString is not valid based on the pattern /^hi/i"]);
+      expectValidationFailed(ret, ["someString is not valid based on the pattern /^hi/i"]);
     });
   });
 
@@ -307,14 +307,14 @@ describe('paramType - query', function () {
     };
 
     let result = validateRequest(requestSchema, req);
-    assertValidationPassed(result);
+    expectValidationPassed(result);
 
     req.query.someParameter = null;
     result = validateRequest(requestSchema, req);
-    assertValidationFailed(result, ['someParameter is required']);
+    expectValidationFailed(result, ['someParameter is required']);
 
     req.query.someParameter = 1;
     result = validateRequest(requestSchema, req);
-    assertValidationFailed(result, ['someParameter is not a type of string']);
+    expectValidationFailed(result, ['someParameter is not a type of string']);
   });
 });

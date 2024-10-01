@@ -2,7 +2,7 @@ const moment = require('moment');
 const {expect} = require('chai');
 const {validateRequest} = require('../lib/validation/validateRequest');
 const helper = require('./test_helper');
-const {assertValidationPassed, assertValidationFailed} = helper;
+const {expectValidationPassed, expectValidationFailed} = helper;
 
 describe('paramType - body', function () {
   it('should validate a body parameter using the "type" of the body parameter as if it was a "$ref" pointing to another model (legacy behaviour)', () => {
@@ -39,11 +39,11 @@ describe('paramType - body', function () {
     };
 
     let result = validateRequest(requestSchema, req, models);
-    assertValidationPassed(result);
+    expectValidationPassed(result);
 
     req.body.someProperty = null;
     result = validateRequest(requestSchema, req, models);
-    assertValidationFailed(result, ['someProperty is required']);
+    expectValidationFailed(result, ['someProperty is required']);
   });
 
   it('should validate a body parameter using the embedded schema, when one is available', () => {
@@ -76,11 +76,11 @@ describe('paramType - body', function () {
     };
 
     let result = validateRequest(requestSchema, req);
-    assertValidationPassed(result);
+    expectValidationPassed(result);
 
     req.body.someProperty = null;
     result = validateRequest(requestSchema, req);
-    assertValidationFailed(result, ['someProperty is required']);
+    expectValidationFailed(result, ['someProperty is required']);
   });
 
   describe('with models', function () {
@@ -120,7 +120,7 @@ describe('paramType - body', function () {
         }
       };
       var ret = validateRequest(spec, req, models);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.body.someModel.someDate).to.eql(someDateTransformed);
       expect(req.body.someModel.someString).to.equal(someString);
     });
@@ -171,7 +171,7 @@ describe('paramType - body', function () {
         }
       };
       var ret = validateRequest(spec, req, models);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.body.someModel.someDate).to.eql(someDateTransformed);
       expect(req.body.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
     });
@@ -209,7 +209,7 @@ describe('paramType - body', function () {
         }
       };
       var ret = validateRequest(spec, req, models);
-      assertValidationFailed(ret, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
+      expectValidationFailed(ret, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
     });
   });
 
@@ -250,7 +250,7 @@ describe('paramType - body', function () {
         }
       };
       var ret = validateRequest(spec, req, models);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.body.someModel.someDate).to.eql(someDateTransformed);
       expect(req.body.someModel.someString).to.equal(someString);
     });
@@ -301,7 +301,7 @@ describe('paramType - body', function () {
         }
       };
       var ret = validateRequest(spec, req, models);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.body.someModel.someDate).to.eql(someDateTransformed);
       expect(req.body.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
     });
@@ -339,7 +339,7 @@ describe('paramType - body', function () {
         }
       };
       var ret = validateRequest(spec, req, models);
-      assertValidationFailed(ret, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
+      expectValidationFailed(ret, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
     });
   });
 
@@ -363,7 +363,7 @@ describe('paramType - body', function () {
         }
       };
       var ret = validateRequest(spec, req);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.body.someDate).to.eql(someDateTransformed);
     });
 
@@ -386,7 +386,7 @@ describe('paramType - body', function () {
         body: {someDate: someDate}
       };
       var ret = validateRequest(spec, req);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.body.someDate).to.eql(someDate);
     });
   });
@@ -411,7 +411,7 @@ describe('paramType - body', function () {
         }
       };
       var ret = validateRequest(spec, req);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.body.someDate).to.eql(someDateTransformed);
     });
 
@@ -434,7 +434,7 @@ describe('paramType - body', function () {
         body: {someDate: someDate}
       };
       var ret = validateRequest(spec, req);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.body.someDate).to.eql(someDate);
     });
   });

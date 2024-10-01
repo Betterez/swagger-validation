@@ -2,7 +2,7 @@ const moment = require('moment');
 const {expect} = require('chai');
 const {validateRequest} = require('../lib/validation/validateRequest');
 const helper = require('./test_helper');
-const {assertValidationPassed, assertValidationFailed} = helper;
+const {expectValidationPassed, expectValidationFailed} = helper;
 
 describe('paramType - header', function () {
   describe('with models', function () {
@@ -42,7 +42,7 @@ describe('paramType - header', function () {
         }
       };
       var ret = validateRequest(spec, req, models);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.header.someModel.someDate).to.eql(someDateTransformed);
       expect(req.header.someModel.someString).to.equal(someString);
     });
@@ -94,7 +94,7 @@ describe('paramType - header', function () {
       };
 
       var ret = validateRequest(spec, req, models);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.header.someModel.someDate).to.eql(someDateTransformed);
       expect(req.header.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
     });
@@ -132,7 +132,7 @@ describe('paramType - header', function () {
         }
       };
       var ret = validateRequest(spec, req, models);
-      assertValidationFailed(ret, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
+      expectValidationFailed(ret, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
     });
   });
 
@@ -173,7 +173,7 @@ describe('paramType - header', function () {
         }
       };
       var ret = validateRequest(spec, req, models);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.header.someModel.someDate).to.eql(someDateTransformed);
       expect(req.header.someModel.someString).to.equal(someString);
     });
@@ -225,7 +225,7 @@ describe('paramType - header', function () {
       };
 
       var ret = validateRequest(spec, req, models);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.header.someModel.someDate).to.eql(someDateTransformed);
       expect(req.header.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
     });
@@ -263,7 +263,7 @@ describe('paramType - header', function () {
         }
       };
       var ret = validateRequest(spec, req, models);
-      assertValidationFailed(ret, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
+      expectValidationFailed(ret, ["someDate is not valid based on the pattern for moment.ISO 8601"]);
     });
   });
 
@@ -287,7 +287,7 @@ describe('paramType - header', function () {
         }
       };
       var ret = validateRequest(spec, req);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.header.someDate).to.eql(someDateTransformed);
     });
 
@@ -312,7 +312,7 @@ describe('paramType - header', function () {
         }
       };
       var ret = validateRequest(spec, req);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.header.someDate).to.eql(someDate);
     });
   });
@@ -337,7 +337,7 @@ describe('paramType - header', function () {
         }
       };
       var ret = validateRequest(spec, req);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.header.someDate).to.eql(someDateTransformed);
     });
 
@@ -362,7 +362,7 @@ describe('paramType - header', function () {
         }
       };
       var ret = validateRequest(spec, req);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.header.someDate).to.eql(someDate);
     });
   });
@@ -391,15 +391,15 @@ describe('paramType - header', function () {
     };
 
     let result = validateRequest(requestSchema, req);
-    assertValidationPassed(result);
+    expectValidationPassed(result);
 
     req.header['x-some-header'] = null;
     result = validateRequest(requestSchema, req);
-    assertValidationFailed(result, ['x-some-header is required']);
+    expectValidationFailed(result, ['x-some-header is required']);
 
     req.header['x-some-header'] = 1;
     result = validateRequest(requestSchema, req);
-    assertValidationFailed(result, ['x-some-header is not a type of string']);
+    expectValidationFailed(result, ['x-some-header is not a type of string']);
   });
 
   it('should apply a default value if a header parameter is not provided, and a default value is specified for the parameter', function () {
@@ -424,7 +424,7 @@ describe('paramType - header', function () {
     };
 
     const result = validateRequest(requestSchema, req);
-    assertValidationPassed(result);
+    expectValidationPassed(result);
 
     expect(req.header['x-some-header']).to.eql('someDefaultValue');
   });
@@ -447,7 +447,7 @@ describe('paramType - header', function () {
       header: {}
     };
     const validationResults = validateRequest(spec, req);
-    assertValidationPassed(validationResults);
+    expectValidationPassed(validationResults);
   });
 
   it('should fail validation when a header parameter is required, but no value is present in the request', function () {
@@ -468,6 +468,6 @@ describe('paramType - header', function () {
       header: {}
     };
     const validationResults = validateRequest(spec, req);
-    assertValidationFailed(validationResults, ['x-some-header is required']);
+    expectValidationFailed(validationResults, ['x-some-header is required']);
   });
 });

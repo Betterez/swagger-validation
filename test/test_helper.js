@@ -91,3 +91,24 @@ exports.assertValidationFailed = function (validationResults, expectedErrorMessa
     expect(result.context).to.be.an.instanceof(ValidationContext);
   });
 };
+
+exports.expectValidationPassed = function (validationResults) {
+  expect(validationResults).to.haveOwnProperty('errors');
+  expect(validationResults).to.haveOwnProperty('logs');
+  expect(validationResults.errors).to.be.an('array').with.lengthOf(0);
+}
+
+exports.expectValidationFailed = function(validationResults, expectedErrorMessages) {
+  expect(validationResults).to.haveOwnProperty('errors');
+  expect(validationResults).to.haveOwnProperty('logs');
+  expect(validationResults.errors).to.be.an('array');
+  expect(validationResults.errors.length).to.be.greaterThan(0);
+
+  if (expectedErrorMessages) {
+    expect(validationResults.errors.length).to.eql(expectedErrorMessages.length);
+    validationResults.errors.forEach((result, index) => {
+      expect(result.error).to.exist;
+      expect(result.error.message).to.eql(expectedErrorMessages[index]);
+    });
+  }
+}

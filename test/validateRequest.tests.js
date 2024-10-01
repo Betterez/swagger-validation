@@ -1,6 +1,7 @@
-const {expect} = require("chai");
+const {expect} = require('chai');
 const {validateRequest} = require('../index');
-const {assertValidationPassed, assertValidationFailed} = require('./test_helper');
+const {expectValidationPassed, expectValidationFailed} = require('./test_helper');
+const {ValidationLogs} = require('../lib/validation/validationLogs');
 
 describe('validateRequest', () => {
   let requestSchema;
@@ -43,10 +44,10 @@ describe('validateRequest', () => {
     it('should include the path of the data which failed validation in the result', () => {
       req.body = {id: 1};
       let result = validateRequest(requestSchema, req, models);
-      assertValidationFailed(result, ['id is not a type of string']);
-      expect(result[0].context.toLiteral()).to.have.property('dataPath');
-      expect(result[0].context.toLiteral().dataPath).to.eql(['id']);
-      expect(result[0].context.formatDataPath()).to.eql("id");
+      expectValidationFailed(result, ['id is not a type of string']);
+      expect(result.errors[0].context.toLiteral()).to.have.property('dataPath');
+      expect(result.errors[0].context.toLiteral().dataPath).to.eql(['id']);
+      expect(result.errors[0].context.formatDataPath()).to.eql("id");
 
       models = {
         RequestBody: {
@@ -75,19 +76,19 @@ describe('validateRequest', () => {
 
       req.body = {someNestedObject: {someArray: [1]}};
       result = validateRequest(requestSchema, req, models);
-      assertValidationFailed(result, ['1 is not a type of string']);
-      expect(result[0].context.toLiteral()).to.have.property('dataPath');
-      expect(result[0].context.toLiteral().dataPath).to.eql(['someNestedObject', 'someArray', 0]);
-      expect(result[0].context.formatDataPath()).to.eql("someNestedObject.someArray[0]");
+      expectValidationFailed(result, ['1 is not a type of string']);
+      expect(result.errors[0].context.toLiteral()).to.have.property('dataPath');
+      expect(result.errors[0].context.toLiteral().dataPath).to.eql(['someNestedObject', 'someArray', 0]);
+      expect(result.errors[0].context.formatDataPath()).to.eql("someNestedObject.someArray[0]");
     });
 
     it('should include the path of the model which failed validation in the result', () => {
       req.body = {id: 1};
       let result = validateRequest(requestSchema, req, models);
-      assertValidationFailed(result, ['id is not a type of string']);
-      expect(result[0].context.toLiteral()).to.have.property('modelPath');
-      expect(result[0].context.toLiteral().modelPath).to.eql(['RequestBody']);
-      expect(result[0].context.formatModelPath()).to.eql("RequestBody");
+      expectValidationFailed(result, ['id is not a type of string']);
+      expect(result.errors[0].context.toLiteral()).to.have.property('modelPath');
+      expect(result.errors[0].context.toLiteral().modelPath).to.eql(['RequestBody']);
+      expect(result.errors[0].context.formatModelPath()).to.eql("RequestBody");
 
       models = {
         RequestBody: {
@@ -116,10 +117,10 @@ describe('validateRequest', () => {
 
       req.body = {someNestedObject: {someArray: [1]}};
       result = validateRequest(requestSchema, req, models);
-      assertValidationFailed(result, ['1 is not a type of string']);
-      expect(result[0].context.toLiteral()).to.have.property('modelPath');
-      expect(result[0].context.toLiteral().modelPath).to.eql(['RequestBody', 'ObjectWithArray', 'ArrayOfStrings']);
-      expect(result[0].context.formatModelPath()).to.eql("RequestBody → ObjectWithArray → ArrayOfStrings");
+      expectValidationFailed(result, ['1 is not a type of string']);
+      expect(result.errors[0].context.toLiteral()).to.have.property('modelPath');
+      expect(result.errors[0].context.toLiteral().modelPath).to.eql(['RequestBody', 'ObjectWithArray', 'ArrayOfStrings']);
+      expect(result.errors[0].context.formatModelPath()).to.eql("RequestBody → ObjectWithArray → ArrayOfStrings");
     });
   });
 
@@ -127,7 +128,7 @@ describe('validateRequest', () => {
     it('should allow null values by default (legacy behaviour)', () => {
       req.body = {id: null};
       const result = validateRequest(requestSchema, req, models);
-      assertValidationPassed(result);
+      expectValidationPassed(result);
     });
 
     it('should allow null values by default for a property which is specified with a $ref (legacy behaviour)', () => {
@@ -147,14 +148,14 @@ describe('validateRequest', () => {
 
       req.body = {id: null};
       const result = validateRequest(requestSchema, req, models);
-      assertValidationPassed(result);
+      expectValidationPassed(result);
     });
 
     it('should not allow a value to be null when "nullable" is false', () => {
       models.RequestBody.properties.id.nullable = false;
       req.body = {id: null};
       const result = validateRequest(requestSchema, req, models);
-      assertValidationFailed(result, ["id cannot be null"]);
+      expectValidationFailed(result, ["id cannot be null"]);
     });
 
     it('should not allow a value to be null when a property is specified with a $ref, and the referenced model has "nullable" set to false', () => {
@@ -175,14 +176,14 @@ describe('validateRequest', () => {
 
       req.body = {id: null};
       const result = validateRequest(requestSchema, req, models);
-      assertValidationFailed(result, ["id cannot be null"]);
+      expectValidationFailed(result, ["id cannot be null"]);
     });
 
     describe('when the validation options specify that properties are not nullable by default', () => {
       it('should not allow a property to be null by default', () => {
         req.body = {id: null};
         const result = validateRequest(requestSchema, req, models, {allPropertiesAreNullableByDefault: false});
-        assertValidationFailed(result, ["id cannot be null"]);
+        expectValidationFailed(result, ["id cannot be null"]);
       });
 
       it('should not allow a property to be null by default when the property is specified with a $ref', () => {
@@ -202,7 +203,7 @@ describe('validateRequest', () => {
 
         req.body = {id: null};
         const result = validateRequest(requestSchema, req, models, {allPropertiesAreNullableByDefault: false});
-        assertValidationFailed(result, ["id cannot be null"]);
+        expectValidationFailed(result, ["id cannot be null"]);
       });
     });
   });
@@ -212,7 +213,7 @@ describe('validateRequest', () => {
       models.RequestBody.required = ['id'];
       req.body = {id: ''};
       const result = validateRequest(requestSchema, req, models);
-      assertValidationFailed(result, ["id is required"]);
+      expectValidationFailed(result, ["id is required"]);
     });
 
     describe('when the validation settings specify that empty strings are not treated the same as undefined values', () => {
@@ -220,7 +221,7 @@ describe('validateRequest', () => {
         models.RequestBody.required = ['id'];
         req.body = {id: ''};
         const result = validateRequest(requestSchema, req, models, {treatEmptyStringsLikeUndefinedValues: false});
-        assertValidationPassed(result);
+        expectValidationPassed(result);
       });
     });
   });
@@ -229,14 +230,14 @@ describe('validateRequest', () => {
     it('should allow an object to have additional properties which are not specified in the schema (legacy behaviour)', () => {
       req.body = {id: '1', someExtraProperty: 'some value'}
       const result = validateRequest(requestSchema, req, models);
-      assertValidationPassed(result);
+      expectValidationPassed(result);
     });
 
     describe('when the validation settings specify that objects are not allowed to have additional properties by default', () => {
       it('should not allow an object to have additional properties which are not specified in the schema', () => {
         req.body = {id: '1', someExtraProperty: 'some value'}
         const result = validateRequest(requestSchema, req, models, {objectsCanHaveAnyAdditionalPropertiesByDefault: false});
-        assertValidationFailed(result, ['object contains invalid properties: someExtraProperty']);
+        expectValidationFailed(result, ['object contains invalid properties: someExtraProperty']);
       });
     });
 
@@ -246,8 +247,18 @@ describe('validateRequest', () => {
         req.body = {id: '1', someExtraProperty: 'some value', anotherExtraProperty: 'another value'};
 
         const result = validateRequest(requestSchema, req, models, validationSettings);
-        assertValidationPassed(result);
+        expectValidationPassed(result);
         expect(req.body).to.eql({id: '1'});
+      });
+
+      it('should return information about which properties were removed', () => {
+        const validationSettings = {removeUnrecognizedPropertiesFromObjects: true, replaceValues: true};
+        req.body = {id: '1', someExtraProperty: 'some value', anotherExtraProperty: 'another value'};
+
+        const result = validateRequest(requestSchema, req, models, validationSettings);
+        expectValidationPassed(result);
+        expect(result.logs).to.be.an.instanceof(ValidationLogs);
+        expect(result.logs.formatDeletedProperties()).to.eql('someExtraProperty, anotherExtraProperty');
       });
 
       it('should not remove any unrecognized properties from an object when the schema specifies "additionalProperties: true"', () => {
@@ -257,7 +268,7 @@ describe('validateRequest', () => {
         req.body = {id: '1', someExtraProperty: 'some value', anotherExtraProperty: 'another value'};
 
         const result = validateRequest(requestSchema, req, models, validationSettings);
-        assertValidationPassed(result);
+        expectValidationPassed(result);
         expect(req.body).to.eql({id: '1', someExtraProperty: 'some value', anotherExtraProperty: 'another value'});
       });
 
@@ -289,7 +300,7 @@ describe('validateRequest', () => {
         id: '1'
       };
       let result = validateRequest(requestSchema, req, models);
-      assertValidationPassed(result);
+      expectValidationPassed(result);
 
       req.body = {
         requestBody: {
@@ -297,7 +308,7 @@ describe('validateRequest', () => {
         }
       };
       result = validateRequest(requestSchema, req, models);
-      assertValidationPassed(result);
+      expectValidationPassed(result);
     });
 
     describe('when the validation settings specify that the request body is not allowed to have two contradictory schemas', () => {
@@ -308,7 +319,7 @@ describe('validateRequest', () => {
           id: '1'
         };
         let result = validateRequest(requestSchema, req, models, {requestBodyCanHaveTwoContradictorySchemas: false});
-        assertValidationPassed(result);
+        expectValidationPassed(result);
 
         req.body = {
           requestBody: {
@@ -316,7 +327,7 @@ describe('validateRequest', () => {
           }
         };
         result = validateRequest(requestSchema, req, models, {requestBodyCanHaveTwoContradictorySchemas: false});
-        assertValidationFailed(result, ['id is required']);
+        expectValidationFailed(result, ['id is required']);
       });
     });
   });
@@ -340,7 +351,7 @@ describe('validateRequest', () => {
         someProperty: 'some value'
       };
       let result = validateRequest(requestSchema, req, models);
-      assertValidationPassed(result);
+      expectValidationPassed(result);
     });
 
     it('should not allow a schema to have an invalid "type"', () => {
@@ -358,7 +369,7 @@ describe('validateRequest', () => {
         someProperty: 'some value'
       };
       let result = validateRequest(requestSchema, req, models);
-      assertValidationFailed(result, ['Unknown param type abcdefghijklmnop']);
+      expectValidationFailed(result, ['Unknown param type abcdefghijklmnop']);
     });
 
     it('should allow a schema to declare both a "type" and a "$ref" which contradict each other (legacy behaviour)', () => {
@@ -388,7 +399,7 @@ describe('validateRequest', () => {
         }
       };
       let result = validateRequest(requestSchema, req, models);
-      assertValidationPassed(result);
+      expectValidationPassed(result);
     });
 
     it('should allow a request parameter to declare both a "type" and a "schema" which contradict each other (legacy behaviour)', () => {
@@ -413,7 +424,7 @@ describe('validateRequest', () => {
         someParameter: 'ABC'
       };
       let result = validateRequest(requestSchema, req, models);
-      assertValidationPassed(result);
+      expectValidationPassed(result);
     });
 
     describe('when the validation settings specify that schemas with invalid types are not allowed', () => {
@@ -448,7 +459,7 @@ describe('validateRequest', () => {
 
       it('should return an error when a schema has a "type" which is not one of the types recognized in the OpenAPI spec', () => {
         let result = validateRequest(requestSchema, req, models, {allowSchemasWithInvalidTypesAndTreatThemLikeRefs: false});
-        assertValidationFailed(result, ['Swagger schema is invalid: RequestBody has bad type "SomeModel".  Allowed types are: array, boolean, file, integer, number, string, object']);
+        expectValidationFailed(result, ['Swagger schema is invalid: RequestBody has bad type "SomeModel".  Allowed types are: array, boolean, file, integer, number, string, object']);
       });
 
       describe('when the validation settings specify that an error should be thrown when there is a problem with the swagger schema', () => {
@@ -722,7 +733,7 @@ describe('validateRequest', () => {
 
     function expectValueToCauseError(value, expectedErrorMessage) {
       const result = performValidation(value);
-      assertValidationFailed(result, [expectedErrorMessage]);
+      expectValidationFailed(result, [expectedErrorMessage]);
     }
 
     function expectValueToThrowError(value, expectedErrorMessage) {

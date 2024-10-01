@@ -2,7 +2,7 @@ const moment = require('moment');
 const {expect} = require('chai');
 const {validateRequest} = require('../lib/validation/validateRequest');
 const helper = require('./test_helper');
-const {assertValidationPassed, assertValidationFailed} = helper;
+const {expectValidationPassed, expectValidationFailed} = helper;
 
 describe('paramType - path', function () {
   describe('without models', function () {
@@ -40,7 +40,7 @@ describe('paramType - path', function () {
         }
       };
       var ret = validateRequest(spec, req);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.params.someDate).to.eql(someDateTransformed);
       expect(req.params.someNumber).to.equal(someNumberTransformed);
     });
@@ -74,7 +74,7 @@ describe('paramType - path', function () {
         }
       };
       var ret = validateRequest(spec, req);
-      assertValidationPassed(ret);
+      expectValidationPassed(ret);
       expect(req.params.someDate).to.eql(someDate);
       expect(req.params.someNumber).to.equal(someNumber);
     });
@@ -104,15 +104,15 @@ describe('paramType - path', function () {
     };
 
     let result = validateRequest(requestSchema, req);
-    assertValidationPassed(result);
+    expectValidationPassed(result);
 
     req.params.someParameter = null;
     result = validateRequest(requestSchema, req);
-    assertValidationFailed(result, ['someParameter is required']);
+    expectValidationFailed(result, ['someParameter is required']);
 
     req.params.someParameter = 1;
     result = validateRequest(requestSchema, req);
-    assertValidationFailed(result, ['someParameter is not a type of string']);
+    expectValidationFailed(result, ['someParameter is not a type of string']);
   });
 
   it('should apply a default value if a path parameter is not provided, and a default value is specified for the parameter', function () {
@@ -137,7 +137,7 @@ describe('paramType - path', function () {
     };
 
     const result = validateRequest(requestSchema, req);
-    assertValidationPassed(result);
+    expectValidationPassed(result);
 
     expect(req.params.someParameter).to.eql('someDefaultValue');
   });
@@ -160,7 +160,7 @@ describe('paramType - path', function () {
       params: {}
     };
     const validationResults = validateRequest(spec, req);
-    assertValidationPassed(validationResults);
+    expectValidationPassed(validationResults);
   });
 
   it('should fail validation when a path parameter is required, but no value is present in the request', function () {
@@ -181,6 +181,6 @@ describe('paramType - path', function () {
       params: {}
     };
     const validationResults = validateRequest(spec, req);
-    assertValidationFailed(validationResults, ['someParameter is required']);
+    expectValidationFailed(validationResults, ['someParameter is required']);
   });
 });
