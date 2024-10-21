@@ -274,6 +274,78 @@ describe('validateRequest', () => {
           .to.throw('Incompatible validation settings.  When using the "removeNullValuesFromObjects" setting, you must also enable the "replaceValues" setting because the "removeNullValuesFromObjects" setting will delete object properties.');
       });
     });
+
+    describe('when the validation options specify that null values should be removed from arrays', () => {
+      let validationSettings;
+
+      beforeEach(() => {
+        models.RequestBody = {
+          type: 'object',
+          properties: {
+            ids: {
+              type: 'array',
+              items: {
+                type: 'integer'
+              }
+            }
+          }
+        };
+
+        validationSettings = {
+          replaceValues: true,
+          removeNullValuesFromArrays: true
+        };
+      });
+
+      it('should remove all array items whose value is "null"', () => {
+        req.body = {ids: [null, 1, 2, null, 3, null]};
+        const result = validateRequest(requestSchema, req, models, validationSettings);
+        expectValidationPassed(result);
+        expect(req.body).to.eql({ids: [1, 2, 3]});
+      });
+
+      it('should not remove array items that are "null" when the array items are explicitly marked as nullable in the schema', () => {
+        models.RequestBody.properties.ids.items.nullable = true;
+        req.body = {ids: [null, 1, 2, null, 3, null]};
+        const result = validateRequest(requestSchema, req, models, validationSettings);
+        expectValidationPassed(result);
+        expect(req.body).to.eql({ids: [null, 1, 2, null, 3, null]});
+      });
+
+      it('should remove all array items that are "null" when the "allPropertiesAreNullableByDefault" validation option is enabled', () => {
+        validationSettings.allPropertiesAreNullableByDefault = true;
+
+        req.body = {ids: [null, 1, 2, null, 3, null]};
+        const result = validateRequest(requestSchema, req, models, validationSettings);
+        expectValidationPassed(result);
+        expect(req.body).to.eql({ids: [1, 2, 3]});
+      });
+
+      it('should not remove array items that are "null" and instead return a validation error when the "allPropertiesAreNullableByDefault" validation option is disabled', () => {
+        validationSettings.allPropertiesAreNullableByDefault = false;
+
+        req.body = {ids: [null, 1, 2, null, 3, null]};
+        const result = validateRequest(requestSchema, req, models, validationSettings);
+        expectValidationFailed(result, ["integer cannot be null", "integer cannot be null", "integer cannot be null"]);
+        expect(req.body).to.eql({ids: [null, 1, 2, null, 3, null]});
+      });
+
+      it('should return information about which array items were removed', () => {
+        req.body = {ids: [null, 1, 2, null, 3, null]};
+
+        const result = validateRequest(requestSchema, req, models, validationSettings);
+        expectValidationPassed(result);
+        expect(result.logs).to.be.an.instanceof(ValidationLogs);
+        expect(result.logs.formatNullValuesRemovedFromArrays()).to.eql('ids[0], ids[3], ids[5]');
+      });
+
+      it('should throw an error if the "removeNullValuesFromArrays" validation setting is enabled, but the "replaceValues" setting is not', () => {
+        const validationSettings = {removeNullValuesFromArrays: true, replaceValues: false};
+        req.body = {id: '1'};
+        expect(() => validateRequest(requestSchema, req, models, validationSettings))
+          .to.throw('Incompatible validation settings.  When using the "removeNullValuesFromArrays" setting, you must also enable the "replaceValues" setting because the "removeNullValuesFromArrays" setting will modify the contents of arrays.');
+      });
+    });
   });
 
   describe('empty string handling', () => {
