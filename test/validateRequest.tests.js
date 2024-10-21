@@ -206,6 +206,74 @@ describe('validateRequest', () => {
         expectValidationFailed(result, ["id cannot be null"]);
       });
     });
+
+    describe('when the validation options specify that null values should be removed from objects', () => {
+      let validationSettings;
+
+      beforeEach(() => {
+        validationSettings = {
+          replaceValues: true,
+          removeNullValuesFromObjects: true
+        };
+      });
+
+      it('should remove all properties from an object whose value is "null"', () => {
+        req.body = {id: null, someOtherProperty: null};
+        const result = validateRequest(requestSchema, req, models, validationSettings);
+        expectValidationPassed(result);
+        expect(req.body).to.eql({});
+      });
+
+      it('should not remove a property from an object when the property value is "null" and the value is explicitly marked as nullable in the schema', () => {
+        models.RequestBody.properties.id.nullable = true;
+        req.body = {id: null, someOtherProperty: null};
+        const result = validateRequest(requestSchema, req, models, validationSettings);
+        expectValidationPassed(result);
+        expect(req.body).to.eql({id: null});
+      });
+
+      it('should remove all properties from an object whose value is "null" when the object schema does not have any properties', () => {
+        delete models.RequestBody.properties;
+        req.body = {id: null, someOtherProperty: null};
+        const result = validateRequest(requestSchema, req, models, validationSettings);
+        expectValidationPassed(result);
+        expect(req.body).to.eql({});
+      });
+
+      it('should remove all properties from an object whose value is "null" when the "allPropertiesAreNullableByDefault" validation option is enabled', () => {
+        validationSettings.allPropertiesAreNullableByDefault = true;
+
+        req.body = {id: null, someOtherProperty: null};
+        const result = validateRequest(requestSchema, req, models, validationSettings);
+        expectValidationPassed(result);
+        expect(req.body).to.eql({});
+      });
+
+      it('should not remove a null property from an object and instead return a validation error when the "allPropertiesAreNullableByDefault" validation option is disabled', () => {
+        validationSettings.allPropertiesAreNullableByDefault = false;
+
+        req.body = {id: null};
+        const result = validateRequest(requestSchema, req, models, validationSettings);
+        expectValidationFailed(result, ["id cannot be null"]);
+        expect(req.body).to.eql({id: null});
+      });
+
+      it('should return information about which properties were removed', () => {
+        req.body = {id: null, someOtherProperty: null};
+
+        const result = validateRequest(requestSchema, req, models, validationSettings);
+        expectValidationPassed(result);
+        expect(result.logs).to.be.an.instanceof(ValidationLogs);
+        expect(result.logs.formatNullValuesRemovedFromObjects()).to.eql('id, someOtherProperty');
+      });
+
+      it('should throw an error if the "removeNullValuesFromObjects" validation setting is enabled, but the "replaceValues" setting is not', () => {
+        const validationSettings = {removeNullValuesFromObjects: true, replaceValues: false};
+        req.body = {id: '1'};
+        expect(() => validateRequest(requestSchema, req, models, validationSettings))
+          .to.throw('Incompatible validation settings.  When using the "removeNullValuesFromObjects" setting, you must also enable the "replaceValues" setting because the "removeNullValuesFromObjects" setting will delete object properties.');
+      });
+    });
   });
 
   describe('empty string handling', () => {
