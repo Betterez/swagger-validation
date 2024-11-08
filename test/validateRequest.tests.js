@@ -179,6 +179,25 @@ describe('validateRequest', () => {
       expectValidationFailed(result, ["id cannot be null"]);
     });
 
+    it('should allow a required property of an object to be null when it is explicitly marked as nullable', () => {
+      models = {
+        RequestBody: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {
+              type: 'string',
+              nullable: true
+            }
+          }
+        }
+      };
+
+      req.body = {id: null};
+      const result = validateRequest(requestSchema, req, models);
+      expectValidationPassed(result);
+    });
+
     describe('when the validation options specify that properties are not nullable by default', () => {
       it('should not allow a property to be null by default', () => {
         req.body = {id: null};
