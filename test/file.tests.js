@@ -1,3 +1,4 @@
+const {describe, it, before, after, beforeEach, afterEach} = require('node:test');
 const helper = require('./test_helper');
 const {assertValidationPassed} = helper;
 const {validateParameter} = require('../lib/validation/parameter');

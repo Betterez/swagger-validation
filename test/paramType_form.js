@@ -1,5 +1,6 @@
+const {describe, it, before, after, beforeEach, afterEach} = require('node:test');
 const moment = require('moment');
-const {expect} = require('chai');
+const assert = require('node:assert/strict');
 const {validateRequest} = require('../lib/validation/validateRequest');
 const helper = require('./test_helper');
 const {expectValidationPassed, expectValidationFailed} = helper;
@@ -43,8 +44,8 @@ describe('paramType - form', function () {
       };
       var ret = validateRequest(spec, req, models);
       expectValidationPassed(ret);
-      expect(req.form.someModel.someDate).to.eql(someDateTransformed);
-      expect(req.form.someModel.someString).to.equal(someString);
+      assert.deepStrictEqual(req.form.someModel.someDate, someDateTransformed);
+      assert.strictEqual(req.form.someModel.someString, someString);
     });
 
     it('should handle nested models when converting strings', function () {
@@ -95,8 +96,8 @@ describe('paramType - form', function () {
 
       var ret = validateRequest(spec, req, models);
       expectValidationPassed(ret);
-      expect(req.form.someModel.someDate).to.eql(someDateTransformed);
-      expect(req.form.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
+      assert.deepStrictEqual(req.form.someModel.someDate, someDateTransformed);
+      assert.deepStrictEqual(req.form.someModel.nestedModel.anotherDate, someDateTransformed);
     });
 
     it('should return validation errors', function () {
@@ -174,8 +175,8 @@ describe('paramType - form', function () {
       };
       var ret = validateRequest(spec, req, models);
       expectValidationPassed(ret);
-      expect(req.form.someModel.someDate).to.eql(someDateTransformed);
-      expect(req.form.someModel.someString).to.equal(someString);
+      assert.deepStrictEqual(req.form.someModel.someDate, someDateTransformed);
+      assert.strictEqual(req.form.someModel.someString, someString);
     });
 
     it('should handle nested models when converting strings', function () {
@@ -226,8 +227,8 @@ describe('paramType - form', function () {
 
       var ret = validateRequest(spec, req, models);
       expectValidationPassed(ret);
-      expect(req.form.someModel.someDate).to.eql(someDateTransformed);
-      expect(req.form.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
+      assert.deepStrictEqual(req.form.someModel.someDate, someDateTransformed);
+      assert.deepStrictEqual(req.form.someModel.nestedModel.anotherDate, someDateTransformed);
     });
 
     it('should return validation errors', function () {
@@ -288,7 +289,7 @@ describe('paramType - form', function () {
       };
       var ret = validateRequest(spec, req);
       expectValidationPassed(ret);
-      expect(req.form.someDate).to.eql(someDateTransformed);
+      assert.deepStrictEqual(req.form.someDate, someDateTransformed);
     });
 
     it('should validate spec and not convert strings', function () {
@@ -313,7 +314,7 @@ describe('paramType - form', function () {
       };
       var ret = validateRequest(spec, req);
       expectValidationPassed(ret);
-      expect(req.form.someDate).to.eql(someDate);
+      assert.deepStrictEqual(req.form.someDate, someDate);
     });
   });
 
@@ -338,7 +339,7 @@ describe('paramType - form', function () {
       };
       var ret = validateRequest(spec, req);
       expectValidationPassed(ret);
-      expect(req.form.someDate).to.eql(someDateTransformed);
+      assert.deepStrictEqual(req.form.someDate, someDateTransformed);
     });
 
     it('should validate spec and not convert strings', function () {
@@ -363,7 +364,7 @@ describe('paramType - form', function () {
       };
       var ret = validateRequest(spec, req);
       expectValidationPassed(ret);
-      expect(req.form.someDate).to.eql(someDate);
+      assert.deepStrictEqual(req.form.someDate, someDate);
     });
   });
 
@@ -426,7 +427,7 @@ describe('paramType - form', function () {
     const result = validateRequest(requestSchema, req);
     expectValidationPassed(result);
 
-    expect(req.form.someParameter).to.eql('someDefaultValue');
+    assert.deepStrictEqual(req.form.someParameter, 'someDefaultValue');
   });
 
   it('should allow an optional form parameter to be omitted from the request', () => {

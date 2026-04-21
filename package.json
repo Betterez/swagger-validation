@@ -20,17 +20,12 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test": "mocha",
-    "tdd": "mocha -w",
+    "test": "node --test",
+    "tdd": "node --test --watch",
     "preversion": "npm test",
     "postversion": "git push origin master && git push --tags"
   },
   "dependencies": {
-    "lodash": "4.17.21",
     "moment": "2.30.1"
-  },
-  "devDependencies": {
-    "chai": "4.3.6",
-    "mocha": "10.0.0"
   }
 }

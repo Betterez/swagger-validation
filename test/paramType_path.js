@@ -1,5 +1,6 @@
+const {describe, it, before, after, beforeEach, afterEach} = require('node:test');
 const moment = require('moment');
-const {expect} = require('chai');
+const assert = require('node:assert/strict');
 const {validateRequest} = require('../lib/validation/validateRequest');
 const helper = require('./test_helper');
 const {expectValidationPassed, expectValidationFailed} = helper;
@@ -41,8 +42,8 @@ describe('paramType - path', function () {
       };
       var ret = validateRequest(spec, req);
       expectValidationPassed(ret);
-      expect(req.params.someDate).to.eql(someDateTransformed);
-      expect(req.params.someNumber).to.equal(someNumberTransformed);
+      assert.deepStrictEqual(req.params.someDate, someDateTransformed);
+      assert.strictEqual(req.params.someNumber, someNumberTransformed);
     });
 
     it('should not convert strings', function () {
@@ -75,8 +76,8 @@ describe('paramType - path', function () {
       };
       var ret = validateRequest(spec, req);
       expectValidationPassed(ret);
-      expect(req.params.someDate).to.eql(someDate);
-      expect(req.params.someNumber).to.equal(someNumber);
+      assert.deepStrictEqual(req.params.someDate, someDate);
+      assert.strictEqual(req.params.someNumber, someNumber);
     });
   });
 
@@ -139,7 +140,7 @@ describe('paramType - path', function () {
     const result = validateRequest(requestSchema, req);
     expectValidationPassed(result);
 
-    expect(req.params.someParameter).to.eql('someDefaultValue');
+    assert.deepStrictEqual(req.params.someParameter, 'someDefaultValue');
   });
 
   it('should allow an optional path parameter to be omitted from the request', () => {

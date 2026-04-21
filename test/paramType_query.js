@@ -1,5 +1,6 @@
+const {describe, it, before, after, beforeEach, afterEach} = require('node:test');
 const moment = require('moment');
-const {expect} = require('chai');
+const assert = require('node:assert/strict');
 const {validateRequest} = require('../lib/validation/validateRequest');
 const helper = require('./test_helper');
 const {expectValidationPassed, expectValidationFailed} = helper;
@@ -36,8 +37,8 @@ describe('paramType - query', function () {
       };
       var ret = validateRequest(spec, req);
       expectValidationPassed(ret);
-      expect(req.query.someDate).to.eql(someDateTransformed);
-      expect(req.query.someNumber).to.equal(someNumberTransformed);
+      assert.deepStrictEqual(req.query.someDate, someDateTransformed);
+      assert.strictEqual(req.query.someNumber, someNumberTransformed);
     });
 
     it('should apply a default value to strings', function () {
@@ -65,8 +66,8 @@ describe('paramType - query', function () {
       };
       var ret = validateRequest(spec, req);
       expectValidationPassed(ret);
-      expect(req.query.someDate).to.eql('2014-11-23');
-      expect(req.query.someNumber).to.equal('233.2354');
+      assert.deepStrictEqual(req.query.someDate, '2014-11-23');
+      assert.strictEqual(req.query.someNumber, '233.2354');
     });
 
     it('should not convert strings with date format to Date object', function () {
@@ -100,8 +101,8 @@ describe('paramType - query', function () {
       };
       var ret = validateRequest(spec, req);
       expectValidationPassed(ret);
-      expect(req.query.someDate).to.eql(someDate);
-      expect(req.query.someNumber).to.equal(someNumber);
+      assert.deepStrictEqual(req.query.someDate, someDate);
+      assert.strictEqual(req.query.someNumber, someNumber);
     });
 
     it('should return validation errors if string pattern does not match', function () {
@@ -156,8 +157,8 @@ describe('paramType - query', function () {
       };
       var ret = validateRequest(spec, req);
       expectValidationPassed(ret);
-      expect(req.query.someDate).to.eql(someDateTransformed);
-      expect(req.query.someNumber).to.equal(someNumberTransformed);
+      assert.deepStrictEqual(req.query.someDate, someDateTransformed);
+      assert.strictEqual(req.query.someNumber, someNumberTransformed);
     });
 
     it('should apply a default value to strings', function () {
@@ -185,8 +186,8 @@ describe('paramType - query', function () {
       };
       var ret = validateRequest(spec, req);
       expectValidationPassed(ret);
-      expect(req.query.someDate).to.eql("2014-11-23");
-      expect(req.query.someNumber).to.equal("233.2354");
+      assert.deepStrictEqual(req.query.someDate, "2014-11-23");
+      assert.strictEqual(req.query.someNumber, "233.2354");
     });
 
     it('should allow an optional query parameter to be omitted from the request', () => {
@@ -258,8 +259,8 @@ describe('paramType - query', function () {
       };
       var ret = validateRequest(spec, req);
       expectValidationPassed(ret);
-      expect(req.query.someDate).to.eql(someDate);
-      expect(req.query.someNumber).to.equal(someNumber);
+      assert.deepStrictEqual(req.query.someDate, someDate);
+      assert.strictEqual(req.query.someNumber, someNumber);
     });
 
     it('should return validation errors if string pattern does not match', function () {

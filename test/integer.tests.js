@@ -1,4 +1,5 @@
-const {expect} = require('chai');
+const {describe, it, before, after, beforeEach, afterEach} = require('node:test');
+const assert = require('node:assert/strict');
 const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
 const {validateParameter} = require('../lib/validation/parameter');
@@ -291,7 +292,7 @@ describe('integer', function () {
       });
 
       it('should throw an error when an integer has an unknown format', () => {
-        expect(() => validateParameter({
+        assert.throws(() => validateParameter({
           schema: {
             type: 'integer',
             format: 'int99'
@@ -300,7 +301,7 @@ describe('integer', function () {
           models,
           validationContext,
           validationSettings
-        })).to.throw('Swagger schema is invalid: integer has unsupported format "int99"');
+        }), {message: 'Swagger schema is invalid: integer has unsupported format "int99"'});
       });
     });
   });
@@ -392,7 +393,7 @@ describe('integer', function () {
       });
 
       it('should throw an error when an integer has an unknown format', () => {
-        expect(() => validateParameter({
+        assert.throws(() => validateParameter({
           schema: {
             type: 'integer',
             format: 'int64'
@@ -401,7 +402,9 @@ describe('integer', function () {
           models,
           validationContext,
           validationSettings
-        })).to.throw(`Swagger schema is invalid: integer has format "int64", but integer formats are not supported by this library.  Omit the format and use 'type: "integer"' instead.`);
+        }), {
+          message: `Swagger schema is invalid: integer has format "int64", but integer formats are not supported by this library.  Omit the format and use 'type: "integer"' instead.`
+        });
       });
     });
   });

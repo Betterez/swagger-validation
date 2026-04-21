@@ -1,4 +1,5 @@
-const {expect} = require("chai");
+const {describe, it, before, after, beforeEach, afterEach} = require('node:test');
+const assert = require('node:assert/strict');
 const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
 const {validateParameter} = require('../lib/validation/parameter');
@@ -391,7 +392,7 @@ describe('number', function () {
       });
 
       it('should throw an error when a number has an unknown format', () => {
-        expect(() => validateParameter({
+        assert.throws(() => validateParameter({
           schema: {
             type: 'number',
             format: 'float16'
@@ -400,7 +401,7 @@ describe('number', function () {
           models,
           validationContext,
           validationSettings
-        })).to.throw('Swagger schema is invalid: number has unsupported format "float16"');
+        }), {message: 'Swagger schema is invalid: number has unsupported format "float16"'});
       });
     });
   });
@@ -427,7 +428,7 @@ describe('number', function () {
       });
 
       it('should throw an error when a number has a format', () => {
-        expect(() => validateParameter({
+        assert.throws(() => validateParameter({
           schema: {
             type: 'number',
             format: 'double'
@@ -436,7 +437,9 @@ describe('number', function () {
           models,
           validationContext,
           validationSettings
-        })).to.throw(`Swagger schema is invalid: number has format "double", but number formats are not supported by this library.  Omit the format and use 'type: "number"' instead.`);
+        }), {
+          message: `Swagger schema is invalid: number has format "double", but number formats are not supported by this library.  Omit the format and use 'type: "number"' instead.`
+        });
       });
     });
   });

@@ -1,4 +1,4 @@
-const {expect} = require('chai');
+const assert = require('node:assert/strict');
 const {ValidationContext} = require('../lib/validation/validationContext');
 const {getValidationSettings} = require('../lib/validation/validationSettings');
 
@@ -59,56 +59,57 @@ exports.makeArrayParam = function (required, itemType, itemFormat, itemPattern, 
 
 // helper method to run all the unit test checks when it should succeed
 exports.assertValidationPassed = function (validationResults, values) {
-  expect(validationResults).to.exist;
-  expect(validationResults).to.be.an("array");
-  expect(validationResults.every((result) => !result.hasOwnProperty('error'))).to.be.true;
+  assert.ok(validationResults);
+  assert.ok(Array.isArray(validationResults));
+  assert.strictEqual(validationResults.every((result) => !result.hasOwnProperty('error')), true);
 
   // don't run this for certain checks (like the ones that convert strings to numbers)
   if (values) {
-    expect(values).to.have.length(validationResults.length);
+    assert.strictEqual(values.length, validationResults.length);
 
     for (var i = 0; i < values.length; i++) {
       var param = validationResults[i];
-      expect(param).to.be.an('object');
-      expect(param).to.have.ownProperty('value');
+      assert.ok(param && typeof param === 'object' && !Array.isArray(param));
+      assert.ok(Object.hasOwn(param, 'value'));
 
       var value = param.value;
-      expect(value).to.eql(values[i]);
+      assert.deepStrictEqual(value, values[i]);
     }
   }
 };
 
 // helper method to run all the unit test checks when it should fail
 exports.assertValidationFailed = function (validationResults, expectedErrorMessages) {
-  expect(validationResults).to.exist;
-  expect(validationResults).to.be.an("array");
-  expect(validationResults).to.have.length(expectedErrorMessages.length);
+  assert.ok(validationResults);
+  assert.ok(Array.isArray(validationResults));
+  assert.strictEqual(validationResults.length, expectedErrorMessages.length);
 
   validationResults.forEach((result, index) => {
-    expect(result).to.be.an('object');
-    expect(result.error).to.be.an.instanceof(Error);
-    expect(result.error.message).to.eql(expectedErrorMessages[index]);
-    expect(result.context).to.be.an.instanceof(ValidationContext);
+    assert.ok(result && typeof result === 'object' && !Array.isArray(result));
+    assert.ok(result.error instanceof Error);
+    assert.deepStrictEqual(result.error.message, expectedErrorMessages[index]);
+    assert.ok(result.context instanceof ValidationContext);
   });
 };
 
 exports.expectValidationPassed = function (validationResults) {
-  expect(validationResults).to.haveOwnProperty('errors');
-  expect(validationResults).to.haveOwnProperty('logs');
-  expect(validationResults.errors).to.be.an('array').with.lengthOf(0);
+  assert.ok(Object.hasOwn(validationResults, 'errors'));
+  assert.ok(Object.hasOwn(validationResults, 'logs'));
+  assert.ok(Array.isArray(validationResults.errors));
+  assert.strictEqual(validationResults.errors.length, 0);
 }
 
 exports.expectValidationFailed = function(validationResults, expectedErrorMessages) {
-  expect(validationResults).to.haveOwnProperty('errors');
-  expect(validationResults).to.haveOwnProperty('logs');
-  expect(validationResults.errors).to.be.an('array');
-  expect(validationResults.errors.length).to.be.greaterThan(0);
+  assert.ok(Object.hasOwn(validationResults, 'errors'));
+  assert.ok(Object.hasOwn(validationResults, 'logs'));
+  assert.ok(Array.isArray(validationResults.errors));
+  assert.ok(validationResults.errors.length > 0);
 
   if (expectedErrorMessages) {
-    expect(validationResults.errors.length).to.eql(expectedErrorMessages.length);
+    assert.deepStrictEqual(validationResults.errors.length, expectedErrorMessages.length);
     validationResults.errors.forEach((result, index) => {
-      expect(result.error).to.exist;
-      expect(result.error.message).to.eql(expectedErrorMessages[index]);
+      assert.ok(result.error);
+      assert.deepStrictEqual(result.error.message, expectedErrorMessages[index]);
     });
   }
 }

@@ -1,4 +1,5 @@
-const {expect} = require('chai');
+const {describe, it, before, after, beforeEach, afterEach} = require('node:test');
+const assert = require('node:assert/strict');
 const {validateParameter} = require('../lib/validation/parameter');
 const {ValidationContext} = require("../lib/validation/validationContext");
 const {getValidationSettings} = require("../lib/validation/validationSettings");
@@ -62,8 +63,8 @@ describe('date', () => {
 
     assertValidationPassed(results);
 
-    expect(results[0].value).to.be.a('Date');
-    expect(results[0].value).not.to.eql(new Date(iso8601DateString));
+    assert.ok(results[0].value instanceof Date);
+    assert.notDeepStrictEqual(results[0].value, new Date(iso8601DateString));
   });
 
   describe('invalid dates', () => {

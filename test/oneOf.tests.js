@@ -1,4 +1,5 @@
-const {expect} = require('chai');
+const {describe, it, before, after, beforeEach, afterEach} = require('node:test');
+const assert = require('node:assert/strict');
 const {validateParameter} = require('../lib/validation/parameter');
 const {ValidationContext} = require('../lib/validation/validationContext');
 const {ValidationLogs} = require('../lib/validation/validationLogs');
@@ -56,50 +57,50 @@ describe('oneOf', function () {
       schema.required = false;
       var value = [{}];
       var ret = validateParameter({schema, value, models, validationContext, validationSettings, validationLogs});
-      expect(ret).to.be.an('array');
-      expect(ret).to.have.length(3);
+      assert.ok(Array.isArray(ret));
+      assert.strictEqual(ret.length, 3);
     });
 
     it('should return all errors because is required and wrong type', function () {
       var value = [{}];
       var ret = validateParameter({schema, value, models, validationContext, validationSettings, validationLogs});
-      expect(ret).to.be.an('array');
-      expect(ret).to.have.length(3);
+      assert.ok(Array.isArray(ret));
+      assert.strictEqual(ret.length, 3);
     });
 
     it('should return all errors because is required and empty string', function () {
       var value = "";
       var ret = validateParameter({schema, value, models, validationContext, validationSettings, validationLogs});
-      expect(ret).to.be.an('array');
-      expect(ret).to.have.length(3);
+      assert.ok(Array.isArray(ret));
+      assert.strictEqual(ret.length, 3);
     });
 
     it('should return success because value is integer', function () {
       var value = 0;
       var ret = validateParameter({schema, value, models, validationContext, validationSettings, validationLogs});
-      expect(ret).to.be.an('array');
-      expect(ret).to.have.length(1);
+      assert.ok(Array.isArray(ret));
+      assert.strictEqual(ret.length, 1);
     });
 
     it('should return success because value is integer', function () {
       var value = 0;
       var ret = validateParameter({schema, value, models, validationContext, validationSettings, validationLogs});
-      expect(ret).to.be.an('array');
-      expect(ret).to.have.length(1);
+      assert.ok(Array.isArray(ret));
+      assert.strictEqual(ret.length, 1);
     });
 
     it('should return success because value is string', function () {
       var value = "hi";
       var ret = validateParameter({schema, value, models, validationContext, validationSettings, validationLogs});
-      expect(ret).to.be.an('array');
-      expect(ret).to.have.length(1);
+      assert.ok(Array.isArray(ret));
+      assert.strictEqual(ret.length, 1);
     });
 
     it('should return success because value is boolean', function () {
       var value = false;
       var ret = validateParameter({schema, value, models, validationContext, validationSettings, validationLogs});
-      expect(ret).to.be.an('array');
-      expect(ret).to.have.length(1);
+      assert.ok(Array.isArray(ret));
+      assert.strictEqual(ret.length, 1);
     });
 
     describe('when the validation settings specify that unrecognized properties in objects should be removed', () => {
@@ -141,14 +142,14 @@ describe('oneOf', function () {
         const value = {someUnrecognizedProperty: 'some value'};
         const validationResults = validateParameter({schema, value, models, validationContext, validationSettings, validationLogs});
         assertValidationFailed(validationResults, ['propertyA is required', 'propertyB is required', 'propertyC is required']);
-        expect(value).to.eql({someUnrecognizedProperty: 'some value'});
+        assert.deepStrictEqual(value, {someUnrecognizedProperty: 'some value'});
       });
 
       it('should remove unknown properties from the object when it matches one of the schemas, keeping only those properties which are present in the schema', () => {
         const value = {propertyB: 'B', someUnrecognizedProperty: 'some value'};
         const validationResults = validateParameter({schema, value, models, validationContext, validationSettings, validationLogs});
         assertValidationPassed(validationResults);
-        expect(value).to.eql({propertyB: 'B'});
+        assert.deepStrictEqual(value, {propertyB: 'B'});
       });
     });
   });

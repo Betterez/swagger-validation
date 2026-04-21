@@ -1,4 +1,5 @@
-const {expect} = require('chai');
+const {describe, it, before, after, beforeEach, afterEach} = require('node:test');
+const assert = require('node:assert/strict');
 const {validateRequest} = require('../index');
 const {expectValidationPassed, expectValidationFailed} = require('./test_helper');
 const {ValidationLogs} = require('../lib/validation/validationLogs');
@@ -45,9 +46,9 @@ describe('validateRequest', () => {
       req.body = {id: 1};
       let result = validateRequest(requestSchema, req, models);
       expectValidationFailed(result, ['id is not a type of string']);
-      expect(result.errors[0].context.toLiteral()).to.have.property('dataPath');
-      expect(result.errors[0].context.toLiteral().dataPath).to.eql(['id']);
-      expect(result.errors[0].context.formatDataPath()).to.eql("id");
+      assert.ok(Object.hasOwn(result.errors[0].context.toLiteral(), 'dataPath'));
+      assert.deepStrictEqual(result.errors[0].context.toLiteral().dataPath, ['id']);
+      assert.deepStrictEqual(result.errors[0].context.formatDataPath(), "id");
 
       models = {
         RequestBody: {
@@ -77,18 +78,18 @@ describe('validateRequest', () => {
       req.body = {someNestedObject: {someArray: [1]}};
       result = validateRequest(requestSchema, req, models);
       expectValidationFailed(result, ['1 is not a type of string']);
-      expect(result.errors[0].context.toLiteral()).to.have.property('dataPath');
-      expect(result.errors[0].context.toLiteral().dataPath).to.eql(['someNestedObject', 'someArray', 0]);
-      expect(result.errors[0].context.formatDataPath()).to.eql("someNestedObject.someArray[0]");
+      assert.ok(Object.hasOwn(result.errors[0].context.toLiteral(), 'dataPath'));
+      assert.deepStrictEqual(result.errors[0].context.toLiteral().dataPath, ['someNestedObject', 'someArray', 0]);
+      assert.deepStrictEqual(result.errors[0].context.formatDataPath(), "someNestedObject.someArray[0]");
     });
 
     it('should include the path of the model which failed validation in the result', () => {
       req.body = {id: 1};
       let result = validateRequest(requestSchema, req, models);
       expectValidationFailed(result, ['id is not a type of string']);
-      expect(result.errors[0].context.toLiteral()).to.have.property('modelPath');
-      expect(result.errors[0].context.toLiteral().modelPath).to.eql(['RequestBody']);
-      expect(result.errors[0].context.formatModelPath()).to.eql("RequestBody");
+      assert.ok(Object.hasOwn(result.errors[0].context.toLiteral(), 'modelPath'));
+      assert.deepStrictEqual(result.errors[0].context.toLiteral().modelPath, ['RequestBody']);
+      assert.deepStrictEqual(result.errors[0].context.formatModelPath(), "RequestBody");
 
       models = {
         RequestBody: {
@@ -118,9 +119,9 @@ describe('validateRequest', () => {
       req.body = {someNestedObject: {someArray: [1]}};
       result = validateRequest(requestSchema, req, models);
       expectValidationFailed(result, ['1 is not a type of string']);
-      expect(result.errors[0].context.toLiteral()).to.have.property('modelPath');
-      expect(result.errors[0].context.toLiteral().modelPath).to.eql(['RequestBody', 'ObjectWithArray', 'ArrayOfStrings']);
-      expect(result.errors[0].context.formatModelPath()).to.eql("RequestBody → ObjectWithArray → ArrayOfStrings");
+      assert.ok(Object.hasOwn(result.errors[0].context.toLiteral(), 'modelPath'));
+      assert.deepStrictEqual(result.errors[0].context.toLiteral().modelPath, ['RequestBody', 'ObjectWithArray', 'ArrayOfStrings']);
+      assert.deepStrictEqual(result.errors[0].context.formatModelPath(), "RequestBody → ObjectWithArray → ArrayOfStrings");
     });
   });
 
@@ -240,7 +241,7 @@ describe('validateRequest', () => {
         req.body = {id: null, someOtherProperty: null};
         const result = validateRequest(requestSchema, req, models, validationSettings);
         expectValidationPassed(result);
-        expect(req.body).to.eql({});
+        assert.deepStrictEqual(req.body, {});
       });
 
       it('should not remove a property from an object when the property value is "null" and the value is explicitly marked as nullable in the schema', () => {
@@ -248,7 +249,7 @@ describe('validateRequest', () => {
         req.body = {id: null, someOtherProperty: null};
         const result = validateRequest(requestSchema, req, models, validationSettings);
         expectValidationPassed(result);
-        expect(req.body).to.eql({id: null});
+        assert.deepStrictEqual(req.body, {id: null});
       });
 
       it('should remove all properties from an object whose value is "null" when the object schema does not have any properties', () => {
@@ -256,7 +257,7 @@ describe('validateRequest', () => {
         req.body = {id: null, someOtherProperty: null};
         const result = validateRequest(requestSchema, req, models, validationSettings);
         expectValidationPassed(result);
-        expect(req.body).to.eql({});
+        assert.deepStrictEqual(req.body, {});
       });
 
       it('should remove all properties from an object whose value is "null" when the "allPropertiesAreNullableByDefault" validation option is enabled', () => {
@@ -265,7 +266,7 @@ describe('validateRequest', () => {
         req.body = {id: null, someOtherProperty: null};
         const result = validateRequest(requestSchema, req, models, validationSettings);
         expectValidationPassed(result);
-        expect(req.body).to.eql({});
+        assert.deepStrictEqual(req.body, {});
       });
 
       it('should not remove a null property from an object and instead return a validation error when the "allPropertiesAreNullableByDefault" validation option is disabled', () => {
@@ -274,7 +275,7 @@ describe('validateRequest', () => {
         req.body = {id: null};
         const result = validateRequest(requestSchema, req, models, validationSettings);
         expectValidationFailed(result, ["id cannot be null"]);
-        expect(req.body).to.eql({id: null});
+        assert.deepStrictEqual(req.body, {id: null});
       });
 
       it('should return information about which properties were removed', () => {
@@ -282,15 +283,16 @@ describe('validateRequest', () => {
 
         const result = validateRequest(requestSchema, req, models, validationSettings);
         expectValidationPassed(result);
-        expect(result.logs).to.be.an.instanceof(ValidationLogs);
-        expect(result.logs.formatNullValuesRemovedFromObjects()).to.eql('id, someOtherProperty');
+        assert.ok(result.logs instanceof ValidationLogs);
+        assert.deepStrictEqual(result.logs.formatNullValuesRemovedFromObjects(), 'id, someOtherProperty');
       });
 
       it('should throw an error if the "removeNullValuesFromObjects" validation setting is enabled, but the "replaceValues" setting is not', () => {
         const validationSettings = {removeNullValuesFromObjects: true, replaceValues: false};
         req.body = {id: '1'};
-        expect(() => validateRequest(requestSchema, req, models, validationSettings))
-          .to.throw('Incompatible validation settings.  When using the "removeNullValuesFromObjects" setting, you must also enable the "replaceValues" setting because the "removeNullValuesFromObjects" setting will delete object properties.');
+        assert.throws(() => validateRequest(requestSchema, req, models, validationSettings), {
+          message: 'Incompatible validation settings.  When using the "removeNullValuesFromObjects" setting, you must also enable the "replaceValues" setting because the "removeNullValuesFromObjects" setting will delete object properties.'
+        });
       });
     });
 
@@ -320,7 +322,7 @@ describe('validateRequest', () => {
         req.body = {ids: [null, 1, 2, null, 3, null]};
         const result = validateRequest(requestSchema, req, models, validationSettings);
         expectValidationPassed(result);
-        expect(req.body).to.eql({ids: [1, 2, 3]});
+        assert.deepStrictEqual(req.body, {ids: [1, 2, 3]});
       });
 
       it('should not remove array items that are "null" when the array items are explicitly marked as nullable in the schema', () => {
@@ -328,7 +330,7 @@ describe('validateRequest', () => {
         req.body = {ids: [null, 1, 2, null, 3, null]};
         const result = validateRequest(requestSchema, req, models, validationSettings);
         expectValidationPassed(result);
-        expect(req.body).to.eql({ids: [null, 1, 2, null, 3, null]});
+        assert.deepStrictEqual(req.body, {ids: [null, 1, 2, null, 3, null]});
       });
 
       it('should remove all array items that are "null" when the "allPropertiesAreNullableByDefault" validation option is enabled', () => {
@@ -337,7 +339,7 @@ describe('validateRequest', () => {
         req.body = {ids: [null, 1, 2, null, 3, null]};
         const result = validateRequest(requestSchema, req, models, validationSettings);
         expectValidationPassed(result);
-        expect(req.body).to.eql({ids: [1, 2, 3]});
+        assert.deepStrictEqual(req.body, {ids: [1, 2, 3]});
       });
 
       it('should not remove array items that are "null" and instead return a validation error when the "allPropertiesAreNullableByDefault" validation option is disabled', () => {
@@ -346,7 +348,7 @@ describe('validateRequest', () => {
         req.body = {ids: [null, 1, 2, null, 3, null]};
         const result = validateRequest(requestSchema, req, models, validationSettings);
         expectValidationFailed(result, ["integer cannot be null", "integer cannot be null", "integer cannot be null"]);
-        expect(req.body).to.eql({ids: [null, 1, 2, null, 3, null]});
+        assert.deepStrictEqual(req.body, {ids: [null, 1, 2, null, 3, null]});
       });
 
       it('should return information about which array items were removed', () => {
@@ -354,15 +356,14 @@ describe('validateRequest', () => {
 
         const result = validateRequest(requestSchema, req, models, validationSettings);
         expectValidationPassed(result);
-        expect(result.logs).to.be.an.instanceof(ValidationLogs);
-        expect(result.logs.formatNullValuesRemovedFromArrays()).to.eql('ids[0], ids[3], ids[5]');
+        assert.ok(result.logs instanceof ValidationLogs);
+        assert.deepStrictEqual(result.logs.formatNullValuesRemovedFromArrays(), 'ids[0], ids[3], ids[5]');
       });
 
       it('should throw an error if the "removeNullValuesFromArrays" validation setting is enabled, but the "replaceValues" setting is not', () => {
         const validationSettings = {removeNullValuesFromArrays: true, replaceValues: false};
         req.body = {id: '1'};
-        expect(() => validateRequest(requestSchema, req, models, validationSettings))
-          .to.throw('Incompatible validation settings.  When using the "removeNullValuesFromArrays" setting, you must also enable the "replaceValues" setting because the "removeNullValuesFromArrays" setting will modify the contents of arrays.');
+        assert.throws(() => validateRequest(requestSchema, req, models, validationSettings), {message: 'Incompatible validation settings.  When using the "removeNullValuesFromArrays" setting, you must also enable the "replaceValues" setting because the "removeNullValuesFromArrays" setting will modify the contents of arrays.'});
       });
     });
   });
@@ -407,7 +408,7 @@ describe('validateRequest', () => {
 
         const result = validateRequest(requestSchema, req, models, validationSettings);
         expectValidationPassed(result);
-        expect(req.body).to.eql({id: '1'});
+        assert.deepStrictEqual(req.body, {id: '1'});
       });
 
       it('should return information about which properties were removed', () => {
@@ -416,8 +417,8 @@ describe('validateRequest', () => {
 
         const result = validateRequest(requestSchema, req, models, validationSettings);
         expectValidationPassed(result);
-        expect(result.logs).to.be.an.instanceof(ValidationLogs);
-        expect(result.logs.formatDeletedProperties()).to.eql('someExtraProperty, anotherExtraProperty');
+        assert.ok(result.logs instanceof ValidationLogs);
+        assert.deepStrictEqual(result.logs.formatDeletedProperties(), 'someExtraProperty, anotherExtraProperty');
       });
 
       it('should not remove any unrecognized properties from an object when the schema specifies "additionalProperties: true"', () => {
@@ -428,21 +429,19 @@ describe('validateRequest', () => {
 
         const result = validateRequest(requestSchema, req, models, validationSettings);
         expectValidationPassed(result);
-        expect(req.body).to.eql({id: '1', someExtraProperty: 'some value', anotherExtraProperty: 'another value'});
+        assert.deepStrictEqual(req.body, {id: '1', someExtraProperty: 'some value', anotherExtraProperty: 'another value'});
       });
 
       it('should throw an error if the "removeUnrecognizedPropertiesFromObjects" validation setting is enabled, but the "replaceValues" setting is not', () => {
         const validationSettings = {removeUnrecognizedPropertiesFromObjects: true, replaceValues: false};
         req.body = {id: '1'};
-        expect(() => validateRequest(requestSchema, req, models, validationSettings))
-          .to.throw('Incompatible validation settings.  When using the "removeUnrecognizedPropertiesFromObjects" setting, you must also enable the "replaceValues" setting because the "removeUnrecognizedPropertiesFromObjects" setting will replace values in objects (it will delete object properties).');
+        assert.throws(() => validateRequest(requestSchema, req, models, validationSettings), {message: 'Incompatible validation settings.  When using the "removeUnrecognizedPropertiesFromObjects" setting, you must also enable the "replaceValues" setting because the "removeUnrecognizedPropertiesFromObjects" setting will replace values in objects (it will delete object properties).'});
       });
 
       it('should throw an error if both the "removeUnrecognizedPropertiesFromObjects" validation setting is enabled, and the "objectsCanHaveAnyAdditionalPropertiesByDefault" validation settings is disabled', () => {
         const validationSettings = {removeUnrecognizedPropertiesFromObjects: true, objectsCanHaveAnyAdditionalPropertiesByDefault: false};
         req.body = {id: '1'};
-        expect(() => validateRequest(requestSchema, req, models, validationSettings))
-          .to.throw('Incompatible validation settings.  When disabling the "objectsCanHaveAnyAdditionalPropertiesByDefault" setting, you cannot enable the "removeUnrecognizedPropertiesFromObjects" setting.  Disabling the "objectsCanHaveAnyAdditionalPropertiesByDefault" setting will cause errors to be thrown when an object contains unrecognized properties.  Enabling the "removeUnrecognizedPropertiesFromObjects" setting will cause unrecognized properties to be removed from objects, thereby preventing any errors from being thrown.');
+        assert.throws(() => validateRequest(requestSchema, req, models, validationSettings), {message: 'Incompatible validation settings.  When disabling the "objectsCanHaveAnyAdditionalPropertiesByDefault" setting, you cannot enable the "removeUnrecognizedPropertiesFromObjects" setting.  Disabling the "objectsCanHaveAnyAdditionalPropertiesByDefault" setting will cause errors to be thrown when an object contains unrecognized properties.  Enabling the "removeUnrecognizedPropertiesFromObjects" setting will cause unrecognized properties to be removed from objects, thereby preventing any errors from being thrown.'});
       });
     });
   });
@@ -623,11 +622,10 @@ describe('validateRequest', () => {
 
       describe('when the validation settings specify that an error should be thrown when there is a problem with the swagger schema', () => {
         it('should throw an error when a schema has a "type" which is not one of the types recognized in the OpenAPI spec', () => {
-          expect(() => validateRequest(requestSchema, req, models, {
+          assert.throws(() => validateRequest(requestSchema, req, models, {
             allowSchemasWithInvalidTypesAndTreatThemLikeRefs: false,
             throwErrorsWhenSchemaIsInvalid: true
-          }))
-            .to.throw('Swagger schema is invalid: RequestBody has bad type "SomeModel".  Allowed types are: array, boolean, file, integer, number, string, object');
+          }), {message: 'Swagger schema is invalid: RequestBody has bad type "SomeModel".  Allowed types are: array, boolean, file, integer, number, string, object'});
         });
       });
     });
@@ -647,11 +645,10 @@ describe('validateRequest', () => {
         req.body = {
           someProperty: 'some value'
         };
-        expect(() => validateRequest(requestSchema, req, models, {
+        assert.throws(() => validateRequest(requestSchema, req, models, {
           allowSchemasWithInvalidTypesAndTreatThemLikeObjects: false,
           throwErrorsWhenSchemaIsInvalid: true
-        }))
-          .to.throw('Swagger schema is invalid: RequestBody contains unknown reference to model "abcdefghijklmnop"');
+        }), {message: 'Swagger schema is invalid: RequestBody contains unknown reference to model "abcdefghijklmnop"'});
       });
 
       it('should throw an error when a schema has both a "type" and a "$ref"', () => {
@@ -680,8 +677,7 @@ describe('validateRequest', () => {
             someOtherProperty: 'some value'
           }
         };
-        expect(() => validateRequest(requestSchema, req, models, {throwErrorsWhenSchemaIsInvalid: true}))
-          .to.throw('Swagger schema is invalid: A schema can have either a "type" or a "$ref", but not both.');
+        assert.throws(() => validateRequest(requestSchema, req, models, {throwErrorsWhenSchemaIsInvalid: true}), {message: 'Swagger schema is invalid: A schema can have either a "type" or a "$ref", but not both.'});
       });
 
       it('should throw an error when a schema has a "$ref" that references a model which was not provided in the "models" argument', () => {
@@ -701,8 +697,7 @@ describe('validateRequest', () => {
             someOtherProperty: 'some value'
           }
         };
-        expect(() => validateRequest(requestSchema, req, models, {throwErrorsWhenSchemaIsInvalid: true}))
-          .to.throw('Swagger schema is invalid: RequestBody contains unknown reference to model "SomeModelWhichDoesNotExist"');
+        assert.throws(() => validateRequest(requestSchema, req, models, {throwErrorsWhenSchemaIsInvalid: true}), {message: 'Swagger schema is invalid: RequestBody contains unknown reference to model "SomeModelWhichDoesNotExist"'});
       });
 
       it('should throw an error when a request parameter declares both a "type" and a "schema"', () => {
@@ -726,8 +721,7 @@ describe('validateRequest', () => {
         req.params = {
           someParameter: 'ABC'
         };
-        expect(() => validateRequest(requestSchema, req, models, {throwErrorsWhenSchemaIsInvalid: true}))
-          .to.throw('Swagger schema is invalid: request parameter "someParameter" can have either a "type" or a "schema", but not both.');
+        assert.throws(() => validateRequest(requestSchema, req, models, {throwErrorsWhenSchemaIsInvalid: true}), {message: 'Swagger schema is invalid: request parameter "someParameter" can have either a "type" or a "schema", but not both.'});
       });
     });
   });
@@ -896,7 +890,7 @@ describe('validateRequest', () => {
     }
 
     function expectValueToThrowError(value, expectedErrorMessage) {
-      expect(() => performValidation(value)).to.throw(expectedErrorMessage);
+      assert.throws(() => performValidation(value), {message: expectedErrorMessage});
     }
 
     it('should return errors with the expected error message under a variety of circumstances', () => {

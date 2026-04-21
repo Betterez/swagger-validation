@@ -1,5 +1,6 @@
+const {describe, it, before, after, beforeEach, afterEach} = require('node:test');
 const moment = require('moment');
-const {expect} = require('chai');
+const assert = require('node:assert/strict');
 const {validateRequest} = require('../lib/validation/validateRequest');
 const helper = require('./test_helper');
 const {expectValidationPassed, expectValidationFailed} = helper;
@@ -121,8 +122,8 @@ describe('paramType - body', function () {
       };
       var ret = validateRequest(spec, req, models);
       expectValidationPassed(ret);
-      expect(req.body.someModel.someDate).to.eql(someDateTransformed);
-      expect(req.body.someModel.someString).to.equal(someString);
+      assert.deepStrictEqual(req.body.someModel.someDate, someDateTransformed);
+      assert.strictEqual(req.body.someModel.someString, someString);
     });
 
     it('should handle nested models when converting strings', function () {
@@ -172,8 +173,8 @@ describe('paramType - body', function () {
       };
       var ret = validateRequest(spec, req, models);
       expectValidationPassed(ret);
-      expect(req.body.someModel.someDate).to.eql(someDateTransformed);
-      expect(req.body.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
+      assert.deepStrictEqual(req.body.someModel.someDate, someDateTransformed);
+      assert.deepStrictEqual(req.body.someModel.nestedModel.anotherDate, someDateTransformed);
     });
 
     it('should return validation errors', function () {
@@ -251,8 +252,8 @@ describe('paramType - body', function () {
       };
       var ret = validateRequest(spec, req, models);
       expectValidationPassed(ret);
-      expect(req.body.someModel.someDate).to.eql(someDateTransformed);
-      expect(req.body.someModel.someString).to.equal(someString);
+      assert.deepStrictEqual(req.body.someModel.someDate, someDateTransformed);
+      assert.strictEqual(req.body.someModel.someString, someString);
     });
 
     it('should handle nested models when converting strings', function () {
@@ -302,8 +303,8 @@ describe('paramType - body', function () {
       };
       var ret = validateRequest(spec, req, models);
       expectValidationPassed(ret);
-      expect(req.body.someModel.someDate).to.eql(someDateTransformed);
-      expect(req.body.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
+      assert.deepStrictEqual(req.body.someModel.someDate, someDateTransformed);
+      assert.deepStrictEqual(req.body.someModel.nestedModel.anotherDate, someDateTransformed);
     });
 
     it('should return validation errors', function () {
@@ -364,7 +365,7 @@ describe('paramType - body', function () {
       };
       var ret = validateRequest(spec, req);
       expectValidationPassed(ret);
-      expect(req.body.someDate).to.eql(someDateTransformed);
+      assert.deepStrictEqual(req.body.someDate, someDateTransformed);
     });
 
     it('should validate spec and not convert strings', function () {
@@ -387,7 +388,7 @@ describe('paramType - body', function () {
       };
       var ret = validateRequest(spec, req);
       expectValidationPassed(ret);
-      expect(req.body.someDate).to.eql(someDate);
+      assert.deepStrictEqual(req.body.someDate, someDate);
     });
   });
 
@@ -412,7 +413,7 @@ describe('paramType - body', function () {
       };
       var ret = validateRequest(spec, req);
       expectValidationPassed(ret);
-      expect(req.body.someDate).to.eql(someDateTransformed);
+      assert.deepStrictEqual(req.body.someDate, someDateTransformed);
     });
 
     it('should validate spec and not convert strings', function () {
@@ -435,7 +436,7 @@ describe('paramType - body', function () {
       };
       var ret = validateRequest(spec, req);
       expectValidationPassed(ret);
-      expect(req.body.someDate).to.eql(someDate);
+      assert.deepStrictEqual(req.body.someDate, someDate);
     });
   });
 });

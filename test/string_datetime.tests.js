@@ -1,3 +1,4 @@
+const {describe, it, before, after, beforeEach, afterEach} = require('node:test');
 const moment = require('moment');
 const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;

@@ -1,4 +1,5 @@
-const {expect} = require('chai');
+const {describe, it, before, after, beforeEach, afterEach} = require('node:test');
+const assert = require('node:assert/strict');
 const moment = require('moment');
 const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
@@ -854,9 +855,9 @@ describe('array', function () {
       validationSettings
     });
     assertValidationFailed(result, ['someString is not a type of string']);
-    expect(result[0].context.toLiteral()).to.have.property('dataPath');
-    expect(result[0].context.toLiteral().dataPath).to.eql([1, 'someString']);
-    expect(result[0].context.formatDataPath()).to.eql("[1].someString");
+    assert.ok(Object.hasOwn(result[0].context.toLiteral(), 'dataPath'));
+    assert.deepStrictEqual(result[0].context.toLiteral().dataPath, [1, 'someString']);
+    assert.deepStrictEqual(result[0].context.formatDataPath(), "[1].someString");
 
     models = {
       ArrayContainingStrings: {
@@ -875,8 +876,8 @@ describe('array', function () {
       validationSettings
     });
     assertValidationFailed(result, ['2 is not a type of string']);
-    expect(result[0].context.toLiteral()).to.have.property('dataPath');
-    expect(result[0].context.toLiteral().dataPath).to.eql([1]);
-    expect(result[0].context.formatDataPath()).to.eql("[1]");
+    assert.ok(Object.hasOwn(result[0].context.toLiteral(), 'dataPath'));
+    assert.deepStrictEqual(result[0].context.toLiteral().dataPath, [1]);
+    assert.deepStrictEqual(result[0].context.formatDataPath(), "[1]");
   });
 });

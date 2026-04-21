@@ -1,4 +1,5 @@
-const {expect} = require('chai');
+const {describe, it, before, after, beforeEach, afterEach} = require('node:test');
+const assert = require('node:assert/strict');
 const moment = require('moment');
 const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
@@ -84,19 +85,17 @@ describe('object', () => {
     });
 
     it('should not throw an error when the object schema does not declare any "properties"', () => {
-      it('should not allow a required property to be undefined', () => {
-        const validationResults = validateParameter({
-          schema: {
-            type: 'object',
-            required: [],
-          },
-          value: {},
-          models,
-          validationContext,
-          validationSettings
-        });
-        assertValidationPassed(validationResults);
+      const validationResults = validateParameter({
+        schema: {
+          type: 'object',
+          required: [],
+        },
+        value: {},
+        models,
+        validationContext,
+        validationSettings
       });
+      assertValidationPassed(validationResults);
     });
 
     describe('null value handling', () => {
@@ -2538,9 +2537,9 @@ describe('object', () => {
         validationSettings
       });
       assertValidationFailed(result, ['someProperty is not a type of string']);
-      expect(result[0].context.toLiteral()).to.have.property('dataPath');
-      expect(result[0].context.toLiteral().dataPath).to.eql(['someProperty']);
-      expect(result[0].context.formatDataPath()).to.eql("someProperty");
+      assert.ok(Object.hasOwn(result[0].context.toLiteral(), 'dataPath'));
+      assert.deepStrictEqual(result[0].context.toLiteral().dataPath, ['someProperty']);
+      assert.deepStrictEqual(result[0].context.formatDataPath(), "someProperty");
 
       models = {
         ObjectContainingAnotherObject: {
@@ -2569,9 +2568,9 @@ describe('object', () => {
         validationSettings
       });
       assertValidationFailed(result, ['someProperty is not a type of string']);
-      expect(result[0].context.toLiteral()).to.have.property('dataPath');
-      expect(result[0].context.toLiteral().dataPath).to.eql(['someNestedObject', 'someProperty']);
-      expect(result[0].context.formatDataPath()).to.eql("someNestedObject.someProperty");
+      assert.ok(Object.hasOwn(result[0].context.toLiteral(), 'dataPath'));
+      assert.deepStrictEqual(result[0].context.toLiteral().dataPath, ['someNestedObject', 'someProperty']);
+      assert.deepStrictEqual(result[0].context.formatDataPath(), "someNestedObject.someProperty");
     });
   });
 
@@ -2595,7 +2594,7 @@ describe('object', () => {
       });
 
       it('should throw an error when the object has a "$ref" that refers to an unknown model', () => {
-        expect(() => validateParameter({
+        assert.throws(() => validateParameter({
           schema: {
             $ref: 'SomeUnknownModel'
           },
@@ -2603,11 +2602,11 @@ describe('object', () => {
           models: {},
           validationContext,
           validationSettings
-        })).to.throw('Swagger schema is invalid: Schema contains unknown reference to model "SomeUnknownModel"');
+        }), {message: 'Swagger schema is invalid: Schema contains unknown reference to model "SomeUnknownModel"'});
       });
 
       it('should throw an error when the object has a "type" that refers to an unknown model when the "type" field is used like a "$ref" pointing to another model (legacy behaviour)', () => {
-        expect(() => validateParameter({
+        assert.throws(() => validateParameter({
           schema: {
             type: 'SomeUnknownModel'
           },
@@ -2615,7 +2614,7 @@ describe('object', () => {
           models: {},
           validationContext,
           validationSettings
-        })).to.throw('Swagger schema is invalid: Schema contains unknown reference to model "SomeUnknownModel"');
+        }), {message: 'Swagger schema is invalid: Schema contains unknown reference to model "SomeUnknownModel"'});
       });
     });
   });

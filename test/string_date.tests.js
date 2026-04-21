@@ -1,4 +1,5 @@
-const {expect} = require('chai');
+const {describe, it, before, after, beforeEach, afterEach} = require('node:test');
+const assert = require('node:assert/strict');
 const moment = require('moment');
 const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
@@ -92,7 +93,7 @@ describe('string - date', function () {
       });
 
       it('should throw an error when a string has the "date" format', function () {
-        expect(() => validateParameter({
+        assert.throws(() => validateParameter({
           schema: {
             type: 'string',
             format: 'date'
@@ -101,7 +102,9 @@ describe('string - date', function () {
           models,
           validationContext,
           validationSettings
-        })).to.throw('Swagger schema is invalid: string has "date" format, but this format is unreliable because it parses dates without considering timezones.  Use the "date-time" format instead, or define a "pattern" to validate the format of the date string, and parse it yourself.');
+        }), {
+          message: 'Swagger schema is invalid: string has "date" format, but this format is unreliable because it parses dates without considering timezones.  Use the "date-time" format instead, or define a "pattern" to validate the format of the date string, and parse it yourself.'
+        });
       });
     });
   });

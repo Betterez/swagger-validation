@@ -1,7 +1,8 @@
+const {describe, it, before, after, beforeEach, afterEach} = require('node:test');
 const helper = require('./test_helper');
 const {assertValidationPassed, assertValidationFailed} = helper;
 const {validateParameter} = require('../lib/validation/parameter');
-const {expect} = require('chai');
+const assert = require('node:assert/strict');
 const {ValidationContext} = require('../lib/validation/validationContext');
 const {getValidationSettings} = require('../lib/validation/validationSettings');
 
@@ -290,7 +291,7 @@ describe('string', function () {
       };
       const value = {someString: ''};
       const result = validateParameter({schema, value, models, validationContext, validationSettings});
-      expect(result).to.eql([{value: {someString: ''}}]);
+      assert.deepStrictEqual(result, [{value: {someString: ''}}]);
     });
 
     it('should allow an empty string when a "minLength" of 0 is specified', function () {
@@ -306,7 +307,7 @@ describe('string', function () {
       };
       const value = {someString: ''};
       const result = validateParameter({schema, value, models, validationContext, validationSettings});
-      expect(result).to.eql([{value: {someString: ''}}]);
+      assert.deepStrictEqual(result, [{value: {someString: ''}}]);
     });
 
     it('should not validate an empty string if a minLength greater than 0 is given', function () {
@@ -391,7 +392,7 @@ describe('string', function () {
       });
 
       it('should throw an error when a string has an unknown format', () => {
-        expect(() => validateParameter({
+        assert.throws(() => validateParameter({
           schema: {
             type: 'string',
             format: 'day-of-week'
@@ -400,11 +401,11 @@ describe('string', function () {
           models,
           validationContext,
           validationSettings
-        })).to.throw('Swagger schema is invalid: string has unsupported format "day-of-week"');
+        }), {message: 'Swagger schema is invalid: string has unsupported format "day-of-week"'});
       });
 
       it('should throw an error when a string has a "pattern" which is not a string', () => {
-        expect(() => validateParameter({
+        assert.throws(() => validateParameter({
           schema: {
             type: 'string',
             pattern: /.*/,
@@ -413,11 +414,11 @@ describe('string', function () {
           models,
           validationContext,
           validationSettings
-        })).to.throw('Swagger schema is invalid: bad regular expression "/.*/".  Regular expressions must be provided as a string, and must have correct syntax')
+        }), {message: 'Swagger schema is invalid: bad regular expression "/.*/".  Regular expressions must be provided as a string, and must have correct syntax'});
       });
 
       it('should throw an error when a string has a "pattern" which is not a parseable regular expression', () => {
-        expect(() => validateParameter({
+        assert.throws(() => validateParameter({
           schema: {
             type: 'string',
             pattern: '****',
@@ -426,7 +427,7 @@ describe('string', function () {
           models,
           validationContext,
           validationSettings
-        })).to.throw(`Swagger schema is invalid: bad regular expression "'****'".  Regular expressions must be provided as a string, and must have correct syntax`);
+        }), {message: `Swagger schema is invalid: bad regular expression "'****'".  Regular expressions must be provided as a string, and must have correct syntax`});
       });
     });
   });

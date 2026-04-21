@@ -5,10 +5,12 @@
 This module validates a request from a swagger-node-express application using the existing swagger-node-express objects,
 parameters, and models following the [swagger specification 1.2](https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md). 
 It returns an array of JavaScript Error objects if there are any validation errors. For now,
-it only uses the message property of the Error object which, using lo-dash or Underscore.js, can be got easily via 
+it only uses the message property of the Error object which can be extracted with:
 
 ```javascript
-var errors = _.pluck(_.pluck([VALIDATION RETURN], 'error'), 'message');)
+var errors = [VALIDATION RETURN]
+  .map((result) => result.error)
+  .map((error) => error.message);
 ```
 
 ## Installation
@@ -41,7 +43,9 @@ against the parameters specified automatically.
 swagger.addMiddleware(function(req, res, spec, models) {
   var ret = validate(spec, req, models);
   if(ret.length) {
-    var errors = _.pluck(_.pluck(ret, 'error'), 'message');
+    var errors = ret
+      .map((result) => result.error)
+      .map((error) => error.message);
     var message = 'validation failure - ' + errors.join();
     return { 'code' : 400, 'message': message };
   }
@@ -102,11 +106,12 @@ exports.findById = {
     
     const validate = require('swagger-validation');
     const models = require('./models.js');
-    const _ = require('lodash');
     // models are only needed if this is intended to validate an object
     var ret = validate(exports.findById.spec, req, models); 
     if(ret.length) {
-      var errors = _.pluck(_.pluck(ret, 'error'), 'message');
+      var errors = ret
+        .map((result) => result.error)
+        .map((error) => error.message);
       res.send(JSON.stringify({
         'message': 'validation failure - ' + errors.join(),
         'code': 400
@@ -157,13 +162,14 @@ exports.findById = {
 // put this somewhere else, either in the same file or put it in a 
 // separate module using the standard module.exports Node convention
 const validate = require('swagger-validation');
-const _ = require('lodash');
 const models = require('./models.js');
 
 function validateReq(req, res, spec, func) {
   var ret = validate(spec, req, models);
   if(ret.length) {
-    var errors = _.pluck(_.pluck(ret, 'error'), 'message');
+    var errors = ret
+      .map((result) => result.error)
+      .map((error) => error.message);
     res.send(JSON.stringify({
       'message': 'validation failure - ' + errors.join(),
       'code': 400
@@ -195,7 +201,9 @@ This **will** be deprecated / removed once the pull request specified above gets
       const validate = require('swagger-validation');
       var ret = validate(spec, req, self.allModels);
       if(ret.length) {
-        var errors = _.pluck(_.pluck(ret, 'error'), 'message');
+        var errors = ret
+          .map((result) => result.error)
+          .map((error) => error.message);
         res.send(JSON.stringify({
           'message': 'validation failure - ' + errors.join(),
           'code': 400

@@ -1,5 +1,6 @@
+const {describe, it, before, after, beforeEach, afterEach} = require('node:test');
 const moment = require('moment');
-const {expect} = require('chai');
+const assert = require('node:assert/strict');
 const {validateAgainstSchema} = require('../lib/validation/validateAgainstSchema');
 const {expectValidationPassed, expectValidationFailed} = require('./test_helper');;
 
@@ -74,8 +75,8 @@ describe("validateAgainstSchema()", function () {
       const ret = validateAgainstSchema(spec, object, models);
       expectValidationPassed(ret);
 
-      expect(object.someModel.someDate).to.eql(someDateTransformed);
-      expect(object.someModel.someString).to.equal(someString);
+      assert.deepStrictEqual(object.someModel.someDate, someDateTransformed);
+      assert.strictEqual(object.someModel.someString, someString);
     });
 
     it("should handle nested models when converting strings", function () {
@@ -99,8 +100,8 @@ describe("validateAgainstSchema()", function () {
       const ret = validateAgainstSchema(spec, object, models);
       expectValidationPassed(ret);
 
-      expect(object.someModel.someDate).to.eql(someDateTransformed);
-      expect(object.someModel.nestedModel.anotherDate).to.eql(someDateTransformed);
+      assert.deepStrictEqual(object.someModel.someDate, someDateTransformed);
+      assert.deepStrictEqual(object.someModel.nestedModel.anotherDate, someDateTransformed);
     });
 
     it("should return validation errors", function () {
@@ -140,7 +141,7 @@ describe("without models", function () {
     };
     const ret = validateAgainstSchema(spec, object);
     expectValidationPassed(ret);
-    expect(object.someDate).to.eql(someDateTransformed);
+    assert.deepStrictEqual(object.someDate, someDateTransformed);
   });
 
   it("should validate spec and not convert strings", function () {
@@ -163,6 +164,6 @@ describe("without models", function () {
     const ret = validateAgainstSchema(spec, object);
     expectValidationPassed(ret);
 
-    expect(object.someDate).to.eql(someDate);
+    assert.deepStrictEqual(object.someDate, someDate);
   });
 });
