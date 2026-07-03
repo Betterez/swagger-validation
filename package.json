@@ -23,7 +23,8 @@
     "test": "node --test",
     "tdd": "node --test --watch",
     "preversion": "npm test",
-    "postversion": "git push origin master && git push --tags"
+    "postversion": "git push origin master && git push --tags",
+    "prepare": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "moment": "2.30.1"
